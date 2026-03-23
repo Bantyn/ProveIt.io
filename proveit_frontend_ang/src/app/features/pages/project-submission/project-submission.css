@@ -1,0 +1,4 @@
+.selection\:bg-\(-\-dd-blue\)\/50 *::selection {
+    background-color: rgb(8 102 255 / 0.5);
+    color: white;
+}

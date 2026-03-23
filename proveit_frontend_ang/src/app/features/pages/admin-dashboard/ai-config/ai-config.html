@@ -1,0 +1,162 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+  <div>
+    <h1
+      class="text-3xl font-extrabold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+      AI Configuration</h1>
+    <p class="text-[13px] text-black mt-1 font-medium">Rate limits, usage tracking and AI engine parameters</p>
+  </div>
+  <div class="flex gap-3">
+    <button
+      class="px-5 py-2.5 rounded-full font-bold text-[13px] bg-slate-100 text-slate-600 border-none cursor-pointer hover:bg-slate-200 transition-colors">
+      Live Analytics
+    </button>
+  </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 mb-8">
+  <!-- Monitored Users -->
+  <div
+    class="stat-card relative overflow-hidden rounded-3xl h-[140px] flex shadow-sm cursor-pointer group bg-[#D8B4FE]">
+    <div class="relative z-10 flex flex-col justify-center pl-6 w-[60%]">
+      <p class="text-[14px] font-bold text-slate-800/60">Monitored Users</p>
+      <div class="text-[2.2rem] font-black mt-1 text-slate-900">{{ data.aiRateLimits.length }}</div>
+    </div>
+    <div class="stat-bg-right absolute top-0 -right-[15%] w-[65%] h-full z-0 bg-[#E9D5FF]"></div>
+    <div class="stat-icon absolute right-8 top-1/2 -translate-y-1/2 z-10 drop-shadow-sm">
+      <i class="bi bi-cpu-fill text-[4rem] opacity-20 group-hover:opacity-40 transition-opacity"></i>
+    </div>
+  </div>
+
+  <!-- Limit Hit Today -->
+  <div
+    class="stat-card relative overflow-hidden rounded-3xl h-[140px] flex shadow-sm cursor-pointer group bg-[#FDA4AF]">
+    <div class="relative z-10 flex flex-col justify-center pl-6 w-[60%]">
+      <p class="text-[14px] font-bold text-slate-800/60">Limits Hit</p>
+      <div class="text-[2.2rem] font-black mt-1 text-slate-900">{{ limitHitCount }}</div>
+    </div>
+    <div class="stat-bg-right absolute top-0 -right-[15%] w-[65%] h-full z-0 bg-[#FECDD3]"></div>
+    <div class="stat-icon absolute right-8 top-1/2 -translate-y-1/2 z-10 drop-shadow-sm">
+      <i class="bi bi-exclamation-triangle text-[4rem] opacity-20 group-hover:opacity-40 transition-opacity"></i>
+    </div>
+  </div>
+
+  <!-- Total AI Calls -->
+  <div
+    class="stat-card relative overflow-hidden rounded-3xl h-[140px] flex shadow-sm cursor-pointer group bg-[#93C5FD]">
+    <div class="relative z-10 flex flex-col justify-center pl-6 w-[60%]">
+      <p class="text-[14px] font-bold text-slate-800/60">Total Calls</p>
+      <div class="text-[2.2rem] font-black mt-1 text-slate-900">{{ totalUsage }}</div>
+    </div>
+    <div class="stat-bg-right absolute top-0 -right-[15%] w-[65%] h-full z-0 bg-[#BFDBFE]"></div>
+    <div class="stat-icon absolute right-8 top-1/2 -translate-y-1/2 z-10 drop-shadow-sm">
+      <i class="bi bi-lightning-charge-fill text-[4rem] opacity-20 group-hover:opacity-40 transition-opacity"></i>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-8 overflow-x-auto relative">
+  <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-50 rounded-full blur-3xl opacity-40"></div>
+
+  <div class="flex items-center gap-3 mb-6 relative z-10">
+    <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg shadow-sm">
+      <i class="bi bi-activity"></i>
+    </div>
+    <h2 class="text-[16px] font-bold text-slate-900">AI Real-time Usage per User</h2>
+  </div>
+
+  <table class="w-full border-collapse text-[13px] text-left whitespace-nowrap relative z-10">
+    <thead>
+      <tr>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-bold pr-4">User ID</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-bold pr-4">Active Plan</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-bold pr-4">Daily Consumption</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-bold pr-4">Quota</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-bold pr-4">Total Life</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-bold pr-4 text-right">Node Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of data.aiRateLimits" class="group hover:bg-slate-50/50 transition-colors">
+        <td class="py-4 border-b border-slate-50 font-mono text-[11px] text-slate-500 pr-4">{{ r.userId }}</td>
+        <td class="py-4 border-b border-slate-50 pr-4">
+          <span
+            class="text-[12px] font-bold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100">{{
+            r.plan }}</span>
+        </td>
+        <td class="py-4 border-b border-slate-50 pr-4">
+          <div class="flex items-center gap-3">
+            <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+              <div class="h-full transition-all duration-700" [style.width.%]="(r.usageToday / r.limitPerDay) * 100"
+                [ngClass]="r.usageToday >= r.limitPerDay ? 'bg-rose-500' : 'bg-linear-to-r from-blue-400 to-(--dd-blue)'">
+              </div>
+            </div>
+            <span class="text-[11px] font-black text-slate-700">{{ r.usageToday }}</span>
+          </div>
+        </td>
+        <td class="py-4 border-b border-slate-50 font-bold text-slate-400 pr-4">{{ r.limitPerDay }}</td>
+        <td class="py-4 border-b border-slate-50 font-bold text-slate-700 pr-4">{{ r.totalUsage }}</td>
+        <td class="py-4 border-b border-slate-50 text-right">
+          <span class="text-[12px] font-bold px-3 py-1 rounded-lg shadow-sm"
+            [ngClass]="r.status === 'limit_hit' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'">{{
+            r.status === 'limit_hit' ? 'Exhausted' : 'Operational' }}</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
+  <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-50 rounded-full blur-3xl opacity-60"></div>
+
+  <div class="flex items-center gap-3 mb-6 relative z-10">
+    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg shadow-sm">
+      <i class="bi bi-sliders"></i>
+    </div>
+    <h2 class="text-[16px] font-bold text-slate-900">Control Plane Settings</h2>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[13px] font-bold text-slate-500 ml-1">Free Plan Daily Limit</label>
+      <div class="relative">
+        <i class="bi bi-shield absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input
+          class="w-full border-[1.5px] border-slate-100 bg-slate-50 rounded-2xl pl-11 pr-4 py-3 text-[13px] font-semibold outline-none transition-all focus:border-purple-500 focus:bg-white focus:shadow-lg focus:shadow-purple-50"
+          type="number" value="20" />
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[13px] font-bold text-slate-500 ml-1">Plus Plan Daily Limit</label>
+      <div class="relative">
+        <i class="bi bi-shield-plus absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input
+          class="w-full border-[1.5px] border-slate-100 bg-slate-50 rounded-2xl pl-11 pr-4 py-3 text-[13px] font-semibold outline-none transition-all focus:border-purple-500 focus:bg-white focus:shadow-lg focus:shadow-purple-50"
+          type="number" value="50" />
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[13px] font-bold text-slate-500 ml-1">Pro Plan Daily Limit</label>
+      <div class="relative">
+        <i class="bi bi-shield-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input
+          class="w-full border-[1.5px] border-slate-100 bg-slate-50 rounded-2xl pl-11 pr-4 py-3 text-[13px] font-semibold outline-none transition-all focus:border-purple-500 focus:bg-white focus:shadow-lg focus:shadow-purple-50"
+          type="number" value="200" />
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[13px] font-bold text-slate-500 ml-1">Engine Core Model</label>
+      <div class="relative">
+        <i class="bi bi-robot absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input
+          class="w-full border-[1.5px] border-slate-100 bg-slate-50 rounded-2xl pl-11 pr-4 py-3 text-[13px] font-semibold outline-none transition-all focus:border-purple-500 focus:bg-white focus:shadow-lg focus:shadow-purple-50"
+          value="gpt-4o-mini" />
+      </div>
+    </div>
+  </div>
+
+  <button
+    class="w-full mt-8 bg-linear-to-r from-(--dd-blue) to-(--dd-blue-dark) text-white font-black text-[14px] py-4 rounded-2xl transition-all hover:scale-[1.01] hover:shadow-xl hover:shadow-(--dd-blue-light)/40 active:scale-95 shadow-lg tracking-wide">
+    Deploy Updated Parameters
+  </button>
+</div>

@@ -1,0 +1,219 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+    <div>
+        <h1
+            class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+            Company Dashboard</h1>
+        <p class="text-[13px] text-black mt-1 font-medium">
+            Welcome back, <span class="text-gray-800">{{ companyName }}</span> | {{ planName || 'Pro' }} Plan
+        </p>
+    </div>
+    <a routerLink="/company/dashboard/competitions/create"
+        class="group relative inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-sm tracking-wide text-white bg-linear-to-r from-(--dd-blue-dark) via-(--dd-orange) to-(--dd-yellow) shadow-lg shadow-orange-200/40 transition-all duration-300 hover:scale-[1.03] no-underline"
+        [class.opacity-50]="companyProfile && !companyProfile.isProfileCompleted">
+        <span class="relative z-10 flex items-center gap-2">
+            <i class="bi bi-plus-circle"></i> New Competition
+        </span>
+    </a>
+</div>
+
+<div class="bg-amber-50 border-[1.5px] border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-4 animate-fade-in"
+    *ngIf="companyProfile && !companyProfile.isProfileCompleted">
+    <div
+        class="w-11 h-11 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0 border-2 border-white shadow-sm">
+        <i class="bi bi-exclamation-circle-fill text-xl"></i>
+    </div>
+    <div class="flex-1">
+        <h4 class="text-sm font-semibold text-amber-800 m-0">Action Required: Complete Company Profile</h4>
+        <p class="text-[12px] text-amber-700 mt-1.5 leading-relaxed max-w-2xl">
+            Your organization profile is currently incomplete. To maintain platform quality and provide clarity to
+            candidates, we require all companies to fill in their details before creating competitions. Please visit
+            the <b>Settings</b> section to complete your profile.
+        </p>
+        <button routerLink="../settings"
+            class="mt-3 bg-amber-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-lg border-none cursor-pointer transition-colors hover:bg-amber-700">
+            Go to Settings
+        </button>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="premium-loader">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading Dashboard...</div>
+</div>
+
+<div *ngIf="!isLoading">
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
+        <app-stats-card *ngFor="let s of stats"
+            [icon]="s.icon === 'bi-people-fill' ? 'users' : s.icon === 'bi-buildings' ? 'building-2' : s.icon === 'bi-trophy-fill' ? 'trophy' : 'layers'"
+            [title]="s.label"
+            [metric]="s.value"
+            [subtext]="s.label === 'Total Applicants' ? 'Cumulative talent pool' : 'Across all competitions'"
+            [decimals]="0">
+        </app-stats-card>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        <div class="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 shadow-sm border border-neutral-100 dark:border-neutral-800 relative overflow-hidden group h-full">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">Application Trends</h2>
+                    <p class="text-[13px] text-slate-500 font-semibold m-0 mt-1">Daily application submissions</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-(--dd-orange)"></span>
+                    <span class="text-[12px] font-semibold text-slate-600">Applications</span>
+                </div>
+            </div>
+            <div class="h-[250px]">
+                <app-area-chart
+                    [data]="applicationData"
+                    [labels]="chartLabels"
+                    label="Daily Applications"
+                    primaryColor="#f97316">
+                </app-area-chart>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 shadow-sm border border-neutral-100 dark:border-neutral-800 relative overflow-hidden group h-full">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">User Engagement</h2>
+                    <p class="text-[13px] text-slate-500 font-semibold m-0 mt-1">Participant interaction levels</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-(--dd-blue)"></span>
+                    <span class="text-[12px] font-semibold text-slate-600">Engagement</span>
+                </div>
+            </div>
+            <div class="h-[250px]">
+                <app-area-chart
+                    [data]="competitionEngagement"
+                    [labels]="chartLabels"
+                    label="User Engagement"
+                    primaryColor="#2563eb">
+                </app-area-chart>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-orange-100 rounded-full blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-[15px] font-bold text-slate-900">Recent Competitions</h2>
+                <a routerLink="/company/dashboard/competitions"
+                    class="text-xs text-(--dd-orange) font-semibold no-underline hover:underline cursor-pointer">View
+                    All</a>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button
+                    *ngFor="let c of recentComps"
+                    type="button"
+                    (click)="viewApplications(c)"
+                    class="group w-full text-left p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-start justify-between gap-4 transition-all duration-300 hover:bg-white hover:shadow-sm hover:border-(--dd-blue)/20"
+                >
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[13px] font-semibold text-slate-900 truncate">{{ c.title }}</p>
+                        <div class="flex flex-wrap gap-1.5 mt-2 font-semibold" *ngIf="c.skills?.length">
+                            <span class="text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full"
+                                *ngFor="let s of c.skills.slice(0, 3)">{{ s }}</span>
+                        </div>
+                        <div class="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 font-semibold">
+                                <i class="bi bi-people"></i>
+                                {{ c.applicants || 0 }} applicants
+                            </span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 font-semibold">
+                                <i class="bi bi-calendar-event"></i>
+                                Deadline {{ formatDate(c.deadline) }}
+                            </span>
+                        </div>
+                    </div>
+                    <span
+                        class="text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap tracking-wider uppercase"
+                        [ngClass]="getStatusClass(c.status)">
+                        {{ formatStatus(c.status) }}
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-[15px] font-semibold text-slate-900">Recent Applications</h2>
+                <a routerLink="/company/dashboard/applications"
+                    class="text-xs text-(--dd-orange) font-semibold no-underline hover:underline cursor-pointer">View
+                    All</a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-[13px] text-left whitespace-nowrap">
+                    <thead>
+                        <tr>
+                            <th class="text-slate-400 text-[11px] pb-3 border-b border-slate-100 font-semibold pr-4">
+                                Candidate</th>
+                            <th class="text-slate-400 text-[11px] pb-3 border-b border-slate-100 font-semibold pr-4">
+                                Competition</th>
+                            <th class="text-slate-400 text-[11px] pb-3 border-b border-slate-100 font-semibold pr-4">
+                                Score</th>
+                            <th class="text-slate-400 text-[11px] pb-3 border-b border-slate-100 font-semibold pr-4">
+                                Rank</th>
+                            <th class="text-slate-400 text-[11px] pb-3 border-b border-slate-100 font-semibold pr-4">
+                                Submitted</th>
+                            <th class="text-slate-400 text-[11px] pb-3 border-b border-slate-100 font-semibold pr-4">
+                                Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-medium">
+                        <tr *ngFor="let a of recentApps">
+                            <td class="font-semibold text-slate-800 py-3 pr-4">{{ a.candidateName }}</td>
+                            <td class="py-3 text-slate-600 max-w-[220px] truncate pr-4">{{ a.competitionTitle }}</td>
+                            <td class="py-3 pr-4">
+                                <span class="font-semibold text-xs px-2.5 py-1 rounded-full"
+                                    [ngClass]="getScoreClass(a.score)">
+                                    {{ a.score }}
+                                </span>
+                            </td>
+                            <td class="py-3 font-medium text-slate-600 pr-4">
+                                {{ a.rank === '-' ? '—' : '#' + a.rank }}
+                            </td>
+                            <td class="py-3 text-slate-500 pr-4">{{ formatSubmittedAt(a.submittedAt) }}</td>
+                            <td class="py-3">
+                                <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap"
+                                    [ngClass]="getStatusClass(a.status)">
+                                    {{ formatStatus(a.status) }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="recentApps.length === 0">
+                            <td colspan="6" class="text-center py-6 text-slate-400 text-sm">No recent applications found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div
+    class="bg-linear-to-r from-gray-900 to-slate-800 rounded-3xl p-6 shadow-lg mt-8 flex items-center gap-5 flex-wrap relative overflow-hidden text-white">
+    <div
+        class="absolute inset-0 bg-linear-to-r from-(--dd-blue)/20 via-(--dd-orange)/10 to-(--dd-yellow)/20 blur-xl">
+    </div>
+    <div class="relative text-3xl text-(--dd-yellow) bg-white/10 p-4 rounded-2xl backdrop-blur-sm">
+        <i class="bi bi-gem gap-2 flex items-center"></i>
+    </div>
+    <div class="flex-1 relative">
+        <h3 class="text-xl font-bold">{{ planName || 'Pro' }} Plan</h3>
+        <p class="text-sm text-gray-300 mt-1">
+            Renews on <strong class="text-white font-semibold">{{ subEndDate || '8 Jan 2026' }}</strong> | ₹{{ (planPrice | number) || '12,999' }}/year |
+            {{ planLimit === 999 ? 'Unlimited' : (planLimit || 20) }} Active Competitions allowed
+        </p>
+    </div>
+    <a routerLink="/company/dashboard/billing"
+        class="relative bg-white/10 border border-white/20 hover:bg-white text-white hover:text-gray-900 font-bold text-sm px-6 py-3 rounded-full cursor-pointer inline-flex items-center transition-all duration-300 shadow-md no-underline backdrop-blur-sm">
+        Manage Billing
+    </a>
+</div>

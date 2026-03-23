@@ -1,0 +1,250 @@
+<!-- ================= HEADER ================= -->
+<header>
+    <app-navbar
+        [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+</header>
+<div class="min-h-screen flex flex-col pt-30 bg-slate-50/30">
+    <div class="flex-grow max-w-[90%] mx-auto w-full mb-20">
+
+        <section class="mt-10">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div>
+                    <h1 class="text-[22px] md:text-[28px] font-bold  text-slate-900">Apply for {{ competition?.title ||
+                        competition?.name || 'Competition' }}</h1>
+                    <p class="text-[13px] md:text-[15px] text-slate-500 mt-0.5">Submit your application to participate
+                        in this challenge.</p>
+                </div>
+                <a [routerLink]="['/user/compition', competitionId]"
+                    class="text-md font-semibold px-4 py-2 rounded-xl bg-white border border-slate-200 text-black no-underline hover:bg-slate-50 transition-all shadow-sm">
+                    <i class="bi bi-arrow-left mr-1"></i> Back to Details
+                </a>
+            </div>
+
+            <div *ngIf="loading"
+                class="flex flex-col items-center justify-center p-20 bg-white border border-slate-100 rounded-3xl shadow-sm">
+                <app-morph-loading size="md"></app-morph-loading>
+                <p class="mt-4 text-slate-600 font-medium">Loading details...</p>
+            </div>
+
+            <div class="p-6 md:p-10" *ngIf="!loading && competition">
+                <form [formGroup]="applyForm" (ngSubmit)="onSubmit()">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <!-- Left Col -->
+                        <div class="md:col-span-2 flex flex-col gap-8">
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-md font-semibold text-black ml-1">Candidate Name</label>
+                                <input
+                                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/30 outline-none bg-slate-50 text-slate-600 font-medium"
+                                    [value]="mongoUser?.fullName || user?.displayName || 'Unknown Name'" disabled />
+                            </div>
+
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-md font-semibold text-black ml-1">Candidate Email</label>
+                                <input
+                                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/30 outline-none bg-slate-50 text-slate-600 font-medium"
+                                    [value]="mongoUser?.email || user?.email || 'Unknown Email'" disabled />
+                            </div>
+
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-md font-semibold text-black ml-1">Cover Letter / Note <span
+                                        class="text-rose-500">*</span></label>
+                                <textarea
+                                    class="w-full py-5 px-5 rounded-3xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 min-h-[160px] resize-none"
+                                    placeholder="Why are you a good fit for this competition or hiring role? Describe your motivation..."
+                                    formControlName="feedback"></textarea>
+                                <span class="text-xs text-rose-500 ml-2 mt-1 font-medium"
+                                    *ngIf="applyForm.get('feedback')?.touched && applyForm.get('feedback')?.hasError('required')">
+                                    This field is required.
+                                </span>
+                                <span class="text-xs text-rose-500 ml-2 mt-1 font-medium"
+                                    *ngIf="applyForm.get('feedback')?.touched && applyForm.get('feedback')?.hasError('minlength')">
+                                    Please provide a more detailed note (minimum 20 characters).
+                                </span>
+                            </div>
+                            <div class="flex flex-col gap-6 mt-4">
+                                <div class="border-t border-slate-100 pt-8">
+                                    <h3 class="text-lg font-bold text-slate-900 mb-5 flex items-center gap-2">
+                                        <i class="bi bi-question-circle text-[var(--dd-blue)]"></i>
+                                        Frequently Asked Questions
+                                    </h3>
+                                    <div class="grid grid-cols-1 gap-4">
+                                        <div class="p-5 rounded-2xl bg-slate-50/50 border border-slate-100">
+                                            <h4 class="text-sm font-bold text-slate-800 mb-1">How are winners selected?
+                                            </h4>
+                                            <p class="text-sm text-slate-500 leading-relaxed">Submissions are evaluated
+                                                based on creativity, technical execution, and adherence to the
+                                                competition brief by a panel of industry experts.</p>
+                                        </div>
+                                        <div class="p-5 rounded-2xl bg-slate-50/50 border border-slate-100">
+                                            <h4 class="text-sm font-bold text-slate-800 mb-1">Is there a participation
+                                                fee?</h4>
+                                            <p class="text-sm text-slate-500 leading-relaxed">Most competitions on
+                                                ProveIt are free to enter unless specified otherwise in the competition
+                                                details.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="border-t border-slate-100 pt-8">
+                                    <h3 class="text-lg font-bold text-slate-900 mb-5 flex items-center gap-2">
+                                        <i class="bi bi-chat-left-quote text-[var(--dd-blue)]"></i>
+                                        Candidate Reviews
+                                    </h3>
+                                    <div class="space-y-4">
+                                        <div class="p-6 rounded-2xl border border-slate-100 bg-white shadow-sm">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-[var(--dd-blue)] font-bold">
+                                                        AS</div>
+                                                    <div>
+                                                        <p class="text-sm font-bold text-slate-900">Alex Smith</p>
+                                                        <p class="text-xs text-slate-400">Previous Participant</p>
+                                                    </div>
+                                                </div>
+                                                <div class="flex text-amber-400 text-xs gap-0.5">
+                                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
+                                                        class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
+                                                        class="bi bi-star-fill"></i>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-slate-600 leading-relaxed italic">"Participating in
+                                                the last challenge hosted by this company was a game-changer for my
+                                                portfolio. Highly recommend!"</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Col -->
+                        <div class="flex flex-col gap-5">
+                            <div class="bg-indigo-50/10 p-6 flex flex-col">
+                                <img [src]="competition.img_url" alt="Banner"
+                                    class="rounded-xl w-full mb-5 object-cover h-32 md:h-40 shadow-sm"
+                                    *ngIf="competition.img_url" />
+
+                                <h3 class="font-bold text-xl text-slate-900 leading-tight">{{ competition.title ||
+                                    competition.name }}</h3>
+                                <p class="text-[14px] font-semibold text-[var(--dd-blue-dark)] mt-1.5">{{
+                                    competition.companyName || 'Unknown Company' }}</p>
+
+                                <div class="mt-6 pt-5 border-t border-indigo-100/80 space-y-4">
+                                    <!-- Type & Difficulty -->
+                                    <div class="flex justify-between items-center" *ngIf="competition.competitionType">
+                                        <p class="text-[15px] text-slate-500  tracking-wider ">
+                                            Type</p>
+                                        <span
+                                            class="px-3 py-1 bg-[var(--dd-blue-dark)] text-white text-[13px] rounded-lg  tracking-wider ">{{
+                                            competition.competitionType }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center"
+                                        *ngIf="competition.projectInfo?.difficulty">
+                                        <p class="text-[15px] text-slate-500  tracking-wider ">
+                                            Difficulty
+                                        </p>
+                                        <span
+                                            class="px-3 py-1 bg-white border border-slate-200 text-slate-800 text-[13px] rounded-lg  shadow-sm ">{{
+                                            competition.projectInfo?.difficulty }}</span>
+                                    </div>
+
+                                    <!-- Timeline -->
+                                    <div class="flex flex-col gap-5 pt-2">
+                                        <p class="text-[15px] text-slate-500  tracking-wider ">
+                                            Timeline</p>
+                                        <div class="space-y-5.5">
+                                            <div class="flex items-center gap-3 text-slate-700"
+                                                *ngIf="competition.startDate">
+                                                <div
+                                                    class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100/50">
+                                                    <i class="bi bi-calendar2-check"></i>
+                                                </div>
+                                                <div class="flex flex-col leading-tight">
+                                                    <span
+                                                        class="text-[15px] text-slate-400   tracking-wider">Starts</span>
+                                                    <span class="text-[13px]  text-slate-800">{{
+                                                        competition.startDate | date:'MMM d, yyyy' }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-3 text-slate-700"
+                                                *ngIf="competition.endDate">
+                                                <div
+                                                    class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 border border-rose-100/50">
+                                                    <i class="bi bi-calendar2-x"></i>
+                                                </div>
+                                                <div class="flex flex-col leading-tight">
+                                                    <span
+                                                        class="text-[15px] text-slate-400   tracking-wider">Deadline</span>
+                                                    <span class="text-[13px]  text-slate-800">{{
+                                                        competition.endDate | date:'MMM d, yyyy' }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Required Skills -->
+                                    <div class="pt-2" *ngIf="competition.requiredSkills?.length">
+                                        <p class="text-[15px] text-slate-500  tracking-wider  mb-2.5">
+                                            Required Skills</p>
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span *ngFor="let skill of competition.requiredSkills"
+                                                class="px-2.5 py-1 bg-white border border-slate-100 text-slate-600 text-[11px]  rounded-lg shadow-sm">
+                                                {{ skill }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Stats Grid -->
+                                    <div class="grid grid-cols-2 gap-3 pt-2">
+                                        <div class="bg-white/60 p-3 rounded-2xl border border-indigo-100/30 shadow-sm">
+                                            <p class="text-[15px] text-slate-400   mb-1">
+                                                Participants</p>
+                                            <div class="flex items-center gap-2">
+                                                <i class="bi bi-people text-[var(--dd-blue-dark)]"></i>
+                                                <span class="text-sm font-black text-slate-900">{{
+                                                    competition.totalApplications || 0 }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="bg-white/60 p-3 rounded-2xl border border-indigo-100/30 shadow-sm"
+                                            *ngIf="competition.projectInfo?.maxSubmissions">
+                                            <p class="text-[15px] text-slate-400   mb-1">Max
+                                                Trials</p>
+                                            <div class="flex items-center gap-2">
+                                                <i class="bi bi-arrow-repeat text-orange-500"></i>
+                                                <span class="text-sm font-black text-slate-900">{{
+                                                    competition.projectInfo.maxSubmissions }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="mt-2 p-5 rounded-2xl bg-orange-50/70 border border-orange-100 flex items-start gap-3 shadow-sm">
+                                <i class="bi bi-info-circle-fill text-[var(--dd-orange)] mt-0.5"></i>
+                                <p class="text-[12px] text-orange-800 leading-relaxed font-semibold">Your complete
+                                    candidate profile will automatically be attached and shared with the organizing
+                                    company upon submission.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 pt-8 border-t border-slate-100 flex items-center justify-end">
+                        <button type="submit"
+                            class="bg-gradient-to-r from-[var(--dd-blue-dark)] via-[var(--dd-orange)] to-[var(--dd-yellow)] text-white font-black text-[15px] px-10 py-4 rounded-full border-none cursor-pointer transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                            [disabled]="submitting || !mongoUser?.isProfileCompleted">
+                            <i class="bi bi-send-fill" *ngIf="!submitting"></i>
+                            <app-morph-loading *ngIf="submitting" size="xs" theme="light"></app-morph-loading>
+                            {{ submitting ? 'Submitting Application...' : (mongoUser?.isProfileCompleted ? 'Submit
+                            Verify & Apply' : 'Complete Profile First') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <app-footer></app-footer>
+</div>

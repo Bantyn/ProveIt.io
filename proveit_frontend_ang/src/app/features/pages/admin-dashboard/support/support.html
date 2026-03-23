@@ -1,0 +1,119 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+  <div>
+    <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+      Support Desk</h1>
+    <p class="text-[13px] text-black mt-1 font-medium">Every contact message and support request lands here for admin review</p>
+  </div>
+</div>
+
+<div class="bg-white dark:bg-neutral-900 rounded-4xl p-4 mb-8 border border-neutral-100 dark:border-neutral-800 shadow-sm">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-2 p-1 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl border border-neutral-200/50 dark:border-neutral-700">
+      <button *ngFor="let f of filters"
+        class="text-[14px] font-semibold px-5 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
+        [ngClass]="filter === f ? 'bg-white dark:bg-neutral-900 text-(--dd-blue) shadow-sm' : 'bg-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'"
+        (click)="filter = f">
+        {{ f | titlecase }}
+      </button>
+    </div>
+
+    <div class="relative min-w-[320px] flex-1 md:flex-none">
+      <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
+      <input type="text" [(ngModel)]="searchTerm"
+        class="w-full py-3.5 pl-11 pr-5 rounded-2xl text-[13px] bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-neutral-400 dark:text-white"
+        placeholder="Search tickets by subject, name or message..." />
+    </div>
+  </div>
+</div>
+
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-x-auto relative">
+  <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+
+  <table class="w-full border-collapse text-[13px] text-left relative z-10">
+    <thead>
+      <tr>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Inquiry Subject</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Sender</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Message</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Priority</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Received</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Status</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of filtered" class="group hover:bg-slate-50/50 transition-colors">
+        <td class="py-4 border-b border-slate-50 pr-4">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-[18px] group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+              <i class="bi bi-chat-left-text"></i>
+            </div>
+            <div>
+              <span class="font-semibold text-slate-900 block">{{ t.subject }}</span>
+              <span class="text-[11px] text-slate-400 uppercase">{{ t.source }}</span>
+            </div>
+          </div>
+        </td>
+        <td class="py-4 border-b border-slate-50 pr-4">
+          <div class="flex flex-col">
+            <span class="font-bold text-slate-700">{{ t.name }}</span>
+            <span class="text-[11px] text-slate-400">{{ t.email }}</span>
+          </div>
+        </td>
+        <td class="py-4 border-b border-slate-50 pr-4 text-slate-500 max-w-[320px]">
+          <p class="line-clamp-2 m-0">{{ t.message }}</p>
+        </td>
+        <td class="py-4 border-b border-slate-50 pr-4">
+          <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg border"
+            [ngClass]="{
+              'bg-rose-50 text-rose-600 border-rose-100': t.priority?.toLowerCase() === 'high',
+              'bg-amber-50 text-amber-600 border-amber-100': t.priority?.toLowerCase() === 'medium',
+              'bg-slate-50 text-slate-500 border-slate-100': t.priority?.toLowerCase() === 'low'
+            }">{{ (t.priority || 'medium') | uppercase }}</span>
+        </td>
+        <td class="py-4 border-b border-slate-50 text-[11px] text-slate-400 font-medium pr-4">
+          {{ t.createdAt ? (t.createdAt | date:'MMM d, y, h:mm a') : 'N/A' }}
+        </td>
+        <td class="py-4 border-b border-slate-50 pr-4">
+          <span
+            class="text-[12px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap"
+            [ngClass]="{
+              'bg-amber-50 text-amber-600 border border-amber-100': t.status?.toLowerCase() === 'open',
+              'bg-green-50 text-green-600 border border-green-100': t.status?.toLowerCase() === 'resolved'
+            }">
+            {{ (t.status || 'open') | titlecase }}
+          </span>
+        </td>
+        <td class="py-4 border-b border-slate-50 text-right">
+          <div class="flex gap-2 justify-end">
+            <button
+              class="px-3 h-8 rounded-xl border-none cursor-pointer flex items-center justify-center text-[12px] font-semibold transition-all bg-indigo-50 text-indigo-600 hover:bg-indigo-100 shadow-sm"
+              title="Reply"
+              (click)="replyTo(t)">
+              Reply
+            </button>
+            <button
+              *ngIf="t.status !== 'resolved'"
+              class="px-3 h-8 rounded-xl border-none cursor-pointer flex items-center justify-center text-[12px] font-semibold transition-all bg-green-50 text-green-600 hover:bg-green-100 shadow-sm"
+              title="Resolve"
+              (click)="updateStatus(t, 'resolved')">
+              Resolve
+            </button>
+            <button
+              *ngIf="t.status === 'resolved'"
+              class="px-3 h-8 rounded-xl border-none cursor-pointer flex items-center justify-center text-[12px] font-semibold transition-all bg-amber-50 text-amber-600 hover:bg-amber-100 shadow-sm"
+              title="Reopen"
+              (click)="updateStatus(t, 'open')">
+              Reopen
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!isLoading && filtered.length === 0" class="py-20 text-center">
+    <i class="bi bi-inbox text-4xl text-slate-200 mb-2"></i>
+    <p class="text-slate-400 font-semibold text-sm">No support tickets found.</p>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+<app-navbar
+    [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+
+<main class="relative min-h-screen w-full overflow-hidden bg-(--dd-cream) flex flex-col items-center pt-32 pb-20 px-4">
+
+    <!-- Subtle dotted grid background -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 opacity-20"
+        style="background-image: radial-gradient(rgba(0,0,0,0.1) 0.8px, transparent 0.8px); background-size: 14px 14px; mask-image: radial-gradient(circle at 50% 10%, rgba(0,0,0,1), rgba(0,0,0,0.2) 40%, rgba(0,0,0,0) 70%);">
+    </div>
+
+    <!-- Radial spotlight -->
+    <div aria-hidden="true"
+        class="pointer-events-none absolute -top-1/2 left-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 rounded-full blur-[60px]"
+        style="background: radial-gradient(ellipse at center, rgba(var(--dd-blue-rgb, 154,140,255), 0.12), transparent 50%)">
+    </div>
+
+    <div class="relative z-10 text-center mb-16 max-w-4xl min-h-[50vh] flex flex-col justify-center items-center">
+        <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
+            Simple, Transparent <span
+                class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-orange) to-(--dd-yellow)">Pricing</span>
+        </h1>
+        <p class="text-slate-500 text-lg">
+            Choose the plan that's right for your business. No hidden fees, no surprises.
+        </p>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full">
+        <div *ngFor="let i of [1,2,3]"
+            class="h-[500px] bg-white/60 rounded-3xl animate-pulse border border-slate-100"></div>
+    </div>
+
+    <!-- Plans Grid -->
+    <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full relative z-10 items-stretch">
+
+        <div *ngFor="let plan of plans"
+            class="flex flex-col group bg-white/70 backdrop-blur-xl border border-slate-200 p-1.5 rounded-3xl shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            [ngClass]="{'border-(--dd-orange)/50 ring-1 ring-(--dd-orange)/20 scale-105 z-10': plan.popular}">
+
+            <!-- Card Header -->
+            <div class="bg-slate-50 relative mb-4 rounded-2xl border border-slate-100 p-6">
+                <!-- Top glass gradient -->
+                <div aria-hidden="true" class="absolute inset-x-0 top-0 h-32 rounded-[inherit]"
+                    style="background: linear-gradient(180deg, color-mix(in srgb, var(--dd-orange) 5%, transparent) 0%, rgba(255,255,255,0) 100%)">
+                </div>
+
+                <div class="relative z-10 mb-8 flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                        <i class="bi bi-people-fill text-(--dd-orange)"></i>
+                        <span>{{ plan.name }}</span>
+                    </div>
+                    <span class="bg-(--dd-orange) text-white rounded-full px-3 py-1 text-sm font-bold tracking-wider">
+                        {{ plan.badge }}
+                    </span>
+                </div>
+
+                <div class="relative z-10 mb-6 flex items-end gap-1">
+                    <span class="text-4xl font-black text-slate-900 tracking-tight">{{ plan.price }}</span>
+                    <span class="text-slate-500 pb-1 text-sm">{{ plan.period }}</span>
+                    <span *ngIf="plan.priceYearly" class="text-slate-400 ml-auto text-sm font-medium">
+                        {{ plan.priceYearly }}/yr
+                    </span>
+                </div>
+
+                <button
+                    class="relative z-10 w-full py-4 rounded-xl font-bold text-white transition-all transform active:scale-95 shadow-lg"
+                    [ngClass]="plan.popular ? 
+                        'bg-linear-to-r from-(--dd-orange) to-(--dd-blue-dark) shadow-(--dd-orange)/30' : 
+                        'bg-slate-900 shadow-slate-900/10'">
+                    {{ plan.buttonText }}
+                </button>
+            </div>
+
+            <!-- Card Body -->
+            <div class="space-y-5 p-6 grow blur-[2px] group-hover:blur-[0px] transition-all duration-500">
+                <p class="text-slate-600 text-sm leading-relaxed">{{ plan.description }}</p>
+
+                <ul class="space-y-3">
+                    <li *ngFor="let feature of plan.features" class="flex items-start gap-3 text-sm text-slate-600">
+                        <i class="bi bi-check-circle-fill text-green-500 mt-0.5 shrink-0"></i>
+                        <span>{{ feature }}</span>
+                    </li>
+                </ul>
+
+                <!-- Empty state -->
+                <p *ngIf="!plan.features?.length" class="text-sm text-slate-400 italic">
+                    Contact us for custom features.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom CTA -->
+    <p *ngIf="!loading" class="relative z-10 text-slate-400 text-sm mt-12">
+        All plans include a 14-day free trial. No credit card required.
+    </p>
+
+    <!-- How It Works Accordion -->
+    <div class="max-w-7xl mx-auto px-6 py-12 w-full mt-24 mb-10">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 border-b-2 border-orange-400 inline-block pb-2">Frequently Asked Questions</h2>
+            <p class="text-gray-500 mt-2">Got questions about our plans? We have answers.</p>
+        </div>
+        <app-faq-accordion [items]="howItWorksItems"></app-faq-accordion>
+    </div>
+
+</main>
+
+<app-footer></app-footer>

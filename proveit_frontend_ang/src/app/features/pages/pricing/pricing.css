@@ -1,0 +1,5 @@
+/* Pricing page specific styles if needed beyond Tailwind */
+:host {
+    display: block;
+    width: 100%;
+}

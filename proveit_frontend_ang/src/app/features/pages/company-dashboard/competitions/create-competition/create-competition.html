@@ -1,0 +1,149 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="text-[22px] font-bold text-slate-900">{{ isEditMode ? 'Update Competition' : 'Create New Competition'
+            }}</h1>
+        <p class="text-[13px] text-slate-500 mt-0.5">{{ isEditMode ? 'Modify your existing competition details' :
+            'Design a new competition to find top talent' }}</p>
+    </div>
+    <a routerLink="/company/dashboard/competitions"
+        class="text-md font-semibold px-4 py-2 rounded-xl bg-slate-100 text-black no-underline hover:bg-slate-200">
+        <i class="bi bi-arrow-left mr-1"></i> Back to List
+    </a>
+</div>
+
+<div *ngIf="fetchingData"
+    class="flex flex-col items-center justify-center p-20 bg-white border border-slate-100 rounded-3xl">
+    <app-morph-loading size="md"></app-morph-loading>
+    <p class="mt-4 text-slate-600 font-medium">Loading competition details...</p>
+</div>
+
+<div class="p-6 bg-white  rounded-3xl" *ngIf="!fetchingData">
+    <form [formGroup]="compForm" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-10">
+            <!-- Left Col -->
+            <div class="flex flex-col gap-10">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Competition Title <span
+                            class="text-rose-500">*</span></label>
+                    <input
+                        class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none focus:shadow-(--dd-blue) transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                        placeholder="e.g. NextGen Web Master Hackathon" formControlName="title" />
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Description <span
+                            class="text-rose-500">*</span></label>
+                    <textarea
+                        class="w-full py-5 px-5 rounded-3xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 min-h-[120px] resize-none"
+                        placeholder="Detailed description of the competition..."
+                        formControlName="description"></textarea>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Competition Rules</label>
+                    <textarea
+                        class="w-full py-5 px-5 rounded-3xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 min-h-[100px] resize-none"
+                        placeholder="Specific rules for participation..." formControlName="rules"></textarea>
+                </div>
+            </div>
+
+            <!-- Right Col -->
+            <div class="flex flex-col gap-5">
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Type <span
+                                class="text-rose-500">*</span></label>
+                        <app-fluid-dropdown [options]="competitionTypeOptions" placeholder="Select Type"
+                            formControlName="competitionType">
+                        </app-fluid-dropdown>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Type of Industry <span
+                                class="text-rose-500">*</span></label>
+                        <app-fluid-dropdown [options]="industryOptions" placeholder="Select Industry"
+                            formControlName="industry">
+                        </app-fluid-dropdown>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Project Difficulty</label>
+                        <app-fluid-dropdown [options]="difficultyOptions" placeholder="Select Difficulty"
+                            formControlName="difficulty">
+                        </app-fluid-dropdown>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Start Date <span
+                                class="text-rose-500">*</span></label>
+                        <app-date-picker [date]="startDateValue" (dateChange)="onStartDateChange($event)"
+                            placeholder="Pick start date"></app-date-picker>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-md font-semibold text-black ml-1">End Date <span
+                                class="text-rose-500">*</span></label>
+                        <app-date-picker [date]="endDateValue" (dateChange)="onEndDateChange($event)"
+                            placeholder="Pick end date"></app-date-picker>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-md font-semibold text-black ml-1">Project Deadline <span
+                                class="text-rose-500">*</span></label>
+                        <app-date-picker [date]="deadlineValue" (dateChange)="onDeadlineChange($event)"
+                            placeholder="Pick deadline"></app-date-picker>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Required Skills</label>
+                        <input
+                            class="w-full py-6 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. Angular, Node.js, Firebase..." formControlName="requiredSkills" />
+                    </div>
+                </div>
+
+                <!-- Max Candidates -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">
+                        Max Candidates <span class="text-rose-500">*</span>
+                        <span class="text-xs font-normal text-slate-400 ml-2">(How many submissions will be accepted)</span>
+                    </label>
+                    <div class="relative">
+                        <i class="bi bi-people-fill absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                        <input type="number" formControlName="maxCandidates" min="1"
+                            class="w-full py-5 pl-11 pr-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 50" />
+                    </div>
+                    <p class="text-[11px] text-slate-500 ml-1">Once the limit is reached, new submissions will be automatically rejected.</p>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Project Image URL <span
+                            class="text-rose-500">*</span></label>
+                    <input
+                        class="w-full py-6 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                        placeholder="e.g. https://example.com/banner.png" formControlName="img_url" />
+                </div>
+
+
+
+                <div class="mt-4 p-4 rounded-xl bg-orange-50/50 border border-orange-100 flex items-start gap-3"
+                    *ngIf="!isEditMode">
+                    <i class="bi bi-info-circle-fill text-(--dd-orange)"></i>
+                    <p class="text-[11px] text-orange-700 leading-relaxed font-bold">Competitions will be created in
+                        <b>DRAFT</b> mode. You can later review and publish them from the management list.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-end">
+            <button type="submit" class="action-button" [disabled]="loading">
+                <app-morph-loading *ngIf="loading" size="xs" theme="light"></app-morph-loading>
+                <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-cloud-arrow-up-fill'"
+                    *ngIf="!loading"></i>
+                {{ loading ? 'Saving...' : (isEditMode ? 'Update Competition' : 'Create Competition') }}
+            </button>
+        </div>
+    </form>
+</div>

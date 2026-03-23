@@ -1,0 +1,189 @@
+const express = require('express');
+const router = express.Router();
+const { db } = require('../config/firebase');
+const { checkShortlistLimit, checkApplicationLimit } = require('../utils/planLimits');
+
+// Get all applications
+router.get('/', async (req, res) => {
+    try {
+        const snapshot = await db.collection('applications').get();
+        if (snapshot.empty) {
+            return res.status(200).json([]);
+        }
+        let applications = [];
+        snapshot.forEach(doc => {
+            applications.push({ id: doc.id, ...doc.data() });
+        });
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get application by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const appRef = db.collection('applications').doc(req.params.id);
+        const doc = await appRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'Application not found' });
+        }
+        res.status(200).json({ id: doc.id, ...doc.data() });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get applications by user ID
+router.get('/user/:userId', async (req, res) => {
+    try {
+        const snapshot = await db.collection('applications')
+            .where('userId', '==', req.params.userId)
+            .get();
+        if (snapshot.empty) {
+            return res.status(200).json([]);
+        }
+        let applications = [];
+        snapshot.forEach(doc => {
+            applications.push({ id: doc.id, ...doc.data() });
+        });
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get applications by competition ID
+router.get('/competition/:competitionId', async (req, res) => {
+    try {
+        const snapshot = await db.collection('applications')
+            .where('competitionId', '==', req.params.competitionId)
+            .get();
+        if (snapshot.empty) {
+            return res.status(200).json([]);
+        }
+        let applications = [];
+        snapshot.forEach(doc => {
+            applications.push({ id: doc.id, ...doc.data() });
+        });
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Create application
+router.post('/', async (req, res) => {
+    try {
+        const payload = req.body;
+        const { userId, competitionId, companyId } = payload;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        // --- ENFORCE PLAN LIMITS ---
+        if (competitionId && companyId) {
+            const limitCheck = await checkApplicationLimit(competitionId, companyId);
+            if (!limitCheck.allowed) {
+                return res.status(403).json({ error: limitCheck.error });
+            }
+        }
+        // ---------------------------
+
+        // Check if user has already applied to THIS specific competition
+        const existsSnapshot = await db.collection('applications')
+            .where('userId', '==', userId)
+            .where('competitionId', '==', competitionId)
+            .get();
+
+        if (!existsSnapshot.empty) {
+            return res.status(400).json({ error: 'You have already applied for this competition.' });
+        }
+
+        // Check if user already has an active application across the platform
+        const snapshot = await db.collection('applications')
+            .where('userId', '==', userId)
+            .get();
+
+        const activeApp = snapshot.docs.find(doc => {
+            const data = doc.data();
+            const status = (data.status || '').toUpperCase();
+            // Blocking statuses: anything that isn't terminal (REJECTED or SELECTED)
+            return status !== 'REJECTED' && status !== 'SELECTED';
+        });
+
+        if (activeApp) {
+            return res.status(400).json({ 
+                error: 'You already have an active application. You cannot apply for a new one until your current application is rejected or completed.' 
+            });
+        }
+        // ----------------------------------------------------------
+
+        payload.submittedAt = new Date().toISOString();
+
+        const docRef = await db.collection('applications').add(payload);
+        res.status(201).json({ id: docRef.id, ...payload });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update application
+router.put('/:id', async (req, res) => {
+    try {
+        const appRef = db.collection('applications').doc(req.params.id);
+        const updates = req.body;
+
+        // --- ENFORCE PLAN LIMITS FOR SHORTLISTING ---
+        if (updates.status && updates.status.toUpperCase() === 'SHORTLISTED') {
+            const appDoc = await appRef.get();
+            if (appDoc.exists) {
+                const appData = appDoc.data();
+                const limitCheck = await checkShortlistLimit(appData.competitionId, appData.companyId);
+                if (!limitCheck.allowed) {
+                    return res.status(403).json({ error: limitCheck.error });
+                }
+            }
+        }
+        // --------------------------------------------
+
+        await appRef.update(updates);
+        res.status(200).json({ id: req.params.id, ...updates, message: 'Application updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete application
+router.delete('/:id', async (req, res) => {
+    try {
+        const appRef = db.collection('applications').doc(req.params.id);
+        await appRef.delete();
+        res.status(200).json({ message: 'Application deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get applications by company ID
+router.get('/company/:companyId', async (req, res) => {
+    try {
+        const companyId = req.params.companyId;
+        const snapshot = await db.collection('applications')
+            .where('companyId', '==', companyId)
+            .get();
+        if (snapshot.empty) {
+            return res.status(200).json([]);
+        }
+        let applications = [];
+        snapshot.forEach(doc => {
+            applications.push({ id: doc.id, ...doc.data() });
+        });
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+module.exports = router;

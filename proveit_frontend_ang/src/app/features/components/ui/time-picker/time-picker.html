@@ -1,0 +1,46 @@
+<div class="tp-root">
+    <button type="button" class="tp-trigger" [class.tp-trigger--active]="isOpen" [class.tp-trigger--selected]="!!time"
+        (click)="toggleDropdown()">
+        <i class="bi bi-clock tp-icon"></i>
+        <span class="tp-trigger-text" [class.tp-trigger-text--placeholder]="!time">
+            {{ displayText }}
+        </span>
+        <i *ngIf="time" class="bi bi-x tp-clear" (click)="$event.stopPropagation(); clearTime($event)"></i>
+        <i *ngIf="!time" class="bi bi-chevron-down tp-chevron" [class.tp-chevron--open]="isOpen"></i>
+    </button>
+
+    <div class="tp-popover" [class.tp-popover--open]="isOpen">
+        <div class="tp-header">
+            <span class="tp-title">Choose time</span>
+            <span class="tp-value">{{ time || 'Not selected' }}</span>
+        </div>
+
+        <div class="tp-sections">
+            <div class="tp-section">
+                <label class="tp-label">Hour</label>
+                <div class="tp-grid tp-grid--hour">
+                    <button *ngFor="let hour of hours" type="button" class="tp-item"
+                        [class.tp-item--selected]="selectedHour === hour" (click)="selectHour(hour)">
+                        {{ hour.toString().padStart(2, '0') }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="tp-section">
+                <label class="tp-label">Minute</label>
+                <div class="tp-grid tp-grid--minute">
+                    <button *ngFor="let minute of minutes" type="button" class="tp-item"
+                        [class.tp-item--selected]="selectedMinute === minute" (click)="selectMinute(minute)">
+                        {{ minute.toString().padStart(2, '0') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tp-footer">
+            <button type="button" class="tp-clear-btn" *ngIf="time" (click)="clearTime($event)">
+                Clear
+            </button>
+        </div>
+    </div>
+</div>

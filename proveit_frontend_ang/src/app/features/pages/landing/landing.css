@@ -1,0 +1,77 @@
+.landing-lock {
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.landing-unlock {
+  overflow: visible;
+  min-height: 100vh;
+}
+
+/* Font Face */
+@font-face {
+  font-family: 'PPMori-SemiBold';
+  src: url('/fonts/PPMori-SemiBold-e4abbbc4.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'PPMori';
+  src: url('/fonts/PPMori-SemiBold-e4abbbc4.woff2') format('woff2');
+}
+
+.hero {
+  font-family: 'PPMori';
+  font-weight: 700;
+}
+.hero-2 {
+  font-family: 'PPMori';
+  font-weight: 700;
+}
+
+.animate-spinner {
+  display: inline-block;
+  animation: animate-spinner 5s infinite ease-in-out;
+}
+
+.animated-text-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-text span,
+.animated-text-2 span {
+  display: inline-block;
+}
+
+.animated-text span:nth-child(2n+1),
+.animated-text-2 span:nth-child(2n+1) {
+  transform: translateY(395px);
+  filter: "blur(50px)";
+}
+
+.animated-text span:nth-child(2n),
+.animated-text-2 span:nth-child(2n) {
+  transform: translateY(-395px);
+  filter: "blur(50px)";
+}
+
+.animated-text span:last-child {
+  transform: translateX(700px);
+  filter: "blur(50px)";
+}
+
+.animated-text-2 span:nth-child(12) {
+  transform: translateY(500px);
+  filter: "blur(50px)";
+  scale: 0;
+}
+
+@keyframes animate-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

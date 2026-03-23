@@ -1,0 +1,15 @@
+<!-- ================= MAIN ================= -->
+<main class="min-h-screen w-full bg-(--dd-cream) text-slate-900 transition-colors duration-300 dark:bg-[#0c1020] dark:text-slate-100">
+  <div
+    *ngIf="cursorFollowerEnabled()"
+    aria-hidden="true"
+    class="cursor-follower"
+    [class.cursor-follower-hidden]="!cursorFollowerVisible()"
+    [class.cursor-follower-interactive]="cursorFollowerInteractive()"
+    [style.transform]="cursorFollowerTransform()"
+  ></div>
+  <router-outlet>
+  </router-outlet>
+  <app-ai-widget *ngIf="showGlobalUi()"></app-ai-widget>
+  <app-custom-modal *ngIf="showGlobalUi()"></app-custom-modal>
+</main>

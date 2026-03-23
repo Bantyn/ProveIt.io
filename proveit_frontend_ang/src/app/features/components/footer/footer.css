@@ -1,0 +1,46 @@
+.footer-reveal-container {
+    clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%);
+}
+
+.reveal-inner {
+    /* Reveals the footer as the content above scrolls away */
+    pointer-events: none;
+}
+
+.reveal-inner > div {
+    pointer-events: auto;
+}
+
+@keyframes pulse-subtle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 4s ease-in-out infinite;
+}
+
+.animation-delay-1000 {
+    animation-delay: 1s;
+}
+
+/* Smooth reveal animation for footer links */
+.footer-link:hover span.relative::after {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .footer-reveal-container {
+        height: auto;
+        clip-path: none;
+    }
+    .reveal-inner {
+        height: auto;
+        top: 0 !important;
+    }
+    .reveal-inner > div {
+        height: auto;
+        position: relative;
+        top: 0 !important;
+    }
+}

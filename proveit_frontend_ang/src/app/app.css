@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+*{ 
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cursor-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    pointer-events: none;
+    background: var(--dd-blue-light);
+    transition:
+        width 0.22s ease,
+        height 0.22s ease,
+        opacity 0.2s ease,
+        background 0.3s ease,
+        box-shadow 0.3s ease;
+    will-change: transform;
+}
+
+.cursor-follower-hidden {
+    opacity: 0;
+}
+
+.cursor-follower-interactive {
+    background: var(--dd-blue-dark);
+    width: 24px;
+    height: 24px;
+}
+
+:host-context(.dark) .cursor-follower {
+    background: #d9d4ff;
+}
+
+:host-context(.dark) .cursor-follower-interactive {
+    background: #b4a8ff;
+    width: 24px;
+    height: 24px;
+}
+
+@media (pointer: coarse) {
+    .cursor-follower {
+        display: none;
+    }
+}

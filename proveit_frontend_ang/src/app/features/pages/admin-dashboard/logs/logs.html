@@ -1,0 +1,84 @@
+<div>
+  <div>
+    <h1
+      class="text-3xl font-extrabold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+      Activity Logs</h1>
+    <p class="text-[13px] text-black mt-1 font-medium">Platform-wide events and system audit trail</p>
+  </div>
+  <div class="flex gap-3">
+    <button
+      class="px-5 py-2.5 rounded-full font-bold text-[13px] bg-slate-100 text-slate-600 border-none cursor-pointer hover:bg-slate-200 transition-colors">
+      <i class="bi bi-download mr-1"></i> Export Logs
+    </button>
+  </div>
+</div>
+
+<!-- Filters & Search Card -->
+<div class="bg-white dark:bg-neutral-900 rounded-4xl p-4 mb-8 border border-neutral-100 dark:border-neutral-800 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <!-- Status Filters -->
+        <div class="flex items-center gap-2 p-1 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl border border-neutral-200/50 dark:border-neutral-700">
+            <button *ngFor="let f of filters"
+                class="text-[14px] font-bold px-5 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
+                [ngClass]="filter === f ? 'bg-white dark:bg-neutral-900 text-(--dd-blue) shadow-sm' : 'bg-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'"
+                (click)="filter = f">
+                {{ f | titlecase }}
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative min-w-[320px] flex-1 md:flex-none">
+            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
+            <input type="text" [(ngModel)]="searchTerm"
+                class="w-full py-3.5 pl-11 pr-5 rounded-2xl text-[13px] bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-bold placeholder:text-neutral-400 dark:text-white"
+                placeholder="Search logs by action or description..." />
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
+  <!-- Glow effect -->
+  <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-slate-50 rounded-full blur-3xl opacity-60"></div>
+
+  <div class="flex flex-col gap-1 relative z-10">
+    <div
+      class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0 group/log"
+      *ngFor="let l of filtered">
+      <div
+        class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover/log:scale-110"
+        [ngClass]="{
+            'bg-blue-50 text-blue-500 shadow-sm border border-blue-100': l.severity === 'info',
+            'bg-amber-50 text-amber-600 shadow-sm border border-amber-100': l.severity === 'warning',
+            'bg-rose-50 text-rose-600 shadow-sm border border-rose-100': l.severity === 'error'
+          }">
+        <i class="bi" [ngClass]="{
+            'bi-info-circle': l.severity === 'info',
+            'bi-exclamation-triangle': l.severity === 'warning',
+            'bi-bug': l.severity === 'error'
+        }"></i>
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <p class="text-[13px] font-bold text-slate-900 group-hover/log:text-(--dd-blue) transition-colors m-0">{{
+            l.action }}</p>
+          <span
+            class="text-[12px] font-bold bg-white px-2.5 py-1 rounded-lg border border-slate-100 text-slate-400 shadow-sm">{{
+            l.timestamp | slice: 0 : 16 }}</span>
+        </div>
+        <p class="text-[11px] text-slate-500 leading-relaxed">{{ l.description }}</p>
+        <div class="flex gap-2 mt-2">
+          <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-400">ID: {{l.timestamp |
+            date:'HHmm'}}</span>
+          <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-400">Node: worker-1</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="filtered.length === 0" class="py-12 text-center">
+      <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+        <i class="bi bi-journal-x text-3xl"></i>
+      </div>
+      <p class="text-slate-400 font-bold">No logs found for selected severity</p>
+    </div>
+  </div>
+</div>

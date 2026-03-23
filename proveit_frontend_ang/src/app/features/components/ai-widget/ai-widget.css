@@ -1,0 +1,99 @@
+@keyframes pulse-gentle {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(0.95);
+    }
+}
+
+.animate-pulse-gentle {
+    animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.animate-slide-up {
+    animation: slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Glassmorphism effects */
+.backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+/* Custom scrollbar for chat */
+.chat-messages-area {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #3b82f6 rgba(0, 0, 0, 0.05) !important;
+    overscroll-behavior: contain !important;
+    min-height: 0;
+    height: 100% !important; /* Changed from 0 to 100% if flex isn't enough */
+    flex: 1 1 auto;
+    pointer-events: auto !important;
+    touch-action: pan-y !important; /* Critical for mobile touch scrolling */
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure no global styles kill the scrollbar */
+.chat-messages-area::-webkit-scrollbar {
+    width: 8px !important;
+    display: block !important;
+}
+
+.chat-messages-area::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05) !important;
+    border-radius: 10px;
+}
+
+.chat-messages-area::-webkit-scrollbar-thumb {
+    background: #3b82f6 !important;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+.chat-messages-area::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+}
+
+.dark .chat-messages-area::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .chat-messages-area::-webkit-scrollbar-thumb {
+    background: #60a5fa;
+}
+
+.dark .chat-messages-area::-webkit-scrollbar-thumb:hover {
+    background: #93c5fd;
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hidden-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

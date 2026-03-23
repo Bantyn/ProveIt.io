@@ -1,0 +1,501 @@
+<div class="min-h-screen flex flex-col bg-(--dd-cream)">
+    <div class="grow">
+        <!-- ================= HEADER ================= -->
+        <header>
+            <app-navbar
+                [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+        </header>
+
+        <section class="mt-30 min-h-screen pb-20">
+            <!-- Loading State -->
+            <div *ngIf="isLoading" class="premium-loader mt-20">
+                <div class="spinner"></div>
+                <div class="loading-text">Fetching Company Profile...</div>
+            </div>
+
+            <!-- If Company Not Found -->
+            <div *ngIf="!isLoading && !company" class="flex flex-col items-center justify-center p-20">
+                <h2 class="text-3xl font-bold text-gray-800">Company Not Found!</h2>
+                <p class="text-gray-500 mt-2">The company profile you are looking for does not exist or has been
+                    removed.
+                </p>
+                <button routerLink="/user/company"
+                    class="mt-6 px-6 py-2 rounded-full bg-(--dd-blue-dark) text-white font-semibold shadow-md">
+                    Back to Companies
+                </button>
+            </div>
+
+            <!-- Company Profile Layout -->
+            <div *ngIf="!isLoading && company" class="md:max-w-[80%] mx-auto px-4 md:px-8 mt-10">
+
+                <!-- Hero Cover & Basic Profile -->
+                <div class="bg-white rounded-3xl overflow-hidden border border-gray-200">
+                    <!-- Cover Image -->
+                    <div
+                        class="h-48 md:h-64 bg-linear-to-r from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-cream) relative">
+                        <div class="absolute inset-0 opacity-20 blur-2xl bg-white/30"></div>
+                    </div>
+
+                    <!-- Profile Info Area -->
+                    <div class="px-8 pb-8 relative">
+                        <!-- Logo (Overlapping Cover) -->
+                        <div class="absolute -top-16 bg-white p-3 rounded-2xl shadow-lg border border-gray-100">
+                            <img [src]="company.logoUrl || 'https://ui-avatars.com/api/?name=' + (company.companyName || company.name || 'Company') + '&background=0D8ABC&color=fff'"
+                                alt="{{ company.companyName || company.name }} logo"
+                                class="w-24 h-24 object-contain rounded-xl bg-gray-50" />
+                        </div>
+
+                        <!-- Info Details -->
+                        <div class="pt-14 flex flex-col md:flex-row md:items-start justify-between gap-6">
+                            <div>
+                                <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+                                    {{ company.companyName || company.name || 'Unknown Company' }}
+                                </h1>
+                                <p class="text-lg text-gray-500 font-medium mt-1">{{ company.tagline || company.industry
+                                    || 'Leading Industry Innovator' }}</p>
+
+                                <!-- Quick Specs -->
+                                <div class="flex flex-wrap gap-4 mt-6">
+                                    <div
+                                        class="flex items-center gap-2 text-sm text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
+                                        <i class="bi bi-geo-alt-fill text-(--dd-orange)"></i>
+                                        <span class="font-medium">{{ company.location || 'Multiple Locations' }}</span>
+                                    </div>
+                                    <div
+                                        class="flex items-center gap-2 text-sm text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
+                                        <i class="bi bi-people-fill text-(--dd-orange)"></i>
+                                        <span class="font-medium">{{ company.size || 'Growing Team' }}</span>
+                                    </div>
+                                    <div *ngIf="company.website"
+                                        class="flex items-center gap-2 text-sm text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
+                                        <i class="bi bi-globe text-(--dd-orange)"></i>
+                                        <a [href]="company.website.startsWith('http') ? company.website : 'https://' + company.website"
+                                            target="_blank"
+                                            class="font-medium hover:text-(--dd-blue) hover:underline">{{
+                                            company.website }}</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button (click)="setActiveTab('jobs')"
+                                    class="px-8 py-3 rounded-full bg-linear-to-r from-(--dd-orange) to-(--dd-yellow) text-white font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all text-sm whitespace-nowrap">
+                                    View Open Roles
+                                </button>
+                                <button routerLink="/user/company"
+                                    class="px-8 py-3 rounded-full border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all text-sm shadow-sm whitespace-nowrap">
+                                    Back
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- TABS CONTAINER -->
+                <div class="mt-8  overflow-hidden">
+
+                    <!-- Tab Navigation -->
+                    <div class="flex flex-wrap border-b border-gray-200 px-4 pt-2">
+                        <button (click)="setActiveTab('about')" [class.border-b-2]="activeTab === 'about'"
+                            [class.border-(--dd-blue-dark)]="activeTab === 'about'"
+                            [class.text-(--dd-blue-dark)]="activeTab === 'about'"
+                            [class.text-gray-500]="activeTab !== 'about'"
+                            class="px-6 py-4 font-bold text-sm transition-all hover:text-(--dd-blue) focus:outline-none">
+                            About Us
+                        </button>
+
+                        <button (click)="setActiveTab('jobs')" [class.border-b-2]="activeTab === 'jobs'"
+                            [class.border-(--dd-blue-dark)]="activeTab === 'jobs'"
+                            [class.text-(--dd-blue-dark)]="activeTab === 'jobs'"
+                            [class.text-gray-500]="activeTab !== 'jobs'"
+                            class="px-6 py-4 font-bold text-sm transition-all hover:text-(--dd-blue) focus:outline-none flex items-center gap-2">
+                            Jobs / Challenges
+                            <span class="bg-gray-100 text-gray-700 py-0.5 px-2 rounded-full text-xs"
+                                *ngIf="competitions.length > 0">{{ competitions.length }}</span>
+                        </button>
+
+                        <button (click)="setActiveTab('details')" [class.border-b-2]="activeTab === 'details'"
+                            [class.border-(--dd-blue-dark)]="activeTab === 'details'"
+                            [class.text-(--dd-blue-dark)]="activeTab === 'details'"
+                            [class.text-gray-500]="activeTab !== 'details'"
+                            class="px-6 py-4 font-bold text-sm transition-all hover:text-(--dd-blue) focus:outline-none">
+                            Company Details
+                        </button>
+
+                        <button (click)="setActiveTab('contact')" [class.border-b-2]="activeTab === 'contact'"
+                            [class.border-(--dd-blue-dark)]="activeTab === 'contact'"
+                            [class.text-(--dd-blue-dark)]="activeTab === 'contact'"
+                            [class.text-gray-500]="activeTab !== 'contact'"
+                            class="px-6 py-4 font-bold text-sm transition-all hover:text-(--dd-blue) focus:outline-none">
+                            Contact Info
+                        </button>
+                    </div>
+
+                    <!-- Tab Content Area -->
+                    <div class="p-8">
+
+                        <!-- 1. ABOUT TAB -->
+                        <div *ngIf="activeTab === 'about'" class="animation-fade-in">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
+                            <p class="text-gray-700 leading-relaxed text-lg whitespace-pre-line">
+                                {{ company.description || 'Information about the company will be updated soon. Stay
+                                tuned to learn more about their mission, culture, and achievements.' }}
+                            </p>
+
+                            <div class="mt-8 bg-blue-50/50 p-6 rounded-xl border border-blue-100/50"
+                                *ngIf="company.culture || company.mission">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div *ngIf="company.mission">
+                                        <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                            <i class="bi bi-bullseye text-(--dd-orange)"></i> Our Mission
+                                        </h3>
+                                        <p class="text-gray-700">{{ company.mission }}</p>
+                                    </div>
+                                    <div *ngIf="company.culture">
+                                        <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                            <i class="bi bi-heart-fill text-(--dd-orange)"></i> Work Culture
+                                        </h3>
+                                        <p class="text-gray-700">{{ company.culture }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. JOBS TAB -->
+                        <div *ngIf="activeTab === 'jobs'" class="animation-fade-in">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold text-gray-900">Active Opportunities</h2>
+                            </div>
+
+                            <div *ngIf="competitions.length === 0"
+                                class="text-center py-10 bg-gray-50 rounded-xl border border-gray-100">
+                                <h3 class="text-xl font-semibold text-gray-700">No active positions right now</h3>
+                                <p class="text-gray-500 mt-2">Check back later for exciting challenges and roles from {{
+                                    company.companyName || company.name }}.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" *ngIf="competitions.length > 0">
+                                <!-- Reuse simplified competition card -->
+                                <div *ngFor="let comp of competitions"
+                                    class="border border-gray-200 rounded-xl p-5 hover:border-(--dd-blue) hover:shadow-lg transition-all bg-white group flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-start mb-3">
+                                            <h3
+                                                class="font-bold text-lg text-gray-900 group-hover:text-(--dd-blue-dark) transition-colors">
+                                                {{ comp.title || comp.name }}</h3>
+                                            <span
+                                                class="px-2 py-1 bg-green-50 text-green-700 text-xs font-bold rounded">Active</span>
+                                        </div>
+                                        <div class="flex flex-col gap-2 mt-3 text-sm text-gray-600">
+                                            <span class="flex items-center gap-2"><i
+                                                    class="bi bi-briefcase text-gray-400"></i> {{ comp.competitionType
+                                                || 'Competition' }}</span>
+                                            <span class="flex items-center gap-2"
+                                                *ngIf="comp.projectInfo?.difficulty"><i
+                                                    class="bi bi-star text-gray-400"></i> Difficulty: {{
+                                                comp.projectInfo?.difficulty }}</span>
+                                            <span class="flex items-center gap-2"><i
+                                                    class="bi bi-clock text-gray-400"></i> Deadline: <span
+                                                    class="font-medium text-gray-900">{{ (comp.projectInfo?.deadline |
+                                                    date:'mediumDate') || 'TBA' }}</span></span>
+                                        </div>
+                                    </div>
+                                    <a [routerLink]="['/user/compition', comp.id]"
+                                        class="block text-center mt-6 w-full py-2.5 rounded-lg border border-(--dd-blue-dark) text-(--dd-blue-dark) font-bold text-sm group-hover:bg-(--dd-blue-dark) group-hover:text-white transition-all cursor-pointer">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. DETAILS TAB -->
+                        <div *ngIf="activeTab === 'details'" class="animation-fade-in">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-6">Key Information</h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                                <div class="border-b border-gray-100 pb-4">
+                                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                                        Industry</p>
+                                    <p class="text-lg font-medium text-gray-900">{{ company.industry || 'Not Specified'
+                                        }}</p>
+                                </div>
+
+                                <div class="border-b border-gray-100 pb-4">
+                                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Company
+                                        Size</p>
+                                    <p class="text-lg font-medium text-gray-900">{{ company.size || 'Not Specified' }}
+                                    </p>
+                                </div>
+
+                                <div class="border-b border-gray-100 pb-4">
+                                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                                        Headquarters</p>
+                                    <p class="text-lg font-medium text-gray-900">{{ company.location || 'Not Specified'
+                                        }}</p>
+                                </div>
+
+                                <div class="border-b border-gray-100 pb-4">
+                                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Founded
+                                    </p>
+                                    <p class="text-lg font-medium text-gray-900">{{ company.foundedYear || 'Not
+                                        Specified' }}</p>
+                                </div>
+
+                                <div class="md:col-span-2 border-b border-gray-100 pb-4"
+                                    *ngIf="company.benefits && company.benefits.length > 0">
+                                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Perks &
+                                        Benefits</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span *ngFor="let benefit of company.benefits"
+                                            class="px-3 py-1 bg-linear-to-r from-orange-50 to-yellow-50 text-(--dd-orange) border border-orange-100 rounded-full text-sm font-medium">
+                                            {{ benefit }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. CONTACT TAB -->
+                        <div *ngIf="activeTab === 'contact'" class="animation-fade-in">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-6">Get in Touch</h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <!-- Contact Details -->
+                                <div class="space-y-6">
+                                    <div
+                                        class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div
+                                            class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-(--dd-blue-dark) shrink-0">
+                                            <i class="bi bi-globe text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-500 uppercase">Website</p>
+                                            <a [href]="company.website?.startsWith('http') ? company.website : 'https://' + company.website"
+                                                target="_blank"
+                                                class="text-lg font-medium text-(--dd-blue) hover:underline">{{
+                                                company.website || 'Not available' }}</a>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div
+                                            class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-(--dd-blue-dark) shrink-0">
+                                            <i class="bi bi-envelope-fill text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-500 uppercase">Contact Email</p>
+                                            <a href="mailto:{{ company.email || 'contact@example.com' }}"
+                                                class="text-lg font-medium text-gray-900 hover:text-(--dd-blue)">{{
+                                                company.email || 'Contact Info Not Available' }}</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100"
+                                        *ngIf="company.socialLinks">
+                                        <div
+                                            class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-(--dd-blue-dark) shrink-0">
+                                            <i class="bi bi-link-45deg text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-500 uppercase mb-2">Social Profiles
+                                            </p>
+                                            <div class="flex gap-3">
+                                                <a *ngIf="company.socialLinks.linkedin"
+                                                    [href]="company.socialLinks.linkedin" target="_blank"
+                                                    class="text-gray-400 hover:text-[#0A66C2] transition-colors"><i
+                                                        class="bi bi-linkedin text-2xl"></i></a>
+                                                <a *ngIf="company.socialLinks.twitter"
+                                                    [href]="company.socialLinks.twitter" target="_blank"
+                                                    class="text-gray-400 hover:text-[#1DA1F2] transition-colors"><i
+                                                        class="bi bi-twitter text-2xl"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Illustration / Map Placeholder -->
+                                <div
+                                    class="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 flex flex-col items-center justify-center p-8 text-center min-h-[200px]">
+                                    <i class="bi bi-building text-5xl text-(--dd-blue)/50 mb-4"></i>
+                                    <h3 class="font-bold text-gray-800">{{ company.companyName || company.name }}
+                                        Headquarters</h3>
+                                    <p class="text-sm text-gray-600 mt-2">{{ company.location || 'Connect with the team
+                                        online.' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── RATINGS & REVIEWS SECTION ── -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm mt-10">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Overall Rating</h2>
+                    <div class="flex flex-col md:flex-row gap-8 items-start">
+
+                        <!-- Big Score -->
+                        <div
+                            class="flex flex-col items-center justify-center bg-linear-to-br from-yellow-50 to-orange-50 border border-yellow-100 rounded-2xl p-8 min-w-[160px] shrink-0 shadow-sm">
+                            <span class="text-6xl font-black text-gray-900 leading-none">
+                                {{ (company.averageRating | number:'1.1-1') || '—' }}
+                            </span>
+                            <!-- Inline star display -->
+                            <div class="flex gap-0.5 mt-3">
+                                <i *ngFor="let s of [1,2,3,4,5]" class="bi text-xl"
+                                    [ngClass]="s <= (company.averageRating || 0) ? 'bi-star-fill text-yellow-400' : 'bi-star text-gray-200'"></i>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 font-medium">
+                                {{ company.reviewCount || 0 }} {{ (company.reviewCount === 1) ? 'review' : 'reviews' }}
+                            </p>
+                        </div>
+
+                        <!-- Star Bars -->
+                        <div class="flex-1 space-y-3 w-full">
+                            <div *ngFor="let star of [5, 4, 3, 2, 1]" class="flex items-center gap-4">
+                                <div class="flex gap-0.5 shrink-0">
+                                    <i *ngFor="let s of [1,2,3,4,5]" class="bi text-xs"
+                                        [ngClass]="s <= star ? 'bi-star-fill text-yellow-400' : 'bi-star text-gray-200'"></i>
+                                </div>
+                                <div class="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-yellow-400 rounded-full transition-all duration-500"
+                                        [style.width]="starBarWidth(star)"></div>
+                                </div>
+                                <span class="text-xs text-gray-400 w-8 text-right">{{ reviewCountForStar(star) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews -->
+                <div class="mt-12">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 class="text-2xl font-bold text-gray-900">Company Reviews</h2>
+                        <button (click)="openReviewModal()"
+                            class="px-5 py-2.5 bg-(--dd-blue) text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-sm">
+                            Write a Review
+                        </button>
+                    </div>
+
+                    <div class="grid gap-6">
+                        <div *ngFor="let review of reviews"
+                            class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-(--dd-blue) font-bold">
+                                        {{ review.authorName?.charAt(0) || 'U' }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900">{{ review.authorName || 'Anonymous' }}</h4>
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex text-yellow-400 text-xs gap-0.5">
+                                                <i *ngFor="let star of [1,2,3,4,5]" class="bi"
+                                                    [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
+                                            </div>
+                                            <span *ngIf="review.competitionName" class="text-[10px] font-bold py-0.5 px-2 bg-blue-50 text-blue-600 rounded-md border border-blue-100">
+                                                {{ review.competitionName }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-sm text-gray-400">{{ review.createdAt | date:'mediumDate' }}</span>
+                            </div>
+                            <p class="text-gray-600 leading-relaxed">{{ review.comment }}</p>
+                        </div>
+
+                        <div *ngIf="!reviews.length"
+                            class="text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                            <i class="bi bi-chat-square-quote text-4xl text-gray-300 mb-4 block"></i>
+                            <h3 class="text-lg font-medium text-gray-900">No reviews yet</h3>
+                            <p class="text-gray-500 mt-1">Be the first to share your experience with {{
+                                company.companyName || company.name }}</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <app-footer></app-footer>
+</div>
+
+<!-- ── WRITE A REVIEW MODAL ── -->
+<div *ngIf="showReviewModal"
+    class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    (click)="closeReviewModal()">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative" (click)="$event.stopPropagation()">
+
+        <!-- Close -->
+        <button (click)="closeReviewModal()"
+            class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition text-gray-500">
+            <i class="bi bi-x-lg text-sm"></i>
+        </button>
+
+        <!-- Success -->
+        <div *ngIf="reviewSubmitted" class="flex flex-col items-center py-8 gap-4">
+            <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-3xl">✅</div>
+            <h3 class="text-xl font-bold text-gray-900">Review Submitted!</h3>
+            <p class="text-gray-500 text-sm text-center">Thanks for sharing your experience.</p>
+        </div>
+
+        <!-- Form -->
+        <div *ngIf="!reviewSubmitted">
+            <h3 class="text-xl font-bold text-gray-900 mb-1">Rate your experience</h3>
+            <p class="text-sm text-gray-500 mb-6">How was working with {{ company?.companyName || company?.name }}?</p>
+
+            <!-- ⭐ Inline Interactive Star Rating -->
+            <div class="flex justify-center gap-2 mb-6" #starRating>
+                <button *ngFor="let star of [1,2,3,4,5]" type="button" (click)="onRatingChange(star)"
+                    (mouseenter)="hoveredRating = star" (mouseleave)="hoveredRating = 0"
+                    class="p-1 transition-transform hover:scale-125 focus:outline-none"
+                    [attr.aria-label]="star + ' star'" title="{{ star }} star{{ star > 1 ? 's' : '' }}">
+                    <i class="bi text-4xl transition-colors duration-150"
+                        [ngClass]="star <= (hoveredRating || newRating) ? 'bi-star-fill text-yellow-400' : 'bi-star text-gray-200'"></i>
+                </button>
+            </div>
+            <p class="text-center text-sm text-gray-500 -mt-3 mb-4" *ngIf="newRating">
+                <span [ngSwitch]="newRating">
+                    <span *ngSwitchCase="1">😞 Poor</span>
+                    <span *ngSwitchCase="2">😐 Fair</span>
+                    <span *ngSwitchCase="3">🙂 Good</span>
+                    <span *ngSwitchCase="4">😊 Very Good</span>
+                    <span *ngSwitchCase="5">🤩 Excellent!</span>
+                </span>
+            </p>
+
+            <!-- Competition Selection -->
+            <div class="mb-4" *ngIf="competitions.length > 0">
+                <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Related Competition (Optional)</label>
+                <select [(ngModel)]="selectedCompetitionId" 
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition text-sm appearance-none cursor-pointer">
+                    <option value="">No specific competition</option>
+                    <option *ngFor="let comp of competitions" [value]="comp.id">{{ comp.title || comp.name }}</option>
+                </select>
+            </div>
+
+            <textarea [(ngModel)]="newReviewText" rows="4" placeholder="Share your experience (optional)..."
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition text-sm resize-none mb-4"></textarea>
+
+            <!-- Error message -->
+            <p *ngIf="submitError" class="text-sm text-red-500 text-center mb-3">{{ submitError }}</p>
+
+            <div class="flex gap-3">
+                <button (click)="closeReviewModal()"
+                    class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition">
+                    Cancel
+                </button>
+                <button (click)="submitReview()" [disabled]="!newRating || isSubmitting"
+                    class="flex-1 py-3 rounded-xl bg-(--dd-blue) text-white font-semibold text-sm hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    <app-morph-loading *ngIf="isSubmitting" size="xs" theme="light"></app-morph-loading>
+                    {{ isSubmitting ? 'Submitting...' : 'Submit Review' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

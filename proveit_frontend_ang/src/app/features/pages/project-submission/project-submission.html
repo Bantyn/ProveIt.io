@@ -1,0 +1,381 @@
+<div class="min-h-screen flex flex-col bg-(--dd-cream) selection:bg-(--dd-blue)/50 selection:text-white">
+    <div class="grow">
+        <!-- ================= HEADER ================= -->
+        <header>
+            <app-navbar
+                [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+        </header>
+
+        <section class="mt-30 pb-20 px-4">
+
+            <div class="max-w-7xl mx-auto">
+                <!-- Back Route -->
+                <button [routerLink]="['/user/compition', competitionId]"
+                    class="flex items-center gap-2 text-slate-500 hover:text-(--dd-blue) transition-colors font-medium mb-6">
+                    <i class="bi bi-arrow-left"></i> Back to Competition
+                </button>
+
+                <!-- Header -->
+                <div class="mb-10 text-center md:text-left">
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+                        Submit Your Project <span *ngIf="competition" class="text-(--dd-blue)"><br/>for {{ competition.title }}</span>
+                    </h1>
+                    <p class="text-slate-500 mt-2 text-[15px]">Provide details about your work to instantly register & submit for the competition.</p>
+                </div>
+
+                <!-- Main Form Card -->
+                <div class="p-6 md:p-10 relative overflow-hidden">
+
+                    <!-- Decorative Background element -->
+                    <div
+                        class="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-blue-50/80 to-transparent rounded-bl-full pointer-events-none -mr-10 -mt-10">
+                    </div>
+
+                    <form [formGroup]="submissionForm" (ngSubmit)="onSubmit()"
+                        class="relative z-10 flex flex-col gap-10">
+
+                        <!-- SECTION 1: Basic Submission Info -->
+                        <div class="flex flex-col gap-6">
+                            <h2
+                                class="text-[18px] font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100">
+                                <i class="bi bi-info-circle text-(--dd-blue)"></i> 1. Basic Submission Info
+                            </h2>
+
+                            <!-- Title -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-bold text-slate-700">Project Title <span
+                                        class="text-rose-500">*</span></label>
+                                <input type="text" formControlName="projectTitle"
+                                    placeholder="e.g. AI Resume Screening System"
+                                    class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400">
+                                <span
+                                    *ngIf="submissionForm.get('projectTitle')?.touched && submissionForm.get('projectTitle')?.errors?.['required']"
+                                    class="text-xs text-rose-500 font-medium ml-2">Project Title is required</span>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-bold text-slate-700">Short Description <span
+                                        class="text-rose-500">*</span></label>
+                                <textarea formControlName="shortDescription" rows="3"
+                                    placeholder="Briefly describe what your project does..."
+                                    class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                                <span
+                                    *ngIf="submissionForm.get('shortDescription')?.touched && submissionForm.get('shortDescription')?.errors?.['required']"
+                                    class="text-xs text-rose-500 font-medium ml-2">Description is required</span>
+                            </div>
+
+                            <!-- Submission Type -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                                    Submission Type <span class="text-rose-500">*</span>
+                                </label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mt-1">
+                                    <label class="cursor-pointer relative">
+                                        <input type="radio" formControlName="submissionType" value="GITHUB"
+                                            class="peer sr-only">
+                                        <div
+                                            class="p-4 rounded-2xl border-2 border-slate-100 hover:border-[var(--dd-blue)] bg-white transition-all peer-checked:border-(--dd-blue) peer-checked:bg-blue-50/30 text-center text-slate-600 peer-checked:text-(--dd-blue)">
+                                            <i class="bi bi-github text-xl mb-1 block"></i>
+                                            <span class="text-[13px] font-bold block">GitHub</span>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer relative">
+                                        <input type="radio" formControlName="submissionType" value="EXTERNAL_LINK"
+                                            class="peer sr-only">
+                                        <div
+                                            class="p-4 rounded-2xl border-2 border-slate-100 hover:border-[var(--dd-blue)] bg-white transition-all peer-checked:border-(--dd-blue) peer-checked:bg-blue-50/30 text-center text-slate-600 peer-checked:text-(--dd-blue)">
+                                            <i class="bi bi-link-45deg text-xl mb-1 block"></i>
+                                            <span class="text-[13px] font-bold block">External Link</span>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer relative">
+                                        <input type="radio" formControlName="submissionType" value="FILE_UPLOAD"
+                                            class="peer sr-only">
+                                        <div
+                                            class="p-4 rounded-2xl border-2 border-slate-100 hover:border-[var(--dd-blue)] bg-white transition-all peer-checked:border-(--dd-blue) peer-checked:bg-blue-50/30 text-center text-slate-600 peer-checked:text-(--dd-blue)">
+                                            <i class="bi bi-cloud-arrow-up text-xl mb-1 block"></i>
+                                            <span class="text-[13px] font-bold block">File Upload</span>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer relative">
+                                        <input type="radio" formControlName="submissionType" value="DOCUMENT"
+                                            class="peer sr-only">
+                                        <div
+                                            class="p-4 rounded-2xl border-2 border-slate-100 hover:border-[var(--dd-blue)] bg-white transition-all peer-checked:border-(--dd-blue) peer-checked:bg-blue-50/30 text-center text-slate-600 peer-checked:text-(--dd-blue)">
+                                            <i class="bi bi-file-earmark-text text-xl mb-1 block"></i>
+                                            <span class="text-[13px] font-bold block">Document</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: Links Section -->
+                        <div class="flex flex-col gap-6"
+                            *ngIf="submissionForm.get('submissionType')?.value !== 'FILE_UPLOAD'">
+                            <h2
+                                class="text-[18px] font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100">
+                                <i class="bi bi-link-45deg text-(--dd-blue)"></i> 2. Submission Links
+                            </h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <!-- GitHub Link -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700 flex justify-between">
+                                        <span>Repository Link <span
+                                                *ngIf="submissionForm.get('submissionType')?.value === 'GITHUB'"
+                                                class="text-rose-500">*</span></span>
+                                    </label>
+                                    <div class="relative">
+                                        <i
+                                            class="bi bi-github absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="url" formControlName="githubLink"
+                                            placeholder="https://github.com/user/project"
+                                            class="w-full pl-11 pr-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400">
+                                    </div>
+                                </div>
+
+                                <!-- Live Demo -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700">Live Demo Link <span
+                                            class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                                    <div class="relative">
+                                        <i
+                                            class="bi bi-globe absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="url" formControlName="liveDemoLink"
+                                            placeholder="https://project-demo.com"
+                                            class="w-full pl-11 pr-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400">
+                                    </div>
+                                </div>
+
+                                <!-- Demo Video -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                                        Demo Video URL <span
+                                            class="text-amber-500 text-[11px] bg-amber-50 px-2 py-0.5 rounded-md ml-1"><i
+                                                class="bi bi-star-fill"></i> Pro Tip</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i
+                                            class="bi bi-play-circle absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="url" formControlName="demoVideoUrl"
+                                            placeholder="https://youtube.com/..."
+                                            class="w-full pl-11 pr-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400">
+                                    </div>
+                                </div>
+
+                                <!-- Docs -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700">Documentation Link <span
+                                            class="text-amber-500 text-[11px] bg-amber-50 px-2 py-0.5 rounded-md ml-1"><i
+                                                class="bi bi-star-fill"></i> Pro Tip</span></label>
+                                    <div class="relative">
+                                        <i
+                                            class="bi bi-file-earmark-code absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="url" formControlName="documentationUrl"
+                                            placeholder="https://docs.project.com"
+                                            class="w-full pl-11 pr-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400">
+                                    </div>
+                                </div>
+
+                                <!-- Screenshots -->
+                                <div class="flex flex-col gap-2 md:col-span-2">
+                                    <label class="text-sm font-bold text-slate-700">Screenshots (Drive/Imgur Link) <span
+                                            class="text-amber-500 text-[11px] bg-amber-50 px-2 py-0.5 rounded-md ml-1"><i
+                                                class="bi bi-star-fill"></i> Pro Tip</span></label>
+                                    <div class="relative">
+                                        <i
+                                            class="bi bi-images absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="url" formControlName="screenshotsUrl"
+                                            placeholder="https://drive.google.com/..."
+                                            class="w-full pl-11 pr-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 3: File Upload Section (MOCK) -->
+                        <div class="flex flex-col gap-6"
+                            *ngIf="submissionForm.get('submissionType')?.value === 'FILE_UPLOAD' || submissionForm.get('submissionType')?.value === 'DOCUMENT'">
+                            <h2
+                                class="text-[18px] font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100">
+                                <i class="bi bi-folder-fill text-(--dd-blue)"></i> 3. File Uploads
+                            </h2>
+                            <div
+                                class="w-full border-2 border-dashed border-slate-300 rounded-3xl p-10 flex flex-col items-center justify-center text-center hover:border-(--dd-blue) hover:bg-blue-50/30 transition-all cursor-pointer group">
+                                <div
+                                    class="w-16 h-16 bg-blue-50 text-(--dd-blue) rounded-full flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
+                                    <i class="bi bi-cloud-arrow-up-fill"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-800">Upload Project Files</h3>
+                                <p class="text-sm text-slate-500 mt-1">Upload ZIP / PDF / DOC (Max size: 50MB)</p>
+                                <span
+                                    class="bg-amber-100 text-amber-700 text-xs px-3 py-1 rounded-full font-bold mt-4">Feature
+                                    mocked for UI demo</span>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 4: Tech Stack Section -->
+                        <div class="flex flex-col gap-6">
+                            <h2
+                                class="text-[18px] font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100">
+                                <i class="bi bi-braces text-(--dd-blue)"></i> 4. Tech Stack
+                            </h2>
+
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-bold text-slate-700">Technologies Used <span
+                                        class="text-slate-400 font-normal ml-1">(Comma separated)</span> <span
+                                        class="text-rose-500">*</span></label>
+                                <input type="text" formControlName="techStack"
+                                    placeholder="React, Node.js, MongoDB, Tailwind..."
+                                    class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400">
+                                <span
+                                    *ngIf="submissionForm.get('techStack')?.touched && submissionForm.get('techStack')?.errors?.['required']"
+                                    class="text-xs text-rose-500 font-medium ml-2">Tech Stack is required</span>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 5: Candidate Insights -->
+                        <div class="flex flex-col gap-6">
+                            <h2
+                                class="text-[18px] font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100">
+                                <i class="bi bi-person-lines-fill text-(--dd-blue)"></i> 5. Candidate Profile Insights
+                            </h2>
+
+                            <!-- Cover Message -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-bold text-slate-700">Cover Message <span
+                                        class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                                <textarea formControlName="coverMessage" rows="2"
+                                    placeholder="Quick introduction and motivation e.g. 'I have 2 years experience in React...'"
+                                    class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <!-- Project Approach -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700">Project Approach <span
+                                            class="text-rose-500">*</span></label>
+                                    <textarea formControlName="projectApproach" rows="3"
+                                        placeholder="How will you solve this? e.g. 'I will build the dashboard using...'"
+                                        class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                                    <span
+                                        *ngIf="submissionForm.get('projectApproach')?.touched && submissionForm.get('projectApproach')?.errors?.['required']"
+                                        class="text-xs text-rose-500 font-medium ml-2">Project approach is required.</span>
+                                </div>
+
+                                <!-- Experience Summary -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700">Experience Summary <span
+                                            class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                                    <textarea formControlName="experienceSummary" rows="3"
+                                        placeholder="Relevant experience e.g. 'I have worked on multiple MERN stack projects...'"
+                                        class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                                </div>
+
+                                <!-- Portfolio Description -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700">Portfolio / Previous Work <span
+                                            class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                                    <textarea formControlName="portfolioDescription" rows="3"
+                                        placeholder="Previous work e.g. 'I built a project management system using...'"
+                                        class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                                </div>
+
+                                <!-- Why Interested -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700">Why Interested <span
+                                            class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                                    <textarea formControlName="whyInterested" rows="3"
+                                        placeholder="Why apply? e.g. 'I want to work on real-world projects...'"
+                                        class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Availability Note -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-bold text-slate-700">Availability / Timeline <span
+                                        class="text-rose-500">*</span></label>
+                                <input type="text" formControlName="availabilityNote"
+                                    placeholder="e.g. 'I can complete this project within 5 days.'"
+                                    class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400">
+                                <span
+                                    *ngIf="submissionForm.get('availabilityNote')?.touched && submissionForm.get('availabilityNote')?.errors?.['required']"
+                                    class="text-xs text-rose-500 font-medium ml-2">Availability is required.</span>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 6: Additional Explanation -->
+                        <div class="flex flex-col gap-6">
+                            <h2
+                                class="text-[18px] font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100">
+                                <i class="bi bi-ui-checks-grid text-(--dd-blue)"></i> 6. Additional Explanation
+                            </h2>
+
+                            <!-- How it works -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-bold text-slate-700">How your solution works <span
+                                        class="text-rose-500">*</span></label>
+                                <textarea formControlName="howItWorks" rows="4"
+                                    placeholder="Explain the architecture, logic, or flow..."
+                                    class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                                <span
+                                    *ngIf="submissionForm.get('howItWorks')?.touched && submissionForm.get('howItWorks')?.errors?.['required']"
+                                    class="text-xs text-rose-500 font-medium ml-2">This block is required to help
+                                    evaluators.</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <!-- Key Features -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700">Key Features <span
+                                            class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                                    <textarea formControlName="keyFeatures" rows="3"
+                                        placeholder="- Feature 1&#10;- Feature 2"
+                                        class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                                </div>
+
+                                <!-- Challenges -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-slate-700">Challenges Faced <span
+                                            class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                                    <textarea formControlName="challengesFaced" rows="3"
+                                        placeholder="What blocked you and how did you resolve it?"
+                                        class="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 resize-none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUBMIT ACTION -->
+                        <div class="pt-6 border-t border-slate-100 flex items-center justify-end">
+                            <button type="button" routerLink="/user/applications"
+                                class="px-6 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors mr-4">Cancel</button>
+
+                            <button type="submit" [disabled]="isSubmitting"
+                                class="px-8 py-3.5 rounded-full bg-linear-to-r from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-blue) text-white font-bold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-[1.02] active:scale-95 transition-all text-[15px] flex items-center justify-center min-w-[200px] disabled:opacity-70 disabled:cursor-not-allowed">
+                                <span *ngIf="!isSubmitting">Submit Project</span>
+                                <app-morph-loading *ngIf="isSubmitting" size="xs" theme="light"></app-morph-loading>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <!-- How It Works Accordion -->
+                <div class="max-w-4xl mx-auto px-6 py-12 mt-12 mb-10 bg-white rounded-3xl shadow-sm border border-gray-100">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900 border-b-2 border-orange-400 inline-block pb-2">Submission Guidelines</h2>
+                        <p class="text-gray-500 mt-2">Tips and information for a successful project submission.</p>
+                    </div>
+                    <app-faq-accordion [items]="howItWorksItems"></app-faq-accordion>
+                </div>
+
+            </div>
+
+        </section>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <app-footer></app-footer>
+</div>

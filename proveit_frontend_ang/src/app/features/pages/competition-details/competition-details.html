@@ -1,0 +1,178 @@
+<div class="min-h-screen flex flex-col">
+    <div class="grow">
+        <!-- ================= HEADER ================= -->
+        <header>
+            <app-navbar
+                [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+        </header>
+
+        <section class="mt-30 min-h-screen">
+            <!-- Loading State -->
+            <div *ngIf="isLoading" class="premium-loader mt-20">
+                <div class="spinner"></div>
+                <div class="loading-text">Fetching Challenge Details...</div>
+            </div>
+
+            <!-- If Competition Not Found -->
+            <div *ngIf="!isLoading && !competition" class="flex flex-col items-center justify-center p-20">
+                <h2 class="text-3xl font-bold text-gray-800">Challenge Not Found!</h2>
+                <p class="text-gray-500 mt-2">The competition you are looking for does not exist or has been removed.
+                </p>
+                <button routerLink="/user/compition"
+                    class="mt-6 px-6 py-2 rounded-full bg-(--dd-blue-dark) text-white font-semibold">
+                    Back to Competitions
+                </button>
+            </div>
+
+            <!-- Competition Details -->
+            <div *ngIf="!isLoading && competition" class="max-w-[90%] mx-auto p-5 md:p-10 mb-20 bg-white">
+                <!-- Header Image & Basic Info -->
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="w-full md:w-1/3">
+                        <img [src]="competition.img_url" alt="{{ competition.name }}"
+                            class="w-full rounded-2xl object-cover shadow-md" />
+                    </div>
+                    <div class="w-full md:w-2/3 flex flex-col justify-center">
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="px-3 py-1 bg-(--dd-blue-dark) text-(--dd-cream) rounded-full text-sm tracking-wider font-bold">{{
+                                competition.competitionType }}</span>
+                            <span *ngIf="competition.jobId"
+                                class="px-3 py-1 bg-orange-50 text-(--dd-orange) rounded-full text-sm font-bold border tracking-wider border-(--dd-orange)">Hiring
+                                Role</span>
+                            <span *ngIf="competition.industry"
+                                class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-sm font-bold border tracking-wider border-emerald-200">{{
+                                competition.industry }}</span>
+                        </div>
+
+                        <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 mt-4">{{ competition.title ||
+                            competition.name }}</h1>
+                        <p class="text-xl text-gray-600 mt-2 font-medium">By <span class="text-(--dd-blue-dark)">{{
+                                competition.companyName || 'Unknown' }}</span></p>
+
+                        <div class="flex flex-wrap gap-4 mt-6">
+                            <div class="flex items-center gap-2 text-gray-700 bg-gray-50 px-4 py-2 rounded-lg"
+                                *ngIf="competition.projectInfo?.difficulty">
+                                <i class="bi bi-star-fill text-(--dd-orange)"></i>
+                                <span class="font-semibold">{{ competition.projectInfo?.difficulty }}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-700 bg-gray-50 px-4 py-2 rounded-lg"
+                                *ngIf="competition.startDate">
+                                <i class="bi bi-calendar-event text-(--dd-orange)"></i>
+                                <span class="font-semibold">{{ competition.startDate | date:'mediumDate' }} - {{
+                                    competition.endDate | date:'mediumDate' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex gap-6 items-center" *ngIf="!showProfilePrompt">
+                            <app-slide-button 
+                                text="Slide to Submit" 
+                                (onComplete)="applyToEvent()">
+                            </app-slide-button>
+
+                            <button routerLink="/user/compition"
+                                class="px-8 py-3 rounded-full border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all">
+                                Back
+                            </button>
+                        </div>
+
+                        <!-- Profile Prompt -->
+                        <div *ngIf="showProfilePrompt"
+                            class="mt-8 p-5 bg-orange-50 border border-orange-200 rounded-xl space-y-4 animate-fade-in shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <i class="bi bi-exclamation-triangle-fill text-xl text-(--dd-orange)"></i>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-lg">Action Required</h3>
+                                    <p class="text-sm text-gray-700 mt-1">Please complete your profile first. After
+                                        updating your profile, you will be redirected back here to participate in this
+                                        competition.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 pt-2">
+                                <button [routerLink]="['/user/profile']"
+                                    [queryParams]="{returnUrl: '/user/compition/' + competitionId}"
+                                    class="action-button">
+                                    Update Profile
+                                </button>
+                                <button (click)="showProfilePrompt = false"
+                                    class="px-6 py-2 rounded-full border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all text-sm bg-white">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-10 border-gray-200">
+
+                <!-- Deep Details -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <!-- Left Column: Description & Responsibilities -->
+                    <div class="md:col-span-2 space-y-8">
+                        <div>
+                            <h2
+                                class="text-2xl font-bold bg-linear-to-r from-(--dd-blue-dark) to-(--dd-orange) bg-clip-text text-transparent inline-block mb-4">
+                                Challenge Overview</h2>
+                            <p class="text-gray-700 leading-relaxed">{{ competition.description }}</p>
+                        </div>
+
+                        <div>
+                            <h2
+                                class="text-2xl font-bold bg-linear-to-r from-(--dd-blue-dark) to-(--dd-orange) bg-clip-text text-transparent inline-block mb-4">
+                                Rules & Guidelines</h2>
+                            <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ competition.rules || 'No
+                                comprehensive rules specified.' }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Info Cards -->
+                    <div class="space-y-6">
+                        <!-- Requirements Card -->
+                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-sm">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Requirements</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-semibold">Max Submissions</p>
+                                    <p class="text-gray-800 font-medium">{{ competition.projectInfo?.maxSubmissions || 1
+                                        }}</p>
+                                </div>
+                                <div *ngIf="competition.requiredSkills && competition.requiredSkills.length > 0">
+                                    <p class="text-xs text-gray-500 uppercase font-semibold">Required Skills</p>
+                                    <div class="flex flex-wrap gap-2 mt-2">
+                                        <span *ngFor="let skill of competition.requiredSkills"
+                                            class="px-2 py-1 bg-white border border-gray-200 text-gray-700 text-xs rounded-md shadow-sm">
+                                            {{ skill }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Important Dates Card -->
+                        <div
+                            class="bg-linear-to-br from-(--dd-orange)/10 to-(--dd-yellow)/10 rounded-2xl p-6 border border-orange-100 shadow-sm">
+                            <h3 class="text-lg font-bold text-(--dd-orange) mb-4 border-b border-orange-200 pb-2">
+                                Important
+                                Dates</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm text-gray-700 font-medium">Submission Deadline</p>
+                                    <p class="text-sm font-bold text-gray-900">{{ (competition.projectInfo?.deadline |
+                                        date:'mediumDate') || 'TBA' }}</p>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm text-gray-700 font-medium">Challenge Starts</p>
+                                    <p class="text-sm font-bold text-gray-900">{{ (competition.startDate |
+                                        date:'mediumDate') || 'Immediately' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <app-footer></app-footer>
+</div>

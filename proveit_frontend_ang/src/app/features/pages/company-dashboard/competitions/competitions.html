@@ -1,0 +1,215 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+    <div>
+        <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+            Manage Competitions</h1>
+        <p class="text-[13px] text-black mt-1 font-medium">Create, edit, publish or cancel competitions</p>
+    </div>
+    <div class="flex gap-3">
+        <button
+            class="px-5 py-2.5 rounded-full font-semibold text-[13px] bg-(--dd-blue) text-white border-none cursor-pointer hover:bg-(--dd-blue-dark) transition-colors shadow-lg shadow-(--dd-blue-light)/40"
+            [class.opacity-50]="companyProfile && !companyProfile.isProfileCompleted" (click)="create()">
+            <i class="bi bi-plus-circle"></i> Create Competition
+        </button>
+    </div>
+</div>
+
+<!-- Profile Incomplete Warning -->
+<div class="bg-amber-50 border border-amber-200 rounded-3xl p-5 mb-8 flex items-start gap-4"
+    *ngIf="companyProfile && !companyProfile.isProfileCompleted">
+    <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+        <i class="bi bi-exclamation-triangle-fill text-xl"></i>
+    </div>
+    <div>
+        <h4 class="text-[15px] font-bold text-amber-800 m-0">Profile Completion Required</h4>
+        <p class="text-[13px] text-amber-700 mt-1 leading-relaxed">Your company profile is incomplete. You must fill in
+            your company details in the <b>Settings</b> section before you can create new competitions. This ensures
+            candidates have enough information about your organization.</p>
+    </div>
+</div>
+
+<!-- Datatable Filters & Search -->
+<div class="bg-white dark:bg-neutral-900 rounded-4xl p-4 mb-8 border border-neutral-100 dark:border-neutral-800 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <!-- Status Filters -->
+        <div class="flex items-center gap-2 p-1 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl border border-neutral-200/50 dark:border-neutral-700">
+            <button *ngFor="let f of statusFilters"
+                class="text-[14px] font-semibold px-5 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
+                [ngClass]="filter === f ? 'bg-white dark:bg-neutral-900 text-(--dd-blue) shadow-sm' : 'bg-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'"
+                (click)="setFilter(f)">
+                {{ f | titlecase }}
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative min-w-[320px] flex-1 md:flex-none">
+            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
+            <input type="text" [(ngModel)]="searchTerm"
+                class="w-full py-3.5 pl-11 pr-5 rounded-2xl text-[13px] bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-neutral-400 dark:text-white"
+                placeholder="Search by title or skills..." />
+        </div>
+    </div>
+</div>
+
+<!-- Table Card -->
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-x-auto relative min-h-[400px]">
+    <!-- Glow effect -->
+    <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+
+    <table class="w-full border-collapse text-[13px] text-left whitespace-nowrap relative z-10">
+        <thead>
+            <tr>
+                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('title')">
+                    <div class="flex items-center gap-2">
+                        <span>Competition</span>
+                        <i class="bi"
+                            [ngClass]="sortKey === 'title' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
+                    </div>
+                </th>
+                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Skills Required</th>
+                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('applicants')">
+                    <div class="flex items-center gap-2">
+                        <span>Applicants</span>
+                        <i class="bi"
+                            [ngClass]="sortKey === 'applicants' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
+                    </div>
+                </th>
+               
+                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('deadline')">
+                    <div class="flex items-center gap-2">
+                        <span>Deadline</span>
+                        <i class="bi"
+                            [ngClass]="sortKey === 'deadline' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
+                    </div>
+                </th>
+                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('status')">
+                    <div class="flex items-center gap-2">
+                        <span>Status</span>
+                        <i class="bi"
+                            [ngClass]="sortKey === 'status' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
+                    </div>
+                </th>
+                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody *ngIf="!loading && filtered.length > 0">
+            <tr *ngFor="let c of filtered"
+                class="group hover:bg-slate-50/50 transition-colors">
+                <td class="py-4 border-b border-slate-50 pr-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-[18px] group-hover:bg-(--dd-blue-light)/20 group-hover:text-(--dd-blue) transition-colors">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-slate-900 m-0">{{ c.title }}</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5 capitalize">{{ c.competitionType?.toLowerCase() || 'Skill' }} Competition</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="py-4 border-b border-slate-50 pr-4">
+                    <div class="flex flex-wrap gap-1.5">
+                        <span
+                            class="text-[10px] capitalize bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg border border-blue-100 font-semibold"
+                            *ngFor="let s of c.skills">{{ s }}</span>
+                    </div>
+                </td>
+                <td class="py-4 border-b border-slate-50 pr-4">
+                    <div class="flex items-center gap-1.5 cursor-pointer hover:text-(--dd-blue) transition-all" (click)="viewApplications(c)">
+                        <i class="bi bi-people text-slate-400 group-hover:text-(--dd-blue) transition-colors"></i>
+                        <span class="text-slate-600 font-semibold underline decoration-slate-200 underline-offset-4 decoration-dashed hover:decoration-(--dd-blue)">{{ c.applicants }}</span>
+                    </div>
+                </td>
+                <td class="py-4 border-b border-slate-50 text-[11px] text-slate-400 font-medium pr-4">{{ c.deadline | date:'mediumDate' }}</td>
+                <td class="py-4 border-b border-slate-50 pr-4">
+                    <span class="text-[10px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap" [ngClass]="{
+                        'bg-emerald-50 text-emerald-600 border border-emerald-100': c.status === 'active',
+                        'bg-slate-50 text-slate-600 border border-slate-100':  c.status === 'draft',
+                        'bg-rose-50 text-rose-600 border border-rose-100':   c.status === 'cancelled',
+                        'bg-sky-50 text-sky-600 border border-sky-100':  c.status === 'completed'
+                    }">{{ c.status | titlecase }}</span>
+                </td>
+                <td class="py-4 border-b border-slate-50 text-right">
+                    <div class="flex gap-2 justify-end">
+                        <button
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-blue-50 text-blue-600 hover:bg-blue-100"
+                            (click)="edit(c)" title="Edit">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Edit</span>
+                        </button>
+                        <button
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                            *ngIf="c.status === 'draft'" (click)="updateStatus(c, 'active')" title="Publish Now">
+                            <i class="bi bi-send-check-fill"></i>
+                            <span>Publish</span>
+                        </button>
+                        <button
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-rose-50 text-rose-600 hover:bg-rose-100"
+                            *ngIf="c.status !== 'cancelled' && c.status !== 'completed'"
+                            (click)="updateStatus(c, 'cancelled')" title="Cancel">
+                            <i class="bi bi-trash3"></i>
+                            <span>Cancel</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tbody *ngIf="!loading && filtered.length === 0">
+            <tr>
+                <td colspan="7" class="py-20 text-center">
+                    <div class="flex flex-col items-center justify-center opacity-40 text-slate-400">
+                        <i class="bi bi-database-exclamation text-5xl mb-3"></i>
+                        <p class="text-sm font-bold">No matching competitions found</p>
+                        <p class="text-xs mt-1">Try adjusting your filters or search terms</p>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tbody *ngIf="loading">
+            <tr>
+                <td colspan="7" class="py-20 text-center">
+                    <div class="flex flex-col items-center justify-center">
+                        <app-morph-loading size="md"></app-morph-loading>
+                        <p class="text-sm font-bold text-black animate-pulse mt-4">Syncing with server...</p>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Premium Upgrade Modal overlay -->
+<div class="fixed inset-0 z-999 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 transition-all"
+    *ngIf="showUpgradeModal">
+    <div
+        class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden scale-100 animate-[fadeIn_0.3s_ease-out]">
+        <!-- Header Image / Graphic -->
+        <div
+            class="h-32 bg-linear-to-br from-(--dd-blue) to-(--dd-blue-dark) relative flex items-center justify-center">
+            <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+            </div>
+            <i
+                class="bi bi-rocket-takeoff-fill text-6xl text-amber-300 drop-shadow-lg z-10 transition-transform hover:scale-110 duration-500"></i>
+        </div>
+
+        <div class="p-8 text-center">
+            <h2 class="text-2xl font-bold text-black mb-2">Upgrade to Unlock More!</h2>
+            <p class="text-sm text-black/50 mb-6 leading-relaxed">
+                You've reached your <b>{{ companyProfile?.plan || 'Free' }}</b> plan limit of 
+                <b class="text-red-500">{{ currentPlanDetails?.features?.competitions?.maxCompetitionsPerMonth || currentPlanDetails?.features?.competitions?.maxActiveCompetitions || 1 }} competitions</b>.
+                <span class="text-lg text-black mt-4 block">
+                    Upgrade your plan today to host more challenges and unlock advanced hiring analytics.
+                </span>
+            </p>
+
+            <div class="flex flex-col gap-3">
+                <button (click)="showUpgradeModal = false; router.navigate(['/company/dashboard/billing'])"
+                    class="py-5 w-full bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue) hover:opacity-90 text-white font-semibold rounded-2xl  transition-all active:scale-95 text-xl">
+                    View Premium Plans
+                </button>
+                <button (click)="showUpgradeModal = false"
+                    class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition-all text-[14px]">
+                    Maybe Later
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

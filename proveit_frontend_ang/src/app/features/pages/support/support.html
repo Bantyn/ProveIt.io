@@ -1,0 +1,166 @@
+<!-- ================= HEADER ================= -->
+<header>
+    <app-navbar
+        [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+</header>
+
+<div
+    class="min-h-screen bg-[var(--dd-cream)] w-full relative overflow-hidden flex flex-col items-center justify-center">
+
+    <!-- Glowing background element -->
+    <div
+        class="absolute top-0 -right-50 w-[50%] h-full bg-linear-to-br from-transparent to-(--dd-yellow)/30 rounded-full blur-3xl opacity-60 mix-blend-multiply">
+    </div>
+
+    <!-- Main layout -->
+    <div class="relative z-10 w-full max-w-6xl mx-auto px-6 py-24 flex flex-col items-center gap-16">
+
+        <!-- HERO: Title + Search -->
+        <div class="flex flex-col min-h-[50vh] gap-6 text-center items-center justify-center">
+            <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
+                Help
+                <span
+                    class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-blue) to-(--dd-blue-light)">Center</span>
+            </h1>
+            <p class="text-slate-500 text-lg text-center max-w-2xl">
+                Search our knowledge base or browse categories below to find answers to common questions about
+                ProveIt.io.
+            </p>
+
+            <!-- Search Bar — bound to searchQuery -->
+            <div class="w-full max-w-2xl relative group mt-2">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i
+                        class="bi bi-search text-slate-400 group-focus-within:text-[var(--dd-blue)] transition-colors"></i>
+                </div>
+                <input #searchInput type="text" placeholder="Search for articles, guides, or FAQs..."
+                    (input)="onSearch(searchInput.value)"
+                    class="w-full pl-11 pr-5 py-3.5 rounded-2xl text-[14px] bg-white border border-(--dd-yellow)/30 outline-none focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 text-slate-700 placeholder:text-slate-400 transition-all">
+            </div>
+        </div>
+
+        <!-- FAQ ACCORDION (after search, before category cards) -->
+        <div class="w-full -mt-10">
+            <!-- Section label -->
+            <div class="flex items-center gap-4 mb-6">
+                <h2 class="text-2xl font-bold text-slate-900">
+                    Frequently Asked
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--dd-blue)] to-(--dd-blue-light)">Questions</span>
+                </h2>
+                <div class="flex-1 h-px bg-linear-to-r from-(--dd-blue)/40 to-transparent"></div>
+            </div>
+            <app-faq-accordion [searchQuery]="searchQuery"></app-faq-accordion>
+        </div>
+
+        <!-- CATEGORY CARDS -->
+        <div class="w-full p-10 border border-[var(--dd-blue)]/10 rounded-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Category Card 1 -->
+                <a href="javascript:void(0)"
+                    class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center gap-4 hover:-translate-y-2 hover:shadow-xl hover:shadow-(--dd-blue)/10 transition-all duration-300 group no-underline">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-linear-to-br from-(--dd-blue)/10 to-(--dd-blue-dark)/10 flex items-center justify-center text-(--dd-blue) text-2xl group-hover:scale-110 transition-transform duration-300">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">For Candidates</h3>
+                        <p class="text-sm text-slate-500">Learn how to apply, take skill assessments, and manage your
+                            profile.</p>
+                    </div>
+                </a>
+
+                <!-- Category Card 2 -->
+                <a href="javascript:void(0)"
+                    class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center gap-4 hover:-translate-y-2 hover:shadow-xl hover:shadow-(--dd-blue)/10 transition-all duration-300 group no-underline">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-linear-to-br from-(--dd-blue)/10 to-(--dd-blue-light)/10 flex items-center justify-center text-(--dd-blue) text-2xl group-hover:scale-110 transition-transform duration-300">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">For Companies</h3>
+                        <p class="text-sm text-slate-500">Guides on posting competitions, reviewing applications, and
+                            billing.</p>
+                    </div>
+                </a>
+
+                <!-- Category Card 3 -->
+                <a href="javascript:void(0)"
+                    class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center gap-4 hover:-translate-y-2 hover:shadow-xl hover:shadow-(--dd-yellow)/20 transition-all duration-300 group no-underline">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-linear-to-br from-(--dd-yellow)/20 to-(--dd-blue-light)/20 flex items-center justify-center text-(--dd-blue-dark) text-2xl group-hover:scale-110 transition-transform duration-300">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Trust & Safety</h3>
+                        <p class="text-sm text-slate-500">Information about our plagiarism checks, AI scoring, and
+                            privacy policies.</p>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- BOTTOM INFO SECTION -->
+        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Heading -->
+            <h2 class="text-3xl md:text-4xl font-semibold leading-tight text-gray-400">
+                <span
+                    class="bg-gradient-to-r from-[var(--dd-blue-dark)] to-[var(--dd-orange)] bg-clip-text text-transparent">
+                    Still need help?
+                </span>
+                Our team is always here for you.
+            </h2>
+
+            <!-- Content -->
+            <div class="mt-8 space-y-10 text-gray-600 text-lg leading-relaxed">
+
+                <p>
+                    <span class="text-xl font-bold text-gray-800 tracking-wider">
+                        24/7 Support Team
+                    </span><br />
+                    Our dedicated support specialists are available around the clock to assist
+                    you with technical issues, account access, and platform guidance.
+                </p>
+
+                <p>
+                    <span class="text-xl font-bold text-gray-800 tracking-wider">
+                        Detailed Knowledge Base
+                    </span><br />
+                    Browse hundreds of step-by-step guides, FAQs, and tutorials — written
+                    to help both candidates and companies get the most out of ProveIt.
+                </p>
+
+                <p>
+                    <span class="text-xl font-bold text-gray-800 tracking-wider">
+                        Community & Forums
+                    </span><br />
+                    Connect with other ProveIt users, share experiences, and get answers
+                    from the community and our moderators.
+                </p>
+
+                <p>
+                    <span class="text-xl font-bold text-gray-800 tracking-wider">
+                        Onboarding Assistance
+                    </span><br />
+                    New to ProveIt? Our onboarding guides walk you through every feature
+                    so you can hit the ground running from day one.
+                </p>
+
+                <p>
+                    <span class="text-xl font-bold text-gray-800 tracking-wider">
+                        Direct Contact Support
+                    </span><br />
+                    Can't find your answer? Reach out directly via our contact form and a
+                    support representative will respond within one business day.
+                </p>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<app-footer></app-footer>

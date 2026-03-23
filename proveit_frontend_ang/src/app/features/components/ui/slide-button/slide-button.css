@@ -1,0 +1,31 @@
+:host {
+    display: inline-block;
+    user-select: none;
+    touch-action: none;
+}
+
+.slide-button-container {
+    overflow: hidden;
+}
+
+/* Custom spring-like transition for the handle reset */
+.transition-transform {
+    transition-property: transform;
+}
+
+.animate-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.fade-in {
+    opacity: 1 !important;
+}
+
+.zoom-in {
+    transform: scale(1) !important;
+}

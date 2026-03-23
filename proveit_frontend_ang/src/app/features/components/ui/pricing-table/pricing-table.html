@@ -1,0 +1,98 @@
+<section
+    [class]="cn(' text-slate-900 py-4 sm:py-8 px-0 fade-bottom overflow-hidden pb-0 transition-colors w-full', containerClassName)">
+    <div class="w-full mx-auto px-0 md:px-4">
+
+
+        <!-- Plan Cards -->
+        <div class="flex flex-col md:flex-row gap-5 mb-10 w-full justify-between items-stretch">
+            <button *ngFor="let plan of plans" type="button" (click)="handlePlanSelect(plan.level)" [class]="cn(
+          'flex-1 p-6 md:p-8 rounded-[32px] text-left transition-all outline-none border relative h-full bg-white',
+          selectedPlan === plan.level 
+            ? 'border-(--dd-orange) ring-4 ring-(--dd-orange)/10 shadow-xl shadow-(--dd-orange)/10 transform md:-translate-y-2' 
+            : 'border-slate-200 hover:border-slate-300 shadow-sm hover:-translate-y-1'
+        )">
+                <div *ngIf="currentPlanId === plan.id"
+                    class="absolute top-47 left-1/2 -translate-x-1/2 z-80 bg-green-100/80 backdrop-blur text-green-700 text-md px-2.5 py-1 rounded-full border border-green-200/50">
+                    Current
+                </div>
+
+                <div class="flex items-center justify-between mt-5 md:mt-0 mb-4">
+                    <span class="text-[18px] font-black text-slate-900  tracking-wide">{{ plan.name }}</span>
+                    <span *ngIf="plan.popular"
+                        class="text-[10px] font-black bg-linear-to-r from-(--dd-blue) to-(--dd-blue-dark) text-white px-3 py-1.5 rounded-full tracking-widest  shadow-sm">
+                        Popular
+                    </span>
+                </div>
+
+                <div class="flex items-baseline gap-1.5 mb-2">
+                    <span class="text-[42px] font-black text-slate-900 tracking-tighter flex items-start gap-1">
+                        <span class="text-2xl font-bold mt-2 text-slate-400">₹</span>
+                        {{ plan.price.monthly | number:'1.0-0' }}
+                    </span>
+                    <span class="text-[14px] font-semibold text-slate-500">
+                        / mo
+                    </span>
+                </div>
+
+                <p class="text-sm text-slate-500 font-medium mt-3" *ngIf="plan.description">
+                    {{ plan.description }}
+                </p>
+            </button>
+        </div>
+
+        <!-- Feature Table -->
+        <div
+            class="border border-slate-200 rounded-[28px] md:rounded-[36px] overflow-hidden shadow-sm bg-white mt-12 w-full max-w-full">
+            <div class="overflow-x-auto w-full">
+                <div class="min-w-[700px] w-full divide-y divide-slate-100">
+                    <!-- Header -->
+                    <div class="flex items-center px-6 py-5 bg-slate-50/50 border-b border-slate-100 w-full">
+                        <div class="flex-[1.5] text-[13px] font-black text-slate-400  tracking-widest pl-2">
+                            Features Included</div>
+                        <div class="flex flex-1 items-center justify-between gap-2 px-4 shadow-none">
+                            <div *ngFor="let plan of plans"
+                                class="w-[120px] text-center font-extrabold text-slate-800  tracking-wide text-[12px]">
+                                {{ plan.name }}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Rows -->
+                    <div *ngFor="let feature of features; let i = index" [class]="cn(
+                 'flex flex-row items-center px-6 py-4 transition-colors group w-full',
+                 feature.included === selectedPlan ? 'bg-(--dd-cream)' : 'hover:bg-slate-50/50'
+               )">
+                        <div
+                            class="flex-[1.5] text-[15px] font-bold text-slate-600 pl-2 group-hover:text-slate-900 transition-colors">
+                            {{ feature.name }}</div>
+                        <div class="flex flex-1 items-center justify-between gap-2 px-4">
+                            <div *ngFor="let plan of plans" class="w-[120px] flex justify-center items-center">
+                                <!-- Check -->
+                                <div *ngIf="shouldShowCheck(feature.included, plan.level)"
+                                    [class]="cn('w-7 h-7 rounded-full flex items-center justify-center transition-all', plan.level === selectedPlan ? 'bg-(--dd-blue-light) shadow-sm border border-(--dd-blue)/50' : 'bg-slate-100 group-hover:bg-slate-200 border border-slate-200/50')">
+                                    <i
+                                        [class]="cn('bi bi-check2 text-lg stroke-[3px]', plan.level === selectedPlan ? 'text-(--dd-blue-dark) font-black' : 'text-slate-500 font-bold')"></i>
+                                </div>
+                                <!-- Dash -->
+                                <div *ngIf="!shouldShowCheck(feature.included, plan.level)">
+                                    <span
+                                        class="text-slate-300 font-black block w-3.5 border-b-[3px] border-slate-200 rounded-full"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="mt-14 mb-8 text-center pb-2 flex justify-center w-full">
+            <button (click)="onUpgradeClick()" [disabled]="isCurrentSelected()"
+                [class]="cn('w-full sm:w-[320px] font-bold px-10 py-5 rounded-[20px] shadow-lg transition-all inline-flex items-center justify-center gap-3 text-[16px] tracking-wide border border-transparent disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none', buttonClassName || 'bg-(--dd-blue-dark) text-white  active:scale-[0.97] hover:shadow-xl hover:shadow-black/10')">
+                <span *ngIf="isCurrentSelected()">Current Plan Active</span>
+                <span *ngIf="!isCurrentSelected()">Upgrade to {{ getSelectedPlanName() }}</span>
+                <i class="bi"
+                    [ngClass]="isCurrentSelected() ? 'bi-check-circle-fill text-green-400' : 'bi-arrow-right'"></i>
+            </button>
+        </div>
+    </div>
+</section>

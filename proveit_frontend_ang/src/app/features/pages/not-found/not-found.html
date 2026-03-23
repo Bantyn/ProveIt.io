@@ -1,0 +1,29 @@
+<div class="min-h-screen flex flex-col items-center justify-center text-center px-4">
+
+  <h1 #title
+    class="text-[8rem] relative -mt-40 md:text-[32rem] font-extrabold leading-none opacity-30
+          bg-gradient-to-r from-[var(--dd-blue-light)] via-[var(--dd-yellow)] to-[var(--dd-orange)]
+          bg-clip-text text-transparent select-none">
+    404
+    <!-- <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0_,#fff)]"></div> -->
+  </h1>
+
+  <h2 #subtitle class="text-3xl md:text-4xl font-semibold text-gray-800 mt-2">
+    Page Not Found
+  </h2>
+
+  <p #desc class="text-gray-500 mt-4 max-w-md">
+    The page you’re trying to reach doesn’t exist or may have been moved.
+  </p>
+
+  <button
+    #btn
+    (click)="goback()"
+    class="mt-8 text-lg font-semibold
+           bg-gradient-to-r  bg-gradient-to-r from-[var(--dd-blue)] via-[var(--dd-orange)] to-[var(--dd-yellow)]
+           bg-clip-text text-transparent">
+    ← Go Back Home
+  </button>
+
+</div>
+

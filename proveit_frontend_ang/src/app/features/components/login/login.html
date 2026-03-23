@@ -1,0 +1,138 @@
+<div class="min-h-screen w-full flex bg-[var(--dd-cream)]">
+
+  <!-- LEFT : Premium Visual / Brand -->
+  <div class="hidden lg:flex w-1/2 relative">
+
+    <!-- Abstract Shapes -->
+    <div class="absolute -top-32 -left-32 w-[1020px] h-[520px] rounded-full
+             bg-gradient-to-br from-[var(--dd-blue)] via-[var(--dd-orange)] to-[var(--dd-yellow)]
+             blur-3xl opacity-80"></div>
+
+    <div class="absolute bottom-0 left-32 w-[420px] h-[420px] rounded-full
+             bg-gradient-to-tr from-[var(--dd-blue-dark)] via-[var(--dd-blue)] to-[var(--dd-orange)]
+             blur-3xl opacity-70"></div>
+
+    <!-- Brand Text -->
+    <div class="relative z-10 p-24">
+      <h1 class="text-7xl font-bold leading-tight text-black ">
+        Build. <br />
+        Compete. <br />
+        Get Hired.
+      </h1>
+      <p class="mt-6 text-md tracking-wider uppercase font-normal text-black/70 max-w-md">
+        Prove your real-world skills through challenges built by top companies.
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="w-full lg:w-1/2 flex items-center px-8 lg:px-24 bg-transparent">
+    <!-- LOGIN FORM -->
+    <form *ngIf="!forgotMode" class="w-full bg-transparent" (submit)="onSubmit()" [formGroup]="loginForm">
+      <div class="w-full max-w-md space-y-10 auth-container">
+        <!-- Heading -->
+        <div class="auth-item">
+          <h2 class="text-3xl font-bold text-[var(--dd-blue-dark)]">
+            Sign in
+          </h2>
+          <p class="mt-2 text-gray-500">
+            Welcome back. Let’s get you inside.
+          </p>
+        </div>
+        <!-- Inputs -->
+        <div class="space-y-6 auth-item">
+
+          <input type="email" placeholder="Email Address" formControlName="email"
+            class="w-full py-4 px-5 rounded-2xl text-[16px] bg-blue-50/50 border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10"
+            [ngClass]="{
+              'animate-shake border-red-500 placeholder:text-red-400 shadow-lg shadow-red-500/10': isEmailInvalid()
+            }" />
+
+
+          <input type="password" placeholder="Password" formControlName="password" autocomplete="current-password"
+            class="w-full py-4 px-5 rounded-2xl text-[16px] bg-blue-50/50 border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10"
+            [ngClass]="{
+              'animate-shake border-red-500 placeholder:text-red-400 shadow-lg shadow-red-500/10': isPasswordInvalid()
+            }" />
+
+
+        </div>
+
+        <!-- CTA -->
+        <button type="submit" [disabled]="loading" class="w-full py-4 rounded-full font-bold text-white
+               bg-gradient-to-r from-[var(--dd-blue-dark)] via-[var(--dd-orange)] to-[var(--dd-yellow)] shadow-lg shadow-(--dd-orange)/25 hover:scale-[1.02] active:scale-[0.98] transition-all
+               disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+          <app-morph-loading *ngIf="loading" size="xs" theme="light"></app-morph-loading>
+          {{ loading ? 'Processing...' : 'Continue' }}
+        </button>
+
+        <!-- Links -->
+        <div class="auth-item flex justify-between text-sm text-gray-500">
+          <span class="cursor-pointer hover:underline" (click)="toggleForgotMode()">Forgot password?</span>
+          <button type="button" (click)="toggleForm()" class="font-semibold text-[var(--dd-blue)] hover:underline">
+            Create account →
+          </button>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- FORGOT PASSWORD FORM -->
+    <form *ngIf="forgotMode" class="w-full bg-transparent"
+      (submit)="otpVerified ? resetPassword() : (otpSent ? verifyOtp() : sendOtp())" [formGroup]="forgotForm">
+      <div class="w-full max-w-md space-y-10 auth-container">
+        <!-- Heading -->
+        <div class="auth-item">
+          <h2 class="text-3xl font-bold text-[var(--dd-blue-dark)]">
+            Forgot Password
+          </h2>
+          <p class="mt-2 text-gray-500">
+            {{ otpVerified ? 'Enter your new password to reset your account.' : (otpSent ? 'Enter the OTP sent to your
+            email to verify your identity.' : 'Enter your email to receive a password reset OTP.') }}
+          </p>
+        </div>
+
+        <!-- Inputs -->
+        <div class="space-y-6 auth-item">
+          <input type="email" placeholder="Email Address" formControlName="email" *ngIf="!otpVerified"
+            class="w-full py-4 px-5 rounded-2xl text-[16px] bg-blue-50/50 border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10"
+            [readonly]="otpSent" />
+
+          <ng-container *ngIf="otpSent && !otpVerified">
+            <input type="text" placeholder="6-digit OTP" formControlName="otp"
+              class="w-full py-4 px-5 rounded-2xl text-[16px] bg-blue-50/50 border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10" />
+          </ng-container>
+
+          <ng-container *ngIf="otpVerified">
+            <input type="password" placeholder="New Password" formControlName="newPassword" autocomplete="new-password"
+              class="w-full py-4 px-5 rounded-2xl text-[16px] bg-blue-50/50 border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10" />
+          </ng-container>
+        </div>
+
+        <!-- CTA -->
+        <button type="submit" [disabled]="loading" class="w-full py-4 rounded-full font-bold text-white bg-gradient-to-r from-[var(--dd-blue-dark)] via-[var(--dd-orange)] to-[var(--dd-yellow)] shadow-lg shadow-(--dd-orange)/25 hover:scale-[1.02] active:scale-[0.98] transition-all
+               disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+          <app-morph-loading *ngIf="loading" size="xs" theme="light"></app-morph-loading>
+          {{ loading ? 'Processing...' : (otpVerified ? 'Reset Password' : (otpSent ? 'Verify OTP' : 'Send OTP')) }}
+        </button>
+
+        <!-- Links -->
+        <div class="auth-item flex justify-center text-sm text-gray-500">
+          <span class="cursor-pointer font-semibold text-[var(--dd-blue)] hover:underline" (click)="toggleForgotMode()">
+            ← Back to sign in
+          </span>
+        </div>
+      </div>
+    </form>
+  </div> <button type="button" (click)="back()" class="absolute left-0 right-0 bottom-6 mx-auto
+       flex items-center justify-center gap-2
+       text-md font-medium text-gray-500
+       transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+       hover:text-[var(--dd-blue)]
+       group">
+    <i class="bi bi-arrow-left
+         transition-transform duration-300
+         group-hover:-translate-x-1"></i>
+    Cancel
+  </button>
+</div>

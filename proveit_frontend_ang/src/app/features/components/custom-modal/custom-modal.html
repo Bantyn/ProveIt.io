@@ -1,0 +1,88 @@
+<div *ngIf="state"
+    [ngClass]="state.config.mode === 'schedule' ? 'items-start pt-8' : 'items-center'"
+    class="fixed inset-0 z-[99999] flex justify-center modal-backdrop p-4 font-sans">
+    <!-- Blurred overlay -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="onCancel()"></div>
+
+    <!-- Modal Card Border Container -->
+    <div
+        [ngClass]="state.config.mode === 'schedule' ? 'max-w-[620px]' : 'max-w-[400px]'"
+        class="relative w-full rounded-[2.5rem] bg-[var(--dd-blue)] p-1 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] modal-content overflow-visible">
+
+        <!-- Abstract shape behind inner container (optional, similar to reference) -->
+        <div
+            class="absolute bottom-0 left-0 w-full h-[150px] bg-[var(--dd-blue-dark)] opacity-40 blur-2xl rounded-full translate-y-1/2">
+        </div>
+
+        <!-- Inner White Area -->
+        <div
+            [ngClass]="state.config.mode === 'schedule' ? 'items-stretch text-left' : 'items-center text-center'"
+            class="relative w-full rounded-[2.2rem] bg-[#fdfdfc] pt-12 p-6 flex flex-col shadow-inner">
+
+            <!-- Close Button -->
+            <button (click)="onCancel()"
+                class="absolute top-5 right-5 w-9 h-9 rounded-full border-[1.5px] border-[var(--dd-blue)]/50 text-[var(--dd-blue)] flex items-center justify-center hover:bg-[var(--dd-blue)]/10 transition-colors cursor-pointer outline-none">
+                <i class="bi bi-x text-2xl -mt-0.5"></i>
+            </button>
+
+            <!-- Icon -->
+            <div
+                class="w-16 h-16 rounded-full bg-[var(--dd-blue)]/10 flex items-center justify-center text-[var(--dd-blue)] mb-4 shrink-0">
+                <i class="bi text-3xl"
+                    [ngClass]="state.config.type === 'error' ? 'bi-exclamation-triangle-fill text-rose-500' : 'bi-info-circle-fill'"></i>
+            </div>
+
+            <!-- Text Content -->
+            <h2 class="text-[22px] font-extrabold text-slate-800 leading-tight mb-3 px-4 tracking-tight">
+                {{ state.config.title }}
+            </h2>
+            <p class="text-slate-500 font-medium leading-relaxed mb-6 text-[14px] px-2">
+                {{ state.config.message }}
+            </p>
+
+            <!-- Schedule Form -->
+            <div *ngIf="state.config.mode === 'schedule'" class="w-full space-y-4 mb-2">
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Interview Date</label>
+                    <app-date-picker
+                        [date]="selectedDate"
+                        (dateChange)="selectedDate = $event"
+                        placeholder="Pick interview date">
+                    </app-date-picker>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                    <label for="interview-time" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Interview Time</label>
+                    <app-time-picker
+                        [time]="selectedTime"
+                        (timeChange)="selectedTime = $event"
+                        placeholder="Pick interview time">
+                    </app-time-picker>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="w-full flex gap-3 mt-auto pt-2">
+                <button *ngIf="state.config.showCancel" (click)="onCancel()"
+                    class="flex-1 py-3.5 px-4 rounded-xl font-bold text-white bg-gradient-to-tr from-[var(--dd-blue-dark)] to-[var(--dd-blue)] hover:opacity-90 active:scale-95 transition-all text-[15px] shadow-md shadow-blue-500/20 cursor-pointer border-none outline-none">
+                    {{ state.config.cancelText || 'Cancel' }}
+                </button>
+
+                <button *ngIf="state.config.mode === 'schedule'; else defaultConfirm" (click)="onSchedule()"
+                    [disabled]="!selectedDate || !selectedTime"
+                    class="flex-1 py-3.5 px-4 rounded-xl font-bold transition-all active:scale-95 text-[15px] cursor-pointer outline-none bg-gradient-to-tr from-[var(--dd-blue-dark)] to-[var(--dd-blue)] text-white border-transparent hover:opacity-90 shadow-md shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                    {{ state.config.confirmText || 'Schedule' }}
+                </button>
+
+                <ng-template #defaultConfirm>
+                    <button (click)="onConfirm()"
+                        class="flex-1 py-3.5 px-4 rounded-xl font-bold transition-all active:scale-95 text-[15px] cursor-pointer outline-none"
+                        [ngClass]="state.config.showCancel ? 'bg-transparent text-[var(--dd-blue)] border-2 border-[var(--dd-blue)] hover:bg-[var(--dd-blue)]/5' : 'bg-gradient-to-tr from-[var(--dd-blue-dark)] to-[var(--dd-blue)] text-white border-transparent hover:opacity-90 shadow-md shadow-blue-500/20 w-full'">
+                        {{ state.config.confirmText || 'OK' }}
+                    </button>
+                </ng-template>
+            </div>
+
+        </div>
+    </div>
+</div>

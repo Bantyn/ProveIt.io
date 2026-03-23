@@ -1,0 +1,37 @@
+<div class="flex flex-col items-center gap-6" (mouseleave)="clearHover()">
+
+    <!-- Emoji Buttons -->
+    <div class="flex items-center gap-3">
+        <button *ngFor="let item of ratingData; let i = index" (click)="handleClick(i + 1)"
+            (mouseenter)="setHover(i + 1)" class="group relative focus:outline-none transition-transform duration-300"
+            [attr.aria-label]="'Rate ' + (i + 1) + ': ' + item.label">
+
+            <div class="relative flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 ease-out"
+                [ngClass]="isActive(i) ? 'scale-110' : 'scale-100 group-hover:scale-105'">
+
+                <span class="text-3xl transition-all duration-300 ease-out select-none" [ngClass]="isActive(i)
+                        ? 'grayscale-0 drop-shadow-lg'
+                        : 'grayscale opacity-40 group-hover:opacity-70'">
+                    {{ item.emoji }}
+                </span>
+            </div>
+        </button>
+    </div>
+
+    <!-- Label Area -->
+    <div class="relative h-7 w-36">
+        <!-- Default "Rate us" text -->
+        <div class="absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out"
+            [ngClass]="displayRating > 0 ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100'">
+            <span class="text-sm font-medium text-gray-400">Rate this company</span>
+        </div>
+
+        <!-- Active Label -->
+        <div *ngFor="let item of ratingData; let i = index"
+            class="absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out"
+            [ngClass]="displayRating === i + 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-105 blur-sm'">
+            <span class="text-sm font-semibold tracking-wide text-gray-800">{{ item.label }}</span>
+        </div>
+    </div>
+
+</div>

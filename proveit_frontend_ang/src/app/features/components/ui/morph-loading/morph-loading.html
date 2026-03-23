@@ -1,0 +1,11 @@
+<div *ngIf="variant === 'morph'" class="relative inline-flex items-center justify-center p-1"
+    [ngClass]="[containerSizeClass, classes]">
+    <div class="absolute inset-0 flex items-center justify-center">
+        <!-- Items loop -->
+        <div *ngFor="let i of items" class="absolute morph-element border border-white/20"
+            [ngClass]="[elementSizeClass, themeClass]"
+            [style.animation]="'morph-' + i + ' 1.5s infinite cubic-bezier(0.5, 0, 0.5, 1)'"
+            [style.animationDelay]="(i * 0.15) + 's'">
+        </div>
+    </div>
+</div>

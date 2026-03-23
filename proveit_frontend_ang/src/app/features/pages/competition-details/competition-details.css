@@ -1,0 +1,12 @@
+/* Host styling */
+:host {
+    display: block;
+}
+
+/* Variables from global context if accessible, else fallback below */
+:root {
+    --dd-orange: #ff6b00;
+    --dd-yellow: #ffb800;
+    --dd-cream: #fff3e0;
+    --dd-blue-dark: #d89924;
+}

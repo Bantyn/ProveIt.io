@@ -1,0 +1,81 @@
+<div class="footer-reveal-container relative h-[70vh]">
+  <div class="reveal-inner relative h-[calc(100vh+70vh)] -top-[100vh]">
+    <div class="h-[70vh] sticky top-[calc(100vh-70vh)]">
+
+      <footer
+        class="bg-linear-to-br from-(--dd-cream) via-(--dd-cream)/95 to-(--dd-cream)/90 py-12 px-8 md:px-16 h-full w-full flex flex-col justify-between relative overflow-hidden border-t border-(--dd-blue)/10">
+
+        <!-- Animated Background Glows -->
+        <div class="absolute inset-0 bg-linear-to-t from-white/40 to-transparent pointer-events-none"></div>
+
+        <div
+          class="absolute top-0 right-0 w-64 h-64 md:w-120 md:h-120 bg-(--dd-blue)/5 rounded-full blur-[100px] animate-pulse-subtle">
+        </div>
+        <div
+          class="absolute bottom-0 left-0 w-64 h-64 md:w-120 md:h-120 bg-(--dd-blue-light)/10 rounded-full blur-[100px] animate-pulse-subtle animation-delay-1000">
+        </div>
+
+        <!-- Navigation Section -->
+        <div class="relative z-10">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16">
+            <div *ngFor="let section of footerData.sections; let i = index" class="flex flex-col gap-3">
+              <h3
+                class="mb-2  text-(--dd-blue-dark) text-xs font-bold tracking-[0.2em] border-b border-(--dd-blue)/10 pb-2">
+                {{ section.title }}
+              </h3>
+              <a *ngFor="let link of section.links; let j = index" [routerLink]="link.path"
+                class="footer-link text-slate-500 hover:text-(--dd-blue) transition-all duration-300 font-medium text-sm w-fit group flex items-center gap-1">
+                <span class="relative">
+                  {{ link.label }}
+                  <span
+                    class="absolute bottom-0 left-0 h-px w-0 bg-(--dd-blue) transition-all duration-300 group-hover:w-full"></span>
+                </span>
+              </a>
+            </div>
+
+            <!-- Branding column -->
+            <div class="flex flex-col gap-4 max-w-xs">
+              <h3 class="text-3xl font-semibol tracking-tight text-slate-900">
+                Prove<span class="text-(--dd-blue)">It</span>
+              </h3>
+              <p class="text-slate-500 text-sm leading-relaxed">
+                {{ footerData.subtitle }}. The next generation of skills verification for modern teams.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Bottom Section -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end relative z-10 gap-6">
+          <div class="flex-1">
+            <h1
+              class="text-[12vw] md:text-[8vw] leading-[0.8] font-normal bg-linear-to-r from-slate-900 via-slate-700 to-slate-400 bg-clip-text text-transparent cursor-default select-none transition-all duration-700 hover:tracking-widest">
+              {{ footerData.title }}
+            </h1>
+
+            <div class="flex items-center gap-4 mt-6">
+              <div class="w-16 h-1 bg-linear-to-r from-(--dd-blue) to-(--dd-blue-light) rounded-full"></div>
+              <p class="text-slate-400 text-xs md:text-sm font-semibold tracking-wider ">
+                Ready to verify?
+              </p>
+            </div>
+          </div>
+
+          <div class="text-left md:text-right min-w-[200px]">
+            <p class="text-slate-400 text-sm mb-4">
+              {{ footerData.copyright }}
+            </p>
+
+            <div class="flex gap-3 md:justify-end">
+              <a *ngFor="let social of footerData.social" [href]="social.href"
+                class="w-10 h-10 rounded-xl bg-white border border-(--dd-blue)/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-(--dd-blue) hover:border-(--dd-blue) hover:-translate-y-1 hover:shadow-lg hover:shadow-(--dd-blue)/20 transition-all duration-300">
+                <lucide-icon [name]="social.icon" class="w-5 h-5"></lucide-icon>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</div>

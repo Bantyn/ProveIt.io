@@ -1,0 +1,49 @@
+<div class="fd-wrapper" [class.fd-open]="isOpen">
+    <!-- Trigger Button -->
+    <button type="button" class="fd-trigger" [class.fd-trigger--active]="isOpen"
+        [class.fd-trigger--selected]="!!selectedOption" (click)="toggle()" [attr.aria-expanded]="isOpen"
+        aria-haspopup="listbox">
+        <!-- Left: icon + label -->
+        <span class="fd-trigger-label">
+            <i *ngIf="selectedOption?.icon" [class]="selectedOption!.icon + ' fd-trigger-icon'"></i>
+            <i *ngIf="!selectedOption?.icon && !selectedOption"
+                class="bi bi-ui-checks-grid fd-trigger-icon fd-placeholder-icon"></i>
+            {{ displayLabel }}
+        </span>
+        <!-- Right: chevron -->
+        <span class="fd-chevron" [class.fd-chevron--up]="isOpen">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </span>
+    </button>
+
+    <!-- Dropdown panel -->
+    <div *ngIf="isOpen || isClosing" class="fd-panel" [class.fd-panel--open]="isOpen && !isClosing"
+        [class.fd-panel--closing]="isClosing" role="listbox">
+        <div class="fd-panel-inner">
+            <!-- Sliding highlight -->
+            <span class="fd-highlight"
+                [style.transform]="'translateY(calc(' + getHighlightIndex() + ' * 40px))'"></span>
+
+            <!-- Options -->
+            <button *ngFor="let option of options; let i = index" type="button" class="fd-option"
+                [class.fd-option--selected]="option.value === selectedValue"
+                [class.fd-option--hovered]="option.value === hoveredValue" (mouseenter)="setHovered(option.value)"
+                (mouseleave)="setHovered(null)" (click)="select(option)" role="option"
+                [attr.aria-selected]="option.value === selectedValue" [style.animation-delay]="(i * 0.04) + 's'">
+                <span class="fd-option-content">
+                    <i *ngIf="option.icon" [class]="option.icon + ' fd-option-icon'"></i>
+                    {{ option.label }}
+                </span>
+                <span *ngIf="option.value === selectedValue" class="fd-option-check">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>

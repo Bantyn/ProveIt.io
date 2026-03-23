@@ -1,0 +1,34 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div>
+        <h1 class="text-[22px] font-bold text-slate-900">Plans & Pricing</h1>
+        <p class="text-[13px] text-slate-500 mt-0.5">Create, edit or delete subscription plans</p>
+      </div>
+      <button class="bg-linear-to-br from-purple-600 to-purple-500 text-white font-semibold text-[13px] px-5 py-2 rounded-xl border-none cursor-pointer inline-flex items-center transition-opacity hover:opacity-90"><i class="bi bi-plus-circle mr-2"></i>Create Plan</button>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card" *ngFor="let p of plans" [class.plan-popular]="p.popular || p.name === 'GROWTH'">
+        <div class="plan-top">
+          <span class="plan-popular-badge" *ngIf="p.popular || p.name === 'GROWTH'">Most Popular</span>
+        </div>
+        <h3 class="plan-name">{{ p.name }}</h3>
+        <p class="plan-price">
+          ₹{{ (p.priceMonthly ?? p.price ?? 0) | number }}<span class="plan-per">/month</span>
+        </p>
+        <div class="plan-meta">
+          <span class="perm-tag"
+            ><i class="bi bi-trophy mr-1"></i>{{ p.features?.competitions?.maxCompetitionsPerMonth || 2 }} competitions/mo</span
+          >
+        </div>
+        <ul class="plan-features">
+          <li *ngIf="p.features?.messaging?.enabled"><i class="bi bi-check2 text-green-500 mr-2"></i>Messaging</li>
+          <li *ngIf="p.features?.analytics?.advancedAnalytics"><i class="bi bi-check2 text-green-500 mr-2"></i>Advanced Analytics</li>
+          <li *ngIf="p.features?.support?.prioritySupport"><i class="bi bi-check2 text-green-500 mr-2"></i>Priority Support</li>
+          <li *ngIf="p.features?.interviews?.enabled"><i class="bi bi-check2 text-green-500 mr-2"></i>Interviews</li>
+          <li *ngIf="p.features?.ai?.chatbotSupport"><i class="bi bi-check2 text-green-500 mr-2"></i>AI Support</li>
+        </ul>
+        <div class="plan-actions">
+          <a [routerLink]="['/admin/billing/edit', p.id]" class="w-[30px] h-[30px] rounded-lg border-none cursor-pointer flex items-center justify-center text-[13px] transition-opacity hover:opacity-80 bg-blue-50 text-blue-500 no-underline shadow-sm"><i class="bi bi-pencil"></i></a>
+          <button class="w-[30px] h-[30px] rounded-lg border-none cursor-pointer flex items-center justify-center text-[13px] transition-opacity hover:opacity-80 bg-rose-50 text-rose-600 shadow-sm"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+    </div>

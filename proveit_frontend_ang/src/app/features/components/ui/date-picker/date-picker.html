@@ -1,0 +1,55 @@
+<div class="dp-root">
+
+    <!-- ── Trigger Button ── -->
+    <button type="button" class="dp-trigger" [class.dp-trigger--active]="isOpen" [class.dp-trigger--selected]="!!date"
+        (click)="toggleDropdown()">
+        <i class="bi bi-calendar3 dp-icon"></i>
+        <span class="dp-trigger-text" [class.dp-trigger-text--placeholder]="!date">
+            {{ date ? formattedDate : placeholder }}
+        </span>
+        <i *ngIf="date" class="bi bi-x dp-clear" (click)="$event.stopPropagation(); clearDate()"></i>
+        <i *ngIf="!date" class="bi bi-chevron-down dp-chevron" [class.dp-chevron--open]="isOpen"></i>
+    </button>
+
+    <!-- ── Calendar Popover ── -->
+    <div class="dp-popover" [class.dp-popover--open]="isOpen">
+
+        <!-- Header: Month Nav -->
+        <div class="dp-header">
+            <button type="button" class="dp-nav-btn" (click)="prevMonth()" title="Previous month">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <span class="dp-month-label">{{ currentMonthLabel }}</span>
+            <button type="button" class="dp-nav-btn" (click)="nextMonth()" title="Next month">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Week day headers -->
+        <div class="dp-weekdays">
+            <span *ngFor="let d of weekDays" class="dp-weekday">{{ d }}</span>
+        </div>
+
+        <!-- Days Grid -->
+        <div class="dp-grid">
+            <button *ngFor="let day of calendarDays" type="button" class="dp-day"
+                [class.dp-day--other-month]="!day.currentMonth" [class.dp-day--today]="day.isToday && !day.isSelected"
+                [class.dp-day--selected]="day.isSelected" [class.dp-day--disabled]="day.isDisabled"
+                [disabled]="day.isDisabled" (click)="selectDay(day)" [attr.aria-label]="day.date | date:'longDate'"
+                [attr.aria-pressed]="day.isSelected">
+                {{ day.date.getDate() }}
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="dp-footer">
+            <button type="button" class="dp-today-btn" (click)="goToToday()">
+                Today
+            </button>
+            <button type="button" class="dp-clear-btn" *ngIf="date" (click)="clearDate()">
+                Clear
+            </button>
+        </div>
+
+    </div>
+</div>

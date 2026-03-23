@@ -1,0 +1,69 @@
+<section class="w-full mt-2">
+
+    <!-- No results state -->
+    <div *ngIf="filteredFaqs.length === 0" class="flex flex-col items-center justify-center py-16 gap-4 text-slate-400">
+        <i class="bi bi-search text-4xl"></i>
+        <p class="text-lg font-medium">No FAQs match your search.</p>
+        <p class="text-sm">Try a different keyword or browse all categories below.</p>
+    </div>
+
+    <!-- FAQ list -->
+    <ul class="space-y-3" *ngIf="filteredFaqs.length > 0">
+        <li *ngFor="let item of filteredFaqs; let i = index; trackBy: trackByQuestion"
+            class="faq-card group relative overflow-hidden rounded-2xl border border-(--dd-blue)/10 bg-white transition-all duration-400 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-(--dd-blue)/10"
+            [class.faq-card--open]="isOpen(i)">
+
+            <button type="button" [attr.aria-expanded]="isOpen(i)" [attr.aria-controls]="'faq-panel-' + i"
+                (click)="toggle(i)"
+                class="relative flex w-full items-start gap-5 px-7 py-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--dd-blue) transition-colors duration-300">
+
+                <!-- Icon circle -->
+                <span
+                    class="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all duration-500"
+                    [ngClass]="isOpen(i)
+            ? 'border-(--dd-blue) bg-gradient-to-br from-(--dd-blue)/10 to-(--dd-blue-light)/10 scale-105'
+            : 'border-(--dd-blue)/10 bg-(--dd-blue)/5 group-hover:scale-105'">
+                    <!-- Ping ring when open -->
+                    <span *ngIf="isOpen(i)"
+                        class="absolute inset-0 rounded-full border border-(--dd-blue)/40 animate-ping"></span>
+                    <!-- Plus → X icon -->
+                    <svg class="relative h-4 w-4 transition-transform duration-500" [style.color]="'var(--dd-blue)'"
+                        [class.rotate-45]="isOpen(i)" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </span>
+
+                <!-- Question + Meta -->
+                <div class="flex flex-1 flex-col gap-3">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                        <h3 class="text-base font-semibold text-slate-900 leading-snug sm:text-lg"
+                            [class.text-transparent]="isOpen(i)" [class.bg-clip-text]="isOpen(i)"
+                            [style]="isOpen(i) ? 'background-image: linear-gradient(to right, var(--dd-blue), var(--dd-blue-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;' : ''">
+                            {{ item.question }}
+                        </h3>
+                        <span
+                            class="inline-flex w-fit items-center rounded-full border border-(--dd-blue)/10 px-3 py-0.5 text-xs font-normal tracking-wider text-[var(--dd-blue)] sm:ml-auto whitespace-nowrap">
+                            {{ item.meta }}
+                        </span>
+                    </div>
+
+                    <!-- Answer panel (animated height) -->
+                    <div [id]="'faq-panel-' + i" role="region"
+                        class="overflow-hidden text-sm text-slate-500 leading-relaxed transition-all duration-500 ease-out"
+                        [style.maxHeight]="isOpen(i) ? '300px' : '0px'" [style.opacity]="isOpen(i) ? '1' : '0'">
+                        <p class="pr-2 pt-1">{{ item.answer }}</p>
+                    </div>
+                </div>
+            </button>
+
+            <!-- Glow accent bar on left when open -->
+            <div class="absolute left-0 top-0 h-full w-1 rounded-full bg-gradient-to-b from-(--dd-blue) to-(--dd-blue-light) transition-all duration-500"
+                [style.opacity]="isOpen(i) ? '1' : '0'" [style.transform]="isOpen(i) ? 'scaleY(1)' : 'scaleY(0)'">
+            </div>
+
+        </li>
+    </ul>
+
+</section>

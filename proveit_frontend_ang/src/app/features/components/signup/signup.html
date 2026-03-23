@@ -1,0 +1,101 @@
+<div class="min-h-screen w-full flex bg-(--dd-cream)">
+
+  <!-- LEFT : SAME BRAND VISUAL -->
+  <div class="hidden lg:flex w-1/2 relative">
+
+    <div class="absolute -top-32 -left-32 w-[1020px] h-[520px] rounded-full
+             bg-linear-to-br from-(--dd-blue) via-(--dd-orange) to-(--dd-yellow)
+             blur-3xl opacity-80">
+    </div>
+
+    <div class="absolute bottom-0 left-32 w-[420px] h-[420px] rounded-full
+             bg-linear-to-tr from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-orange)
+             blur-3xl opacity-70">
+    </div>
+
+    <div class="relative z-10 p-24">
+      <h1 class="text-7xl font-bold leading-tight text-black">
+        Join. <br />
+        Build. <br />
+        Succeed.
+      </h1>
+      <p class="mt-6 text-md tracking-wider uppercase font-normal text-black/70 max-w-md">
+        Create your ProveIt account and start proving real-world skills.
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="w-full lg:w-1/2 flex items-center px-8 lg:px-24">
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="w-full max-w-md space-y-10 auth-container">
+
+      <!-- Heading -->
+      <div class="auth-item">
+        <h2 class="text-3xl font-bold text-(--dd-blue-dark)">
+          Create account
+        </h2>
+        <p class="mt-2 text-gray-500">
+          Get started in less than a minute.
+        </p>
+      </div>
+      <!-- Inputs -->
+      <div class="space-y-6 auth-item relative">
+        <!-- Role Selection -->
+        <app-auth-mode-switcher
+          [options]="roleOptions"
+          [value]="activeRole"
+          (valueChange)="setActiveRole($event)"
+        ></app-auth-mode-switcher>
+
+        <input type="text" [placeholder]="signupForm.get('role')?.value === 'candidate' ? 'Username' : 'Company Name'"
+          formControlName="username"
+          class="w-full py-4 px-5 mt-5 rounded-2xl text-[16px] bg-blue-50/50 border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10"
+          [ngClass]="{
+            'animate-shake border-red-500 placeholder:text-red-400 shadow-lg shadow-red-500/10': isUsernameInvalid()
+          }" />
+        <input type="email" placeholder="Email Address" formControlName="email"
+          class="w-full py-4 px-5 rounded-2xl text-[16px] bg-blue-50/50 border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10"
+          [ngClass]="{
+            'animate-shake border-red-500 placeholder:text-red-400 shadow-lg shadow-red-500/10': isEmailInvalid()
+          }" />
+
+        <input type="password" placeholder="Password" formControlName="password" autocomplete="new-password"
+          class="w-full py-4 px-5 rounded-2xl text-[16px] bg-blue-50/50 border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10"
+          [ngClass]="{
+            'animate-shake border-red-500 placeholder:text-red-400 shadow-lg shadow-red-500/10': isPasswordInvalid()
+          }" />
+
+      </div>
+
+      <!-- CTA -->
+      <button type="submit" [disabled]="loading" class="w-full py-4 rounded-full font-bold text-white
+               bg-linear-to-r from-(--dd-blue-dark)
+               via-(--dd-orange) to-(--dd-yellow) shadow-lg shadow-(--dd-orange)/25 hover:scale-[1.02] active:scale-[0.98] transition-all
+               disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+        <app-morph-loading *ngIf="loading" size="xs" theme="light"></app-morph-loading>
+        {{ loading ? 'Processing...' : 'Create account' }}
+      </button>
+
+      <!-- Links -->
+      <div class="auth-item text-sm text-gray-500 text-right">
+        Already have an account?
+        <button type="button" (click)="toggleForm()" class="ml-1 font-semibold text-(--dd-blue) hover:underline">
+          Sign in →
+        </button>
+      </div>
+    </form>
+  </div>
+  <button type="button" (click)="back()" class="absolute left-0 right-0 bottom-6 mx-auto
+         flex items-center justify-center gap-2
+         text-md font-medium text-gray-500
+         transition-all duration-300 ease-in-out
+         hover:text-(--dd-blue)
+         group">
+    <i class="bi bi-arrow-left
+           transition-transform duration-300
+           group-hover:-translate-x-1"></i>
+    Cancel
+  </button>
+
+</div>

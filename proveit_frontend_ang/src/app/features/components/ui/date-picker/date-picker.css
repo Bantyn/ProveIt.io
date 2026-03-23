@@ -1,0 +1,310 @@
+/* ─────────────────────────────────────────────────────────
+   Date Picker – ProveIt style
+   Matches: rounded-2xl, orange / blue theme, Mulish font
+   ───────────────────────────────────────────────────────── */
+
+/* Container – needs position:relative so the popover anchors to it */
+.dp-root {
+    position: relative;
+    display: inline-block;
+    font-family: 'Mulish', sans-serif;
+}
+
+/* ── Trigger button ──────────────────────────────────────── */
+.dp-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 18px;
+    background: #ffffff;
+    border: 1.5px solid #dbeafe;
+    /* blue-100 */
+    border-radius: 16px;
+    font-family: 'Mulish', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #94a3b8;
+    /* slate-400 – placeholder */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    outline: none;
+}
+
+.dp-trigger:hover {
+    border-color: var(--dd-blue, #9a8cff);
+    box-shadow: 0 0 0 3px rgba(154, 140, 255, 0.08);
+}
+
+.dp-trigger--active,
+.dp-trigger:focus {
+    border-color: var(--dd-blue, #9a8cff);
+    box-shadow: 0 0 0 4px rgba(154, 140, 255, 0.10);
+}
+
+.dp-trigger--selected {
+    color: #0f172a;
+    /* slate-900 */
+}
+
+.dp-trigger-text {
+    flex: 1;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.dp-trigger-text--placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.dp-icon {
+    font-size: 15px;
+    color: var(--dd-blue, #9a8cff);
+    flex-shrink: 0;
+}
+
+.dp-chevron {
+    font-size: 12px;
+    color: #94a3b8;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.dp-chevron--open {
+    transform: rotate(180deg);
+}
+
+.dp-clear {
+    font-size: 16px;
+    color: #94a3b8;
+    flex-shrink: 0;
+    padding: 2px;
+    border-radius: 50%;
+    transition: color 0.15s, background 0.15s;
+}
+
+.dp-clear:hover {
+    color: #ef4444;
+    background: #fee2e2;
+}
+
+/* ── Popover ─────────────────────────────────────────────── */
+.dp-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 9999;
+    min-width: 300px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    /* slate-200 */
+    border-radius: 20px;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.06),
+        0 20px 40px -6px rgba(0, 0, 0, 0.10);
+    padding: 16px;
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.dp-popover--open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* ── Popover Header ──────────────────────────────────────── */
+.dp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.dp-nav-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.dp-nav-btn:hover {
+    background: var(--dd-orange, #a99cff);
+    border-color: var(--dd-orange, #a99cff);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.dp-month-label {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: 0.01em;
+}
+
+/* ── Weekdays ────────────────────────────────────────────── */
+.dp-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 6px;
+}
+
+.dp-weekday {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    padding: 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ── Day Grid ────────────────────────────────────────────── */
+.dp-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.dp-day {
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    font-family: 'Mulish', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: background 0.14s ease, color 0.14s ease, transform 0.12s ease;
+    outline: none;
+}
+
+.dp-day:hover:not(.dp-day--disabled):not(.dp-day--selected) {
+    background: #ede9ff;
+    /* purple-50 */
+    color: var(--dd-orange, #a99cff);
+    transform: scale(1.08);
+}
+
+/* Other-month days (leading / trailing) */
+.dp-day--other-month {
+    color: #cbd5e1;
+    /* slate-300 */
+    font-weight: 400;
+}
+
+.dp-day--other-month:hover:not(.dp-day--disabled) {
+    background: #f8fafc;
+    color: #94a3b8;
+    transform: scale(1.04);
+}
+
+/* Today */
+.dp-day--today {
+    background: #ede9ff;
+    color: var(--dd-orange, #a99cff);
+    font-weight: 800;
+}
+
+.dp-day--today::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--dd-orange, #a99cff);
+}
+
+.dp-day--today {
+    position: relative;
+}
+
+/* Selected */
+.dp-day--selected {
+    background: linear-gradient(135deg, var(--dd-blue-dark, #7a6cf0), var(--dd-yellow, #d6c9ff));
+    color: #fff !important;
+    font-weight: 800;
+    box-shadow: 0 3px 10px rgba(122, 108, 240, 0.4);
+    transform: scale(1.1);
+}
+
+.dp-day--selected:hover {
+    transform: scale(1.12);
+}
+
+/* Disabled */
+.dp-day--disabled {
+    color: #e2e8f0;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.dp-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1.5px solid #f1f5f9;
+}
+
+.dp-today-btn {
+    font-family: 'Mulish', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--dd-blue, #9a8cff);
+    background: none;
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.dp-today-btn:hover {
+    background: #ede9ff;
+    border-color: var(--dd-orange, #a99cff);
+    color: var(--dd-orange, #a99cff);
+}
+
+.dp-clear-btn {
+    font-family: 'Mulish', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #94a3b8;
+    background: none;
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.dp-clear-btn:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #ef4444;
+}

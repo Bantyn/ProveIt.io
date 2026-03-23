@@ -1,0 +1,325 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="text-[22px] font-bold text-slate-900">Company Settings</h1>
+        <p class="text-[13px] text-slate-500 mt-0.5">Manage profile, branding and security settings</p>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="flex gap-1 border-b-2 border-slate-100">
+
+    <div class="flex items-center gap-2.5 p-1 bg-white shadow-sm rounded-2xl border border-slate-100">
+        <button *ngFor="let f of statusFilters"
+            class="text-sm font-bold px-4 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
+            [ngClass]="filter === f ? 'bg-white text-[var(--dd-blue)] shadow-sm' : 'bg-transparent text-black hover:text-slate-700'"
+            (click)="setFilter(f)" (click)="activeTab=f">
+            {{ f | titlecase }}
+        </button>
+    </div>
+
+</div>
+
+
+<!-- Global Loading Spinner -->
+<div *ngIf="isLoading"
+    class="flex flex-col items-center justify-center p-20 mt-10 w-full rounded-2xl border border-slate-100 bg-white shadow-sm">
+    <app-morph-loading size="md"></app-morph-loading>
+    <div class="text-sm font-semibold text-slate-500 mt-4">Loading your settings...</div>
+</div>
+
+<!-- Profile Tab -->
+<div *ngIf="!isLoading && activeTab==='profile'" class="mt-8 p-6 rounded-3xl bg-white">
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+        <div>
+            <h2 class="text-lg font-bold text-slate-800 m-0">Company Profile</h2>
+            <p class="text-[11px] text-slate-400 mt-0.5 font-medium">This information will be visible to candidates</p>
+        </div>
+        <div class="flex flex-col items-end gap-1">
+            <span class="text-[10px] font-extrabold text-slate-400">Account Status</span>
+            <span class="text-[11px] font-bold px-3 py-1 rounded-full shadow-sm" [ngClass]="{
+                    'bg-amber-100 text-amber-700': company.verificationStatus === 'pending',
+                    'bg-emerald-100 text-emerald-700': company.verificationStatus === 'approved',
+                    'bg-rose-100 text-rose-700': company.verificationStatus === 'rejected'
+                }">{{ company.verificationStatus || 'Pending Approval' | titlecase }}</span>
+        </div>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="save()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+            <!-- Left Col (Basic Info) -->
+            <div class="flex flex-col gap-8">
+                <div class="flex flex-col gap-1.5 shadow-sm p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                    <label class="text-xs font-bold text-slate-400 flex items-center gap-1.5 ml-1">Job Credits <i
+                            class="bi bi-info-circle text-[10px]"
+                            title="Credits are managed by administrator"></i></label>
+                    <div
+                        class="w-full py-3.5 px-5 rounded-2xl bg-white border border-slate-200 text-[13.5px] font-bold text-slate-500 flex items-center justify-between shadow-sm">
+                        <span>{{ company.jobCredits || 0 }} Available</span>
+                        <i class="bi bi-lock-fill text-slate-300"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Company Name <span
+                                class="text-rose-500">*</span></label>
+                        <input
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. EduUp Technologies" formControlName="companyName" />
+                        <span class="text-xs text-rose-500 ml-2 font-medium"
+                            *ngIf="profileForm.get('companyName')?.touched && profileForm.get('companyName')?.invalid">Required</span>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Owner / Founder Name <span
+                                class="text-rose-500">*</span></label>
+                        <input
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. John Doe" formControlName="ownerName" />
+                        <span class="text-xs text-rose-500 ml-2 font-medium"
+                            *ngIf="profileForm.get('ownerName')?.touched && profileForm.get('ownerName')?.invalid">Required</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Tagline</label>
+                    <input
+                        class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                        placeholder="e.g. Innovating the future of learning" formControlName="tagline" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Industry Sector <span
+                                class="text-rose-500">*</span></label>
+                        <input
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. EdTech" formControlName="industry" />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Team Size <span
+                                class="text-rose-500">*</span></label>
+                        <input
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 50-200" formControlName="size" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Headquarters <span
+                                class="text-rose-500">*</span></label>
+                        <input
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. Mumbai, India" formControlName="location" />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Founded Year</label>
+                        <input
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 2018" formControlName="foundedYear" />
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Description <span
+                            class="text-rose-500">*</span></label>
+                    <textarea
+                        class="w-full py-5 px-5 rounded-3xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 min-h-[120px] resize-none"
+                        placeholder="Detailed overview of your company..." formControlName="description"></textarea>
+                    <span class="text-xs text-rose-500 ml-2 font-medium"
+                        *ngIf="profileForm.get('description')?.touched && profileForm.get('description')?.invalid">Description
+                        is required</span>
+                </div>
+            </div>
+
+            <!-- Right Col (Details & Links) -->
+            <div class="flex flex-col gap-8">
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Company Mission</label>
+                    <textarea
+                        class="w-full py-5 px-5 rounded-3xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 min-h-[100px] resize-none"
+                        placeholder="What is your core mission?" formControlName="mission"></textarea>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Work Culture</label>
+                    <textarea
+                        class="w-full py-5 px-5 rounded-3xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 min-h-[100px] resize-none"
+                        placeholder="Describe the day-to-day culture..." formControlName="culture"></textarea>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Perks & Benefits (Comma separated)</label>
+                    <input
+                        class="w-full py-6 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                        placeholder="e.g. Remote work, Health Insurance, Gym..." formControlName="benefits" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Contact Email <span
+                                class="text-rose-500">*</span></label>
+                        <input
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="contact@company.com" formControlName="email" type="email" />
+                        <span class="text-xs text-rose-500 ml-2 font-medium"
+                            *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.invalid">Valid email
+                            is required</span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Website URL</label>
+                        <input
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                            placeholder="https://..." formControlName="website" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-end gap-4 overflow-hidden">
+            <div class="flex items-center gap-2 text-[13px] text-emerald-600 font-bold animate-[fade-in_0.3s_ease-out]"
+                *ngIf="saved && activeTab==='profile'">
+                <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i
+                        class="bi bi-check"></i></div>
+                Profile updated successfully!
+            </div>
+            <p class="text-sm text-rose-500 font-medium" *ngIf="profileForm.invalid && profileForm.touched">Please fill
+                all required fields correctly.</p>
+            <button type="submit"
+                class="action-button"
+                [disabled]="isSaving">
+                <app-morph-loading *ngIf="isSaving" size="xs" theme="light"></app-morph-loading>
+                <i class="bi bi-person-check" *ngIf="!isSaving"></i>
+                {{ isSaving ? 'Saving...' : 'Update Profile' }}
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Branding Tab -->
+<div *ngIf="!isLoading && activeTab==='branding'" class="mt-8 p-6 rounded-3xl bg-white">
+    <h2 class="text-lg font-bold text-slate-800 m-0 mb-6 border-b border-slate-50 pb-4">Branding</h2>
+    <form [formGroup]="profileForm" (ngSubmit)="save()">
+        <div
+            class="flex flex-col md:flex-row items-start md:items-center gap-6 p-6 rounded-3xl border border-slate-100 bg-slate-50/50 mb-8">
+            <div
+                class="w-24 h-24 shrink-0 rounded-2xl bg-white shadow-sm border border-slate-200 flex items-center justify-center overflow-hidden relative">
+                <div class="absolute inset-0 bg-slate-100 animate-pulse" *ngIf="false"></div>
+                <img *ngIf="profileForm.get('logoUrl')?.value" [src]="profileForm.get('logoUrl')?.value"
+                    class="w-full h-full object-contain p-2 relative z-10" />
+                <span *ngIf="!profileForm.get('logoUrl')?.value" class="text-slate-300 font-bold text-xs">LOGO</span>
+            </div>
+            <div class="flex-grow w-full">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Company Logo URL</label>
+                    <input
+                        class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                        placeholder="https://link-to-your-logo.png" formControlName="logoUrl" />
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="flex flex-col md:flex-row items-start md:items-center gap-6 p-6 rounded-3xl border border-slate-100 bg-slate-50/50 mb-8">
+            <div
+                class="w-48 h-24 shrink-0 rounded-2xl bg-white shadow-sm border border-slate-200 flex items-center justify-center overflow-hidden relative">
+                <img *ngIf="profileForm.get('bannerUrl')?.value" [src]="profileForm.get('bannerUrl')?.value"
+                    class="w-full h-full object-cover relative z-10" />
+                <span *ngIf="!profileForm.get('bannerUrl')?.value"
+                    class="text-slate-300 font-bold text-xs uppercase tracking-widest">Banner</span>
+            </div>
+            <div class="flex-grow w-full">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-md font-semibold text-black ml-1">Company Banner URL (Cover Image)</label>
+                    <input
+                        class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                        placeholder="https://link-to-your-banner-image.png" formControlName="bannerUrl" />
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-md font-semibold text-black ml-1">LinkedIn Profile</label>
+                <div class="relative">
+                    <i class="bi bi-linkedin absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                    <input
+                        class="w-full py-5 pl-14 pr-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                        placeholder="https://linkedin.com/company/..." formControlName="linkedin" />
+                </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+                <label class="text-md font-semibold text-black ml-1">Twitter (X) Profile</label>
+                <div class="relative">
+                    <i class="bi bi-twitter-x absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                    <input
+                        class="w-full py-5 pl-14 pr-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                        placeholder="https://twitter.com/..." formControlName="twitter" />
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-end gap-4 overflow-hidden">
+            <div class="flex items-center gap-2 text-[13px] text-emerald-600 font-bold animate-[fade-in_0.3s_ease-out]"
+                *ngIf="saved && activeTab==='branding'">
+                <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i
+                        class="bi bi-check"></i></div>
+                Branding updated successfully!
+            </div>
+            <button type="submit"
+                class="action-button"
+                [disabled]="isSaving">
+                <app-morph-loading *ngIf="isSaving" size="xs" theme="light"></app-morph-loading>
+                <i class="bi bi-palette" *ngIf="!isSaving"></i>
+                {{ isSaving ? 'Saving...' : 'Update Branding' }}
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Security Tab -->
+<div *ngIf="!isLoading && activeTab==='security'" class="mt-8 p-6 rounded-3xl bg-white">
+    <h2 class="text-lg font-bold text-slate-800 m-0 border-b border-slate-50 mb-6 pb-4">Security</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex flex-col gap-1.5">
+            <label class="text-md font-semibold text-black ml-1">Current Password</label>
+            <input
+                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                type="password" />
+        </div>
+        <div class="flex w-full md:block hidden"></div>
+        <div class="flex flex-col gap-1.5">
+            <label class="text-md font-semibold text-black ml-1">New Password</label>
+            <input
+                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                type="password" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+            <label class="text-md font-semibold text-black ml-1">Confirm Password</label>
+            <input
+                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                type="password" />
+        </div>
+    </div>
+
+    <div class="mt-8 p-5 bg-orange-50/50 border border-orange-100 rounded-2xl flex items-center justify-between">
+        <div>
+            <p class="font-bold text-orange-900 text-[15px]">Two-Factor Authentication</p>
+            <p class="text-sm text-orange-700 mt-1">Add extra layer of security to your account</p>
+        </div>
+        <div
+            class="w-14 h-8 rounded-full bg-slate-200 relative cursor-pointer transition-colors shadow-inner flex items-center">
+            <div class="w-6 h-6 rounded-full bg-white absolute left-1 shadow-md transition-all duration-200"></div>
+        </div>
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-slate-100 flex justify-end">
+        <button
+            class="action-button">
+            <i class="bi bi-shield-lock"></i>
+            Update Password
+        </button>
+    </div>
+</div>

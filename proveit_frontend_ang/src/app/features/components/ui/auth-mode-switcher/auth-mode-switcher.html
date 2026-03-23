@@ -1,0 +1,14 @@
+<div class="auth-mode-switcher" [style.--switcher-count]="options.length" [style.--switcher-index]="getActiveIndex()">
+  <div class="auth-mode-switcher__thumb"></div>
+
+  <button
+    *ngFor="let option of options"
+    type="button"
+    class="auth-mode-switcher__option"
+    [ngClass]="{ 'auth-mode-switcher__option--active': value === option.value }"
+    (click)="selectOption(option.value)"
+  >
+    <i *ngIf="option.icon" [class]="option.icon"></i>
+    <span>{{ option.label }}</span>
+  </button>
+</div>

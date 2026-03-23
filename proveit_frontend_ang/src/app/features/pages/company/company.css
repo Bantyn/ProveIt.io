@@ -1,0 +1,73 @@
+/* Hide horizontal scrollbar but keep functionality */
+.cardContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.cardContainer {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Reveal Animation */
+.reveal-card {
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    border-radius: 2rem;
+    transition: transform 0.3s ease;
+}
+
+.reveal-card:hover {
+    /* transform: translateY(-5px); */
+}
+
+.reveal-card-base {
+    position: relative;
+    z-index: 10;
+    background: white;
+    height: 100%;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.reveal-card-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: var(--dd-blue-ultra-light);
+    /* background: rgba(255, 151, 81, 0.308); */
+
+    color: white !important;
+    clip-path: circle(0px at 3.25rem 3.25rem);
+    transition: clip-path 1.7s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.reveal-card:hover .reveal-card-overlay {
+    clip-path: circle(160% at 3.25rem 3.25rem);
+    pointer-events: auto;
+}
+
+.reveal-card-overlay * {
+    color: rgb(0, 0, 0) ;
+}
+
+.reveal-card-overlay .industry-tag {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    /* color: white !important; */
+}
+
+.reveal-card-overlay .view-btn {
+    border-color: rgba(255, 255, 255, 0.4);
+    color: var(--dd-blue-dark) !important;
+}
+
+.reveal-card-overlay .view-btn:hover {  
+    background: var(--dd-blue-dark);
+    color: white !important;
+}

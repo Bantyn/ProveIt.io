@@ -1,0 +1,283 @@
+<!-- Page Header -->
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="text-[22px] font-bold text-slate-900">Edit Plan</h1>
+        <p class="text-[13px] text-slate-500 mt-0.5">Update pricing, limits and features. Changes reflect live on the Pricing page.</p>
+    </div>
+    <a routerLink="/admin/billing"
+        class="text-md font-semibold px-4 py-2 rounded-xl bg-slate-100 text-black no-underline hover:bg-slate-200">
+        <i class="bi bi-arrow-left mr-1"></i> Back to Billing
+    </a>
+</div>
+
+<!-- Loading -->
+<div *ngIf="fetchingData"
+    class="flex flex-col items-center justify-center p-20 bg-white border border-slate-100 rounded-3xl">
+    <app-morph-loading size="md"></app-morph-loading>
+    <p class="mt-4 text-slate-600 font-medium">Loading plan data...</p>
+</div>
+
+<!-- Form -->
+<div class="bg-white rounded-3xl p-8" *ngIf="!fetchingData">
+    <form [formGroup]="planForm" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col gap-10">
+
+            <!-- ── SECTION 1: Basic Info ──────────────────────────── -->
+            <div>
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="bi bi-info-circle-fill text-blue-500 text-sm"></i>
+                    </div>
+                    <h2 class="text-base font-bold text-slate-800">Basic Information</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Plan Tier <span class="text-rose-500">*</span></label>
+                        <app-fluid-dropdown [options]="planNameOptions" placeholder="Select Plan Tier"
+                            formControlName="name">
+                        </app-fluid-dropdown>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Plan Status <span class="text-rose-500">*</span></label>
+                        <app-fluid-dropdown
+                            [options]="planStatusOptions"
+                            placeholder="Status" formControlName="isActive">
+                        </app-fluid-dropdown>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5 md:col-span-2">
+                        <label class="text-md font-semibold text-black ml-1">Description</label>
+                        <textarea formControlName="description"
+                            class="w-full py-4 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30 min-h-[90px] resize-none"
+                            placeholder="Describe what this plan offers to companies..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-px bg-slate-100"></div>
+
+            <!-- ── SECTION 2: Pricing ──────────────────────────────── -->
+            <div>
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <i class="bi bi-currency-rupee text-emerald-600 text-sm"></i>
+                    </div>
+                    <h2 class="text-base font-bold text-slate-800">Pricing (₹)</h2>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Monthly Price <span class="text-rose-500">*</span></label>
+                        <div class="relative">
+                            <i class="bi bi-currency-rupee absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                            <input type="number" formControlName="priceMonthly" min="0"
+                                class="w-full py-5 pl-10 pr-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                                placeholder="e.g. 1200" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Yearly Price</label>
+                        <div class="relative">
+                            <i class="bi bi-currency-rupee absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                            <input type="number" formControlName="priceYearly" min="0"
+                                class="w-full py-5 pl-10 pr-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                                placeholder="e.g. 10000 (optional)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-px bg-slate-100"></div>
+
+            <!-- ── SECTION 3: Competition Limits ──────────────────── -->
+            <div>
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center">
+                        <i class="bi bi-trophy-fill text-violet-500 text-sm"></i>
+                    </div>
+                    <h2 class="text-base font-bold text-slate-800">Competition Limits
+                        <span class="text-slate-400 text-xs font-normal ml-2">(use 999999 for unlimited)</span>
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Competitions / Month <span class="text-rose-500">*</span></label>
+                        <input type="number" formControlName="maxCompetitionsPerMonth" min="1"
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 2" />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Max Active Competitions <span class="text-rose-500">*</span></label>
+                        <input type="number" formControlName="maxActiveCompetitions" min="1"
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 1" />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Max Candidates / Competition <span class="text-rose-500">*</span></label>
+                        <div class="relative">
+                            <i class="bi bi-people-fill absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="number" formControlName="maxApplicationsPerCompetition" min="1"
+                                class="w-full py-5 pl-10 pr-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                                placeholder="e.g. 50" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Max Shortlisted / Competition <span class="text-rose-500">*</span>
+                            <span class="text-slate-400 text-xs font-normal">(-1 = unlimited)</span>
+                        </label>
+                        <input type="number" formControlName="maxShortlistedPerCompetition" min="-1"
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 5" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-px bg-slate-100"></div>
+
+            <!-- ── SECTION 4: Interviews ───────────────────────────── -->
+            <div>
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center">
+                        <i class="bi bi-camera-video-fill text-orange-500 text-sm"></i>
+                    </div>
+                    <h2 class="text-base font-bold text-slate-800">Interviews</h2>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5">
+                    <!-- Toggle Checkbox for Interview -->
+                    <label class="flex items-center gap-4 p-5 rounded-2xl border border-blue-100/50 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
+                        <div class="relative">
+                            <input type="checkbox" formControlName="interviewsEnabled" class="sr-only peer" />
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-(--dd-blue) transition-colors"></div>
+                            <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">Interviews Enabled</p>
+                            <p class="text-xs text-slate-400">Allow companies to schedule interview rounds</p>
+                        </div>
+                    </label>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Max Rounds / Application</label>
+                        <input type="number" formControlName="maxRoundsPerApplication" min="1"
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 2" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-px bg-slate-100"></div>
+
+            <!-- ── SECTION 5: Features & Add-ons ──────────────────── -->
+            <div>
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center">
+                        <i class="bi bi-stars text-teal-600 text-sm"></i>
+                    </div>
+                    <h2 class="text-base font-bold text-slate-800">Features & Add-ons</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label *ngFor="let feat of [
+                        {ctrl: 'advancedAnalytics', label: 'Advanced Analytics', sub: 'Detailed competition & candidate analytics', icon: 'bi bi-bar-chart-fill'},
+                        {ctrl: 'leaderboardAccess', label: 'Leaderboard Access', sub: 'Public ranked leaderboards for competitions', icon: 'bi bi-trophy-fill'},
+                        {ctrl: 'brandingCustomization', label: 'Custom Branding', sub: 'Company logo & colors on competition pages', icon: 'bi bi-palette-fill'},
+                        {ctrl: 'chatbotSupport', label: 'AI Chatbot Support', sub: '24/7 AI-powered support assistant', icon: 'bi bi-robot'},
+                        {ctrl: 'prioritySupport', label: 'Priority Support', sub: 'Dedicated support with faster response times', icon: 'bi bi-headset'}
+                    ]"
+                        class="flex items-center gap-4 p-5 rounded-2xl border border-blue-100/50 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
+                        <div class="relative shrink-0">
+                            <input type="checkbox" [formControlName]="feat.ctrl" class="sr-only peer" />
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-(--dd-blue) transition-colors"></div>
+                            <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                <i [class]="feat.icon + ' text-(--dd-blue) text-xs'"></i> {{ feat.label }}
+                            </p>
+                            <p class="text-xs text-slate-400">{{ feat.sub }}</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="h-px bg-slate-100"></div>
+
+            <!-- ── SECTION 6: Messaging ────────────────────────────── -->
+            <div>
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="bi bi-chat-dots-fill text-blue-500 text-sm"></i>
+                    </div>
+                    <h2 class="text-base font-bold text-slate-800">Messaging</h2>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5">
+                    <!-- Messaging Enabled Toggle -->
+                    <label class="flex items-center gap-4 p-5 rounded-2xl border border-blue-100/50 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
+                        <div class="relative shrink-0">
+                            <input type="checkbox" formControlName="messagingEnabled" class="sr-only peer" />
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-(--dd-blue) transition-colors"></div>
+                            <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">Messaging Enabled</p>
+                            <p class="text-xs text-slate-400">Allow companies to message candidates</p>
+                        </div>
+                    </label>
+
+                    <!-- File Sharing Toggle -->
+                    <label class="flex items-center gap-4 p-5 rounded-2xl border border-blue-100/50 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
+                        <div class="relative shrink-0">
+                            <input type="checkbox" formControlName="allowFileSharing" class="sr-only peer" />
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-(--dd-blue) transition-colors"></div>
+                            <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">Allow File Sharing</p>
+                            <p class="text-xs text-slate-400">Attachments in chat (PDF, images, etc.)</p>
+                        </div>
+                    </label>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Unlock Messaging Stage</label>
+                        <app-fluid-dropdown [options]="messagingStageOptions" placeholder="When to unlock messaging"
+                            formControlName="messagingUnlockStage">
+                        </app-fluid-dropdown>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Max Active Chats</label>
+                        <input type="number" formControlName="maxActiveChats" min="0"
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 10" />
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-md font-semibold text-black ml-1">Max Attachment Size (MB)</label>
+                        <input type="number" formControlName="maxAttachmentSizeMB" min="0"
+                            class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 font-normal placeholder:text-black/30"
+                            placeholder="e.g. 10" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Submit Bar -->
+        <div class="mt-10 pt-6 border-t border-slate-100 flex items-center justify-end gap-4">
+            <a routerLink="/admin/billing"
+                class="px-6 py-3 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 no-underline transition">
+                Cancel
+            </a>
+            <button type="submit" class="action-button" [disabled]="loading">
+                <app-morph-loading *ngIf="loading" size="xs" theme="light"></app-morph-loading>
+                <i class="bi bi-cloud-arrow-up-fill" *ngIf="!loading"></i>
+                {{ loading ? 'Saving...' : 'Save Plan' }}
+            </button>
+        </div>
+    </form>
+</div>

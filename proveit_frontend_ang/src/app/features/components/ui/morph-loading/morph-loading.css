@@ -1,0 +1,5 @@
+/* Morph Loading specific tweaks can go here, global keyframes handled in styles.css */
+.morph-element {
+    /* For smoother scaling and translate animations in tailwind/angular context */
+    will-change: transform, border-radius;
+}

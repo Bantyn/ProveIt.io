@@ -1,0 +1,94 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+  <div>
+    <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+      Application Overrides</h1>
+    <p class="text-[13px] text-black mt-1 font-medium">Moderate and override candidate applications across the platform</p>
+  </div>
+</div>
+
+<!-- Filters & Search Card -->
+<div class="bg-white dark:bg-neutral-900 rounded-4xl p-4 mb-8 border border-neutral-100 dark:border-neutral-800 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <!-- Status Filters -->
+        <div class="flex items-center gap-2 p-1 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl border border-neutral-200/50 dark:border-neutral-700">
+            <button *ngFor="let f of filters"
+                class="text-[14px] font-semibold px-5 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
+                [ngClass]="filter === f ? 'bg-white dark:bg-neutral-900 text-(--dd-blue) shadow-sm' : 'bg-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'"
+                (click)="filter = f">
+                {{ f | titlecase }}
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative min-w-[320px] flex-1 md:flex-none">
+            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
+            <input type="text" [(ngModel)]="searchTerm"
+                class="w-full py-3.5 pl-11 pr-5 rounded-2xl text-[13px] bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-neutral-400 dark:text-white"
+                placeholder="Search candidates by name or competition..." />
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-x-auto relative">
+  <!-- Glow effect -->
+  <div class="absolute -top-10 -left-10 w-32 h-32 bg-purple-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+
+  <table class="w-full border-collapse text-[13px] text-left whitespace-nowrap relative z-10">
+    <thead>
+      <tr>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Candidate Profile</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Competition ID</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Current Status</th>
+        <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let a of filtered" class="group hover:bg-slate-50/50 transition-colors">
+        <td class="py-4 border-b border-slate-50 pr-4">
+          <a [routerLink]="['/user/applications', a.id, 'details']" target="_blank" 
+             class="flex items-center gap-3 no-underline group/link">
+            <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-[16px] group-hover/link:bg-(--dd-blue-light)/20 group-hover/link:text-(--dd-blue) transition-colors font-bold">
+              {{ a.candidateName?.charAt(0) || 'U' }}
+            </div>
+            <span class="font-semibold text-slate-900 group-hover/link:text-(--dd-blue) transition-colors">{{ a.candidateName }}</span>
+          </a>
+        </td>
+        <td class="py-4 border-b border-slate-50 text-[11px] text-slate-400 font-medium pr-4 uppercase tracking-tighter">
+          <span class="cursor-pointer hover:text-(--dd-blue) underline decoration-slate-200 decoration-dashed underline-offset-4 transition-colors font-semibold" (click)="filterByCompetition(a.competitionId)">
+            {{ a.competitionId }}
+          </span>
+        </td>
+        <!-- <td class="py-4 border-b border-slate-50 pr-4 text-center">
+          <div class="inline-flex items-center justify-center px-3 py-1 rounded-lg font-bold text-[12px] shadow-xs"
+            [ngClass]="{
+              'bg-green-50 text-green-600': (a.score || 0) >= 80,
+              'bg-amber-50 text-amber-600': (a.score || 0) < 80 && (a.score || 0) >= 50,
+              'bg-rose-50 text-rose-600': (a.score || 0) < 50
+            }">{{ a.score || 0 }}</div>
+        </td> -->
+        <td class="py-4 border-b border-slate-50 pr-4">
+          <span
+            class="text-[12px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap"
+            [ngClass]="{
+              'bg-green-50 text-green-600 border border-green-100': a.status === 'shortlisted' || a.status === 'hired',
+              'bg-amber-50 text-amber-600 border border-amber-100': a.status === 'under_review',
+              'bg-rose-50 text-rose-600 border border-rose-100': a.status === 'rejected'
+            }"
+            >{{ a.status | titlecase }}</span>
+        </td>
+        <td class="py-4 border-b border-slate-50 text-right">
+          <div class="flex gap-2 justify-end">
+            <button class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-green-50 text-green-600 hover:bg-green-100 shadow-sm" title="Shortlist" (click)="updateStatus(a, 'shortlisted')">
+              <i class="bi bi-person-check"></i>
+              <span>Shortlist</span>
+            </button>
+            <button class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-rose-50 text-rose-600 hover:bg-rose-100 shadow-sm" title="Reject" (click)="updateStatus(a, 'rejected')">
+              <i class="bi bi-person-x"></i>
+              <span>Reject</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,17 @@
+<button [class]="getMergedClasses()" (click)="handleButtonClick()">
+  <span
+    class="circle m-0 block h-12 w-12 overflow-hidden rounded-full duration-500 group-hover:w-full transition-all"
+    [ngClass]="variant === 'primary' ? 'bg-(--dd-blue-dark)' : 'bg-slate-200'"
+    aria-hidden="true"
+  ></span>
+  <div
+    class="icon absolute top-1/2 left-4 translate-x-0 -translate-y-1/2 duration-500 group-hover:translate-x-[0.4rem] transition-all flex items-center justify-center h-12 w-12"
+  >
+    <lucide-icon [name]="arrowRight" class="text-white size-6"></lucide-icon>
+  </div>
+  <span
+    class="button-text text-gray-900 group-hover:text-white font-medium absolute top-1/2 left-1/2 ml-4 -translate-x-1/2 -translate-y-1/2 text-center text-lg tracking-tight whitespace-nowrap duration-500 transition-all"
+  >
+    {{ label }}
+  </span>
+</button>

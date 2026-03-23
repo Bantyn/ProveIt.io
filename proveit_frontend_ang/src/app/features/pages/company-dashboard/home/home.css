@@ -1,0 +1,41 @@
+.stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Base text colors */
+.stat-card.blue .text-content {
+    color: #0f4c81;
+}
+
+.stat-card.orange .text-content {
+    color: #8a3f0f;
+}
+
+.stat-card.green .text-content {
+    color: #166542;
+}
+
+.stat-card.purple .text-content {
+    color: #7f1d1d;
+}
+
+/* The skewed background shape */
+.stat-bg-right {
+    transform: skewX(-18deg);
+    transform-origin: top right;
+    box-shadow: -10px 0 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon hover effect */
+.stat-icon {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stat-card:hover .stat-icon {
+    transform: translateY(-50%) scale(1.15) rotate(5deg);
+}

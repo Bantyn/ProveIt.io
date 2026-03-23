@@ -1,0 +1,13 @@
+/* ── FAQ card open state ── */
+.faq-card--open {
+    border-color: color-mix(in srgb, var(--dd-blue), transparent 75%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--dd-blue), transparent 97%) 0%, color-mix(in srgb, var(--dd-yellow), transparent 97%) 100%);
+    box-shadow: 0 8px 32px -8px color-mix(in srgb, var(--dd-blue), transparent 88%);
+}
+
+/* ── Glow radial on hover (CSS-only fallback) ── */
+.faq-card:hover {
+    background: radial-gradient(circle at var(--faq-x, 50%) var(--faq-y, 50%),
+            color-mix(in srgb, var(--dd-blue), transparent 94%),
+            transparent 70%);
+}

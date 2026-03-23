@@ -1,0 +1,95 @@
+<!-- Company Dashboard – Reviews Tab -->
+<div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+    <div>
+        <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+            Company Reviews</h1>
+        <p class="text-[13px] text-black mt-1 font-medium">What candidates are saying about working with you</p>
+    </div>
+</div>
+
+<!-- Loading -->
+<div *ngIf="isLoading" class="py-20 flex flex-col items-center justify-center">
+    <div class="w-10 h-10 border-4 border-(--dd-blue-light)/20 border-t-(--dd-blue) rounded-full animate-spin"></div>
+    <p class="text-sm font-bold text-black mt-4 animate-pulse">Syncing with server...</p>
+</div>
+
+<div *ngIf="!isLoading">
+
+    <!-- Rating Summary Card -->
+    <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 mb-8 relative overflow-hidden">
+        <!-- Decoration -->
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-amber-50 rounded-full blur-3xl opacity-50"></div>
+        
+        <div class="flex flex-col md:flex-row gap-10 items-start relative z-10">
+
+            <!-- Big Score -->
+            <div
+                class="flex flex-col items-center justify-center bg-linear-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-8 min-w-[160px] shrink-0 shadow-sm transition-transform hover:scale-105">
+                <span class="text-6xl font-black text-gray-900 leading-none">
+                    {{ averageRating > 0 ? (averageRating | number:'1.1-1') : '—' }}
+                </span>
+                <div class="flex gap-0.5 mt-4">
+                    <i *ngFor="let s of starArray" class="bi text-xl"
+                        [ngClass]="s <= averageRating ? 'bi-star-fill text-amber-400' : (s - 0.5 <= averageRating ? 'bi-star-half text-amber-400' : 'bi-star text-neutral-200')"></i>
+                </div>
+                <p class="text-[11px] text-neutral-400 mt-3 font-bold uppercase tracking-wider">
+                    {{ reviewCount }} {{ reviewCount === 1 ? 'review' : 'reviews' }}
+                </p>
+            </div>
+
+            <!-- Star Bars -->
+            <div class="flex-1 space-y-4 w-full pt-2">
+                <div *ngFor="let star of [5,4,3,2,1]" class="flex items-center gap-4">
+                    <div class="flex gap-0.5 shrink-0 w-24">
+                        <i *ngFor="let s of starArray" class="bi text-[10px]"
+                            [ngClass]="s <= star ? 'bi-star-fill text-amber-400' : 'bi-star text-neutral-200'"></i>
+                    </div>
+                    <div class="flex-1 h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-amber-400 rounded-full transition-all duration-700 ease-out"
+                            [style.width]="starBarWidth(star)"></div>
+                    </div>
+                    <span class="text-[11px] text-neutral-400 font-bold w-10 text-right">{{ reviewCountForStar(star) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="grid gap-6">
+        <div *ngFor="let review of reviews"
+            class="group bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md transition-all hover:-translate-y-0.5">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-neutral-100 text-neutral-400 flex items-center justify-center text-xl font-bold shrink-0 transition-colors group-hover:bg-(--dd-blue-light)/20 group-hover:text-(--dd-blue)">
+                        {{ review.authorName?.charAt(0)?.toUpperCase() || 'U' }}
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-900 text-[15px] mb-0.5">{{ review.authorName || 'Anonymous Candidate' }}</p>
+                        <div class="flex gap-0.5">
+                            <i *ngFor="let s of starArray" class="bi text-[11px]"
+                                [ngClass]="s <= review.rating ? 'bi-star-fill text-amber-400' : 'bi-star text-neutral-200'"></i>
+                        </div>
+                    </div>
+                </div>
+                <span class="text-[11px] text-neutral-400 font-medium px-2 py-1 bg-neutral-50 rounded-lg group-hover:bg-neutral-100 transition-colors">
+                    {{ review.createdAt | date:'MMM d, yyyy' }}
+                </span>
+            </div>
+            <div class="pl-16">
+                <p *ngIf="review.comment" class="text-slate-600 text-[13px] leading-relaxed font-medium">{{ review.comment }}</p>
+                <p *ngIf="!review.comment" class="text-neutral-400 text-[13px] italic font-medium">No detailed feedback provided.</p>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="reviews.length === 0"
+            class="text-center py-20 bg-neutral-50 rounded-3xl border border-dashed border-neutral-200">
+            <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <i class="bi bi-chat-square-quote text-3xl text-neutral-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-700">No reviews yet</h3>
+            <p class="text-neutral-500 mt-2 text-[13px] font-medium max-w-xs mx-auto">Reviews from candidates will appear here once you complete competitions or interviews.</p>
+        </div>
+    </div>
+</div>
