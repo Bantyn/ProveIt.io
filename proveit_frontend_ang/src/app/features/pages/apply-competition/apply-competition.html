@@ -46,11 +46,11 @@
                             </div>
 
                             <div class="flex flex-col gap-1.5">
-                                <label class="text-md font-semibold text-black ml-1">Cover Letter / Note <span
+                                <label class="text-md font-semibold text-black ml-1">Quick Note <span
                                         class="text-rose-500">*</span></label>
                                 <textarea
                                     class="w-full py-5 px-5 rounded-3xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 min-h-[160px] resize-none"
-                                    placeholder="Why are you a good fit for this competition or hiring role? Describe your motivation..."
+                                    placeholder="A short intro or reason for applying is enough for the demo."
                                     formControlName="feedback"></textarea>
                                 <span class="text-xs text-rose-500 ml-2 mt-1 font-medium"
                                     *ngIf="applyForm.get('feedback')?.touched && applyForm.get('feedback')?.hasError('required')">
@@ -58,7 +58,7 @@
                                 </span>
                                 <span class="text-xs text-rose-500 ml-2 mt-1 font-medium"
                                     *ngIf="applyForm.get('feedback')?.touched && applyForm.get('feedback')?.hasError('minlength')">
-                                    Please provide a more detailed note (minimum 20 characters).
+                                    Please enter at least a short note.
                                 </span>
                             </div>
                             <div class="flex flex-col gap-6 mt-4">

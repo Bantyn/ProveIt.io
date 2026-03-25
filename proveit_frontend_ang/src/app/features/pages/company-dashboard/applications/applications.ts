@@ -27,7 +27,7 @@ export class CompanyApplications implements OnInit {
   applications: any[] = [];
   filter = 'all';
   selected: any = null;
-  statusFilters = ['all', 'submitted', 'under_evaluation', 'winner', 'interview_scheduled', 'not_selected'];
+  statusFilters = ['all', 'submitted', 'under_evaluation', 'winner', 'interview_scheduled', 'not_selected', 'rejected'];
   userId = '';
   companyId = '';
   loading = false;
@@ -39,6 +39,8 @@ export class CompanyApplications implements OnInit {
   allPlans: any[] = [];
   currentPlanDetails: any = null;
   showUpgradeModal = false;
+  savingEvaluationIds = new Set<string>();
+  evaluationModalApplication: any = null;
 
   ngOnInit() {
     this.auth.user$.pipe(take(1)).subscribe((user: any) => {
@@ -65,33 +67,27 @@ export class CompanyApplications implements OnInit {
               const planName = (profile.plan || 'Starter').toUpperCase();
               this.currentPlanDetails = this.allPlans.find(p => p.name.toUpperCase() === planName);
 
-              this.api.getCompanyApplications(profile.id).subscribe({
+              forkJoin({
+                applications: this.api.getCompanyApplications(profile.id),
+                competitions: this.api.getCompanyCompetitions(profile.id),
+                projects: this.api.getCompanyProjects(profile.id),
+              }).subscribe({
                 next: (data) => {
-                  this.api.getCompanyCompetitions(profile.id).subscribe({
-                    next: (comps) => {
-                      const compMap = new Map();
-                      comps.forEach((c) => compMap.set(c.id, c.title || c.name));
+                  const compMap = new Map();
+                  data.competitions.forEach((c: any) => compMap.set(c.id, c.title || c.name));
 
-                      this.applications = data.map((app: any) => ({
-                        ...app,
-                        competitionTitle: compMap.get(app.competitionId) || app.competitionId,
-                        score: app.score || Math.floor(Math.random() * 41) + 60, // Simulated score for now
-                        rank: app.rank || Math.floor(Math.random() * 50) + 1, // Simulated rank for now
-                      }));
-                      this.loading = false;
-                      this.cdr.detectChanges();
-                    },
-                    error: () => {
-                      this.applications = data.map((app: any) => ({
-                        ...app,
-                        score: app.score || '-',
-                        rank: app.rank || '-',
-                        competitionTitle: app.competitionId,
-                      }));
-                      this.loading = false;
-                      this.cdr.detectChanges();
-                    },
+                  const projectMap = new Map();
+                  data.projects.forEach((project: any) => {
+                    if (project.applicationId) {
+                      projectMap.set(project.applicationId, project);
+                    }
                   });
+
+                  this.applications = data.applications.map((app: any) =>
+                    this.decorateApplication(app, compMap, projectMap),
+                  );
+                  this.loading = false;
+                  this.cdr.detectChanges();
                 },
                 error: (err) => {
                   console.error(err);
@@ -151,8 +147,8 @@ export class CompanyApplications implements OnInit {
     }
 
     list.sort((a, b) => {
-      let valA = a[this.sortKey];
-      let valB = b[this.sortKey];
+      let valA = this.getSortValue(a, this.sortKey);
+      let valB = this.getSortValue(b, this.sortKey);
 
       if (typeof valA === 'string') valA = valA.toLowerCase();
       if (typeof valB === 'string') valB = valB.toLowerCase();
@@ -186,6 +182,65 @@ export class CompanyApplications implements OnInit {
       a.status = newStatus;
       this.cdr.detectChanges();
     });
+  }
+
+  async saveEvaluation(a: any) {
+    const score = Number(a.manualScoreInput);
+    const notes = (a.evaluationNotesInput || '').trim();
+
+    if (!Number.isFinite(score) || score < 0 || score > 100) {
+      this.modalService.alert('Please enter a valid score between 0 and 100.', 'Invalid Score');
+      return;
+    }
+
+    this.savingEvaluationIds.add(a.id);
+    this.cdr.detectChanges();
+
+    const nextStatus =
+      a.status === 'submitted' || a.status === 'under_review' ? 'under_evaluation' : a.status;
+
+    const updates = {
+      score,
+      status: nextStatus,
+      evaluation: {
+        manualScore: score,
+        notes,
+        evaluatedAt: new Date().toISOString(),
+        evaluatedBy: this.userId,
+      },
+    };
+
+    try {
+      await firstValueFrom(this.api.updateApplication(a.id, updates));
+      a.score = score;
+      a.status = nextStatus;
+      a.evaluation = updates.evaluation;
+      a.evaluationNotesInput = notes;
+      await this.recalculateCompetitionRanks(a.competitionId);
+      if (this.evaluationModalApplication?.id === a.id) {
+        this.closeEvaluationModal();
+      }
+    } catch (err: any) {
+      console.error('Failed to save evaluation', err);
+      await this.modalService.alert(
+        err?.error?.error || 'Score could not be saved. Please try again.',
+        'Save Failed',
+        'error',
+      );
+    } finally {
+      this.savingEvaluationIds.delete(a.id);
+      this.cdr.detectChanges();
+    }
+  }
+
+  openEvaluationModal(application: any) {
+    this.evaluationModalApplication = application;
+    this.cdr.detectChanges();
+  }
+
+  closeEvaluationModal() {
+    this.evaluationModalApplication = null;
+    this.cdr.detectChanges();
   }
 
   async scheduleInterview(a: any) {
@@ -250,5 +305,66 @@ export class CompanyApplications implements OnInit {
   filterByCompetition(title: string) {
     this.searchTerm = title;
     this.cdr.detectChanges();
+  }
+
+  hasScore(score: any): boolean {
+    return typeof score === 'number' && Number.isFinite(score);
+  }
+
+  private decorateApplication(app: any, compMap: Map<any, any>, projectMap: Map<any, any>) {
+    const project = projectMap.get(app.id);
+    const manualScore = this.parseNumericValue(app.score ?? app.evaluation?.manualScore);
+    const rank = this.parseNumericValue(app.rank);
+
+    return {
+      ...app,
+      project,
+      competitionTitle: compMap.get(app.competitionId) || app.competitionId,
+      score: manualScore,
+      rank,
+      manualScoreInput: manualScore ?? '',
+      evaluationNotesInput: app.evaluation?.notes || '',
+    };
+  }
+
+  private parseNumericValue(value: any): number | null {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  private getSortValue(application: any, key: string) {
+    if (key === 'score' || key === 'rank') {
+      return this.parseNumericValue(application[key]) ?? -1;
+    }
+    if (key === 'submittedAt') {
+      return application.submittedAt ? new Date(application.submittedAt).getTime() : 0;
+    }
+    return application[key] ?? '';
+  }
+
+  private async recalculateCompetitionRanks(competitionId: string) {
+    const sameCompetition = this.applications
+      .filter((app) => app.competitionId === competitionId)
+      .sort((a, b) => {
+        const scoreDiff = (b.score ?? -1) - (a.score ?? -1);
+        if (scoreDiff !== 0) return scoreDiff;
+        const timeA = a.submittedAt ? new Date(a.submittedAt).getTime() : Number.MAX_SAFE_INTEGER;
+        const timeB = b.submittedAt ? new Date(b.submittedAt).getTime() : Number.MAX_SAFE_INTEGER;
+        return timeA - timeB;
+      });
+
+    const updates: Promise<any>[] = [];
+
+    sameCompetition.forEach((app, index) => {
+      const nextRank = this.hasScore(app.score) ? index + 1 : null;
+      if (app.rank !== nextRank) {
+        app.rank = nextRank;
+        updates.push(firstValueFrom(this.api.updateApplication(app.id, { rank: nextRank })));
+      }
+    });
+
+    if (updates.length) {
+      await Promise.all(updates);
+    }
   }
 }

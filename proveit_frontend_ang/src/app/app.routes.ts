@@ -139,6 +139,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'pipeline',
+        loadComponent: () =>
+          import('./features/pages/company-dashboard/hiring-pipeline/hiring-pipeline').then(
+            (m) => m.HiringPipeline,
+          ),
+      },
+      {
         path: 'interviews',
         loadComponent: () =>
           import('./features/pages/company-dashboard/interviews/interviews').then(

@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 
 import { environment } from '../environments/eniroment';
 
@@ -9,11 +9,31 @@ import { environment } from '../environments/eniroment';
 })
 export class ApiService {
   private baseUrl = environment.apiUrl;
+  private requestCache = new Map<string, Observable<any>>();
 
   constructor(
     private http: HttpClient,
     private zone: NgZone,
   ) {}
+
+  private cachedGet<T>(key: string, factory: () => Observable<T>): Observable<T> {
+    const existing = this.requestCache.get(key);
+    if (existing) {
+      return existing as Observable<T>;
+    }
+
+    const request$ = factory().pipe(shareReplay(1));
+    this.requestCache.set(key, request$);
+    return request$;
+  }
+
+  private clearCache(prefixes: string[]) {
+    for (const key of Array.from(this.requestCache.keys())) {
+      if (prefixes.some((prefix) => key.startsWith(prefix))) {
+        this.requestCache.delete(key);
+      }
+    }
+  }
 
   // ─── AUTHENTICATION ────────────────────────────────────────────────────────
   sendPasswordResetOtp(email: string): Observable<any> {
@@ -51,7 +71,7 @@ export class ApiService {
 
   // ─── COMPANIES ────────────────────────────────────────────────────────────
   getCompanies(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/companies`);
+    return this.cachedGet('companies:list', () => this.http.get<any[]>(`${this.baseUrl}/companies`));
   }
 
   streamCompanies(): Observable<any[]> {
@@ -86,11 +106,14 @@ export class ApiService {
   }
 
   getCompany(id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/companies/${id}`);
+    return this.cachedGet(`companies:id:${id}`, () => this.http.get<any>(`${this.baseUrl}/companies/${id}`));
   }
 
   getCompanyByOwnerId(ownerId: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/companies/owner/${ownerId}`);
+    return this.cachedGet(
+      `companies:owner:${ownerId}`,
+      () => this.http.get<any>(`${this.baseUrl}/companies/owner/${ownerId}`),
+    );
   }
 
   createCompany(company: any): Observable<any> {
@@ -98,6 +121,7 @@ export class ApiService {
   }
 
   updateCompany(id: string, updates: any): Observable<any> {
+    this.clearCache(['companies:', `dashboard:${id}`]);
     return this.http.put<any>(`${this.baseUrl}/companies/${id}`, updates);
   }
 
@@ -106,7 +130,10 @@ export class ApiService {
   }
 
   getCompanyDashboard(id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/companies/${id}/dashboard`);
+    return this.cachedGet(
+      `dashboard:${id}`,
+      () => this.http.get<any>(`${this.baseUrl}/companies/${id}/dashboard`),
+    );
   }
 
   getCompanyReviews(id: string): Observable<any[]> {
@@ -132,7 +159,10 @@ export class ApiService {
 
   // ─── COMPETITIONS ─────────────────────────────────────────────────────────
   getCompetitions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/competitions`);
+    return this.cachedGet(
+      'competitions:list',
+      () => this.http.get<any[]>(`${this.baseUrl}/competitions`),
+    );
   }
 
   streamCompetitions(): Observable<any[]> {
@@ -165,11 +195,17 @@ export class ApiService {
   }
 
   getCompetition(id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/competitions/${id}`);
+    return this.cachedGet(
+      `competitions:id:${id}`,
+      () => this.http.get<any>(`${this.baseUrl}/competitions/${id}`),
+    );
   }
 
   getCompanyCompetitions(companyId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/competitions/company/${companyId}`);
+    return this.cachedGet(
+      `competitions:company:${companyId}`,
+      () => this.http.get<any[]>(`${this.baseUrl}/competitions/company/${companyId}`),
+    );
   }
 
   createCompetition(competition: any): Observable<any> {
@@ -177,6 +213,7 @@ export class ApiService {
   }
 
   updateCompetition(id: string, updates: any): Observable<any> {
+    this.clearCache(['competitions:', 'dashboard:']);
     return this.http.put<any>(`${this.baseUrl}/competitions/${id}`, updates);
   }
 
@@ -190,15 +227,24 @@ export class ApiService {
   }
 
   getApplication(id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/applications/${id}`);
+    return this.cachedGet(
+      `applications:id:${id}`,
+      () => this.http.get<any>(`${this.baseUrl}/applications/${id}`),
+    );
   }
 
   getUserApplications(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/applications/user/${userId}`);
+    return this.cachedGet(
+      `applications:user:${userId}`,
+      () => this.http.get<any[]>(`${this.baseUrl}/applications/user/${userId}`),
+    );
   }
 
   getCompetitionApplications(competitionId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/applications/competition/${competitionId}`);
+    return this.cachedGet(
+      `applications:competition:${competitionId}`,
+      () => this.http.get<any[]>(`${this.baseUrl}/applications/competition/${competitionId}`),
+    );
   }
 
   createApplication(application: any): Observable<any> {
@@ -206,6 +252,7 @@ export class ApiService {
   }
 
   updateApplication(id: string, updates: any): Observable<any> {
+    this.clearCache(['applications:', 'dashboard:']);
     return this.http.put<any>(`${this.baseUrl}/applications/${id}`, updates);
   }
 
@@ -214,12 +261,18 @@ export class ApiService {
   }
 
   getCompanyApplications(companyId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/applications/company/${companyId}`);
+    return this.cachedGet(
+      `applications:company:${companyId}`,
+      () => this.http.get<any[]>(`${this.baseUrl}/applications/company/${companyId}`),
+    );
   }
 
   // ─── PROJECTS ─────────────────────────────────────────────────────────────
   getCompanyProjects(companyId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/projects/company/${companyId}`);
+    return this.cachedGet(
+      `projects:company:${companyId}`,
+      () => this.http.get<any[]>(`${this.baseUrl}/projects/company/${companyId}`),
+    );
   }
   
   createProject(project: any): Observable<any> {
@@ -227,10 +280,14 @@ export class ApiService {
   }
 
   getProject(id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/projects/${id}`);
+    return this.cachedGet(
+      `projects:id:${id}`,
+      () => this.http.get<any>(`${this.baseUrl}/projects/${id}`),
+    );
   }
 
   updateProject(id: string, updates: any): Observable<any> {
+    this.clearCache(['projects:', 'applications:', 'dashboard:']);
     return this.http.put<any>(`${this.baseUrl}/projects/${id}`, updates);
   }
 

@@ -184,21 +184,10 @@ router.put('/:id', async (req, res) => {
 
         await userRef.update(updates);
 
-        // Synchronize with candidateProfiles if profile data is provided
+        // Synchronize a lightweight candidate profile for demo flows
         if (updates.isProfileCompleted) {
             const candidateProfileRef = db.collection('candidateProfiles').doc(userId);
 
-            // Construct education array if data exists
-            let education = [];
-            if (updates.degree || updates.college || updates.graduationYear) {
-                education.push({
-                    degree: updates.degree || '',
-                    college: updates.college || '',
-                    year: updates.graduationYear ? parseInt(updates.graduationYear, 10) : null
-                });
-            }
-
-            // Construct skills array with format required by Model.md
             let skillsData = [];
             if (updates.skills && Array.isArray(updates.skills)) {
                 skillsData = updates.skills.map(skillName => ({
@@ -210,14 +199,12 @@ router.put('/:id', async (req, res) => {
 
             const profileUpdates = {
                 userId: userId,
-                experienceLevel: updates.experienceLevel || 'Fresher',
                 github: updates.github || '',
                 resumeUrl: updates.resumeUrl || '',
                 updatedAt: new Date().toISOString()
             };
 
             if (skillsData.length > 0) profileUpdates.skills = skillsData;
-            if (education.length > 0) profileUpdates.education = education;
 
             await candidateProfileRef.set(profileUpdates, { merge: true });
         }

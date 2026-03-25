@@ -10,6 +10,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const maintenanceSettingsCache = {
+    value: null,
+    fetchedAt: 0,
+};
+const MAINTENANCE_CACHE_TTL_MS = 30000;
+
 app.use(async (req, res, next) => {
     try {
         if (
@@ -20,8 +26,15 @@ app.use(async (req, res, next) => {
             return next();
         }
 
-        const settingsDoc = await db.collection('systemSettings').doc('global').get();
-        const settings = settingsDoc.exists ? settingsDoc.data() : null;
+        const now = Date.now();
+        let settings = maintenanceSettingsCache.value;
+
+        if (!settings || now - maintenanceSettingsCache.fetchedAt > MAINTENANCE_CACHE_TTL_MS) {
+            const settingsDoc = await db.collection('systemSettings').doc('global').get();
+            settings = settingsDoc.exists ? settingsDoc.data() : null;
+            maintenanceSettingsCache.value = settings;
+            maintenanceSettingsCache.fetchedAt = now;
+        }
 
         if (settings?.maintenanceMode) {
             return res.status(503).json({

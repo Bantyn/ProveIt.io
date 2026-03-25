@@ -48,7 +48,7 @@ export class ApplyCompetition implements OnInit {
   submitting = false;
 
   applyForm = new FormGroup({
-    feedback: new FormControl('', [Validators.required, Validators.minLength(20)]),
+    feedback: new FormControl('', [Validators.required, Validators.minLength(5)]),
   });
 
   ngOnInit(): void {
@@ -141,31 +141,27 @@ export class ApplyCompetition implements OnInit {
 
   getProfileCompletion(data: any): number {
     if (!data) return 0;
+    if (data.isProfileCompleted) return 100;
 
     let completedValue = 0;
     const checklist = [
       { bonus: 10, key: 'id' },
       { bonus: 5, key: 'profileImage' },
-      { bonus: 10, key: 'fullName' },
-      { bonus: 20, key: 'college' },
-      { bonus: 15, key: 'skills' },
-      { bonus: 10, key: 'github' },
-      { bonus: 30, key: 'resumeUrl' },
+      { bonus: 35, key: 'fullName' },
+      { bonus: 25, key: 'phone' },
+      { bonus: 25, key: 'skills' },
     ];
 
-    const education = data.candidateProfile?.education?.[0] || {};
     const profileData = data.profile || {};
 
     const checks = {
       id: data.id || data._id || data.uid,
       profileImage: profileData.profileImage || data.profileImage,
       fullName: data.fullName,
-      college: data.college || education.college,
+      phone: profileData.phone || data.phone,
       skills:
         (data.candidateProfile?.skills?.length ? data.candidateProfile.skills : null) ||
         (data.skills?.length ? data.skills : null),
-      github: data.github || data.candidateProfile?.github,
-      resumeUrl: data.resumeUrl || data.candidateProfile?.resumeUrl,
     };
 
     checklist.forEach((item) => {

@@ -128,7 +128,7 @@ export class Compition implements OnInit, OnDestroy {
       this.recentlyViewedIds = [];
     }
 
-    this.subscription = this.api.streamCompetitions().subscribe({
+    this.subscription = this.api.getCompetitions().subscribe({
       next: (data) => {
         this.competitions = data;
         this.isLoading = false;

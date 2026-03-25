@@ -47,13 +47,13 @@ export class ProjectSubmission implements OnInit {
   howItWorksItems: FaqItem[] = [
     {
       question: 'How do I submit my project?',
-      answer: 'Provide links to your source code repository (like GitHub) and a live demo if applicable. Optionally, you can add external links for deeper context.',
+      answer: 'Use one main submission link and a short summary. That keeps the demo flow fast while still giving reviewers enough context.',
       meta: 'Submission'
     },
     {
-      question: 'What is the "How It Works" section for?',
-      answer: 'Use this section to explain your technical decisions, key features, and how you approached the problem. This helps reviewers understand your thought process.',
-      meta: 'Explanation'
+      question: 'What should I include in the summary?',
+      answer: 'Mention what the project does, the stack you used, and anything the reviewer should open first.',
+      meta: 'Summary'
     },
     {
       question: 'Can I edit my submission later?',
@@ -85,39 +85,16 @@ export class ProjectSubmission implements OnInit {
       projectTitle: ['', [Validators.required, Validators.minLength(3)]],
       shortDescription: ['', [Validators.required, Validators.maxLength(500)]],
       submissionType: ['GITHUB', Validators.required],
-
-      githubLink: ['', Validators.pattern('https?://.+')],
+      submissionLink: ['', [Validators.required, Validators.pattern('https?://.+')]],
       liveDemoLink: ['', Validators.pattern('https?://.+')],
-      demoVideoUrl: ['', Validators.pattern('https?://.+')],
-      documentationUrl: ['', Validators.pattern('https?://.+')],
-      screenshotsUrl: ['', Validators.pattern('https?://.+')],
-
       techStack: ['', Validators.required],
-
-      howItWorks: ['', Validators.required],
-      keyFeatures: [''],
-      challengesFaced: [''],
-      
-      // Candidate Insight Fields for Application
-      coverMessage: [''],
-      projectApproach: ['', Validators.required],
-      experienceSummary: [''],
-      portfolioDescription: [''],
-      whyInterested: [''],
-      availabilityNote: ['', Validators.required],
-
-      files: [[]],
     });
   }
 
   updateValidation(submissionType: string) {
-    const githubLinkCtrl = this.submissionForm.get('githubLink');
-    if (submissionType === 'GITHUB') {
-      githubLinkCtrl?.setValidators([Validators.required, Validators.pattern('https?://.+')]);
-    } else {
-      githubLinkCtrl?.setValidators([Validators.pattern('https?://.+')]);
-    }
-    githubLinkCtrl?.updateValueAndValidity();
+    const submissionLinkCtrl = this.submissionForm.get('submissionLink');
+    submissionLinkCtrl?.setValidators([Validators.required, Validators.pattern('https?://.+')]);
+    submissionLinkCtrl?.updateValueAndValidity();
   }
 
   loadComponentData() {
@@ -217,31 +194,27 @@ export class ProjectSubmission implements OnInit {
 
   getProfileCompletion(data: any): number {
     if (!data) return 0;
+    if (data.isProfileCompleted) return 100;
 
     let completedValue = 0;
     const checklist = [
       { bonus: 10, key: 'id' },
       { bonus: 5, key: 'profileImage' },
-      { bonus: 10, key: 'fullName' },
-      { bonus: 20, key: 'college' },
-      { bonus: 15, key: 'skills' },
-      { bonus: 10, key: 'github' },
-      { bonus: 30, key: 'resumeUrl' },
+      { bonus: 35, key: 'fullName' },
+      { bonus: 25, key: 'phone' },
+      { bonus: 25, key: 'skills' },
     ];
 
-    const education = data.candidateProfile?.education?.[0] || {};
     const profileData = data.profile || {};
 
     const checks = {
       id: data.id || data._id || data.uid,
       profileImage: profileData.profileImage || data.profileImage,
       fullName: data.fullName,
-      college: data.college || education.college,
+      phone: profileData.phone || data.phone,
       skills:
         (data.candidateProfile?.skills?.length ? data.candidateProfile.skills : null) ||
         (data.skills?.length ? data.skills : null),
-      github: data.github || data.candidateProfile?.github,
-      resumeUrl: data.resumeUrl || data.candidateProfile?.resumeUrl,
     };
 
     checklist.forEach((item) => {
@@ -275,14 +248,7 @@ export class ProjectSubmission implements OnInit {
       status: 'submitted',  // Directly to submitted state
       feedback: projectSummary,
       projectSummary: projectSummary,
-      
-      // Candidate Insights added exactly when they apply/submit
-      coverMessage: formValue.coverMessage,
-      projectApproach: formValue.projectApproach,
-      experienceSummary: formValue.experienceSummary,
-      portfolioDescription: formValue.portfolioDescription,
-      whyInterested: formValue.whyInterested,
-      availabilityNote: formValue.availabilityNote,
+      submissionLink: formValue.submissionLink,
     };
 
     if (this.competition.jobId) {
@@ -292,14 +258,6 @@ export class ProjectSubmission implements OnInit {
     this.api.createApplication(applicationPayload).subscribe({
       next: (createdApp: any) => {
         const applicationId = createdApp.id || createdApp._id;
-
-        // Build externalLinks and techStack for Project
-        const externalLinks = [];
-        if (formValue.githubLink) externalLinks.push({ label: 'GitHub Repo', url: formValue.githubLink });
-        if (formValue.liveDemoLink) externalLinks.push({ label: 'Live Demo', url: formValue.liveDemoLink });
-        if (formValue.demoVideoUrl) externalLinks.push({ label: 'Demo Video', url: formValue.demoVideoUrl });
-        if (formValue.documentationUrl) externalLinks.push({ label: 'Documentation', url: formValue.documentationUrl });
-        if (formValue.screenshotsUrl) externalLinks.push({ label: 'Screenshots', url: formValue.screenshotsUrl });
 
         const techStack = formValue.techStack
           .split(',')
@@ -316,15 +274,9 @@ export class ProjectSubmission implements OnInit {
           title: formValue.projectTitle,
           description: formValue.shortDescription,
           submissionType: formValue.submissionType,
+          submissionLink: formValue.submissionLink,
           techStack: techStack,
-          repoUrl: formValue.githubLink || '',
-          liveUrl: formValue.liveDemoLink || '',
-          externalLinks: externalLinks,
-          explanation: {
-            howItWorks: formValue.howItWorks,
-            keyFeatures: formValue.keyFeatures,
-            challengesFaced: formValue.challengesFaced,
-          },
+          liveDemoLink: formValue.liveDemoLink || '',
           aiScore: 0,
           plagiarism: '0%',
           status: 'pending',

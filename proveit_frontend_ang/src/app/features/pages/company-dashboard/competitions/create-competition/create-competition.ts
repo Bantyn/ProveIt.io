@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { NgIf, NgClass } from '@angular/common';
+import { NgIf, NgClass, NgFor } from '@angular/common';
 import { DatePicker } from '../../../../components/ui/date-picker/date-picker';
 import {
   FormsModule,
@@ -25,6 +25,7 @@ import { take } from 'rxjs/operators';
   imports: [
     NgIf,
     NgClass,
+    NgFor,
     FormsModule,
     ReactiveFormsModule,
     RouterLink,
@@ -56,12 +57,6 @@ export class CreateCompetition implements OnInit {
     { value: 'HIRING', label: 'Hiring Challenge', icon: 'bi bi-briefcase-fill' },
   ];
 
-  difficultyOptions: DropdownOption[] = [
-    { value: 'EASY', label: 'Easy', icon: 'bi bi-emoji-smile-fill' },
-    { value: 'MEDIUM', label: 'Medium', icon: 'bi bi-emoji-neutral-fill' },
-    { value: 'HARD', label: 'Hard', icon: 'bi bi-emoji-frown-fill' },
-  ];
-
   industryOptions: DropdownOption[] = [
     { value: 'TECHNOLOGY', label: 'Technology', icon: 'bi bi-cpu' },
     { value: 'FINANCE', label: 'Finance', icon: 'bi bi-bank' },
@@ -72,19 +67,27 @@ export class CreateCompetition implements OnInit {
     { value: 'OTHER', label: 'Other', icon: 'bi bi-grid' },
   ];
 
+  skillSuggestions: string[] = [
+    'Angular',
+    'React',
+    'Node.js',
+    'Firebase',
+    'MongoDB',
+    'UI/UX',
+    'Java',
+    'Python',
+    'SQL',
+    'Communication',
+  ];
+
   compForm = new FormGroup({
     title: new FormControl('', [Validators.required, Validators.minLength(5)]),
     description: new FormControl('', [Validators.required]),
     competitionType: new FormControl('SKILL', [Validators.required]),
-    difficulty: new FormControl('MEDIUM', [Validators.required]),
-    deadline: new FormControl('', [Validators.required]),
     startDate: new FormControl('', [Validators.required]),
     endDate: new FormControl('', [Validators.required]),
-    rules: new FormControl(''),
-    requiredSkills: new FormControl(''),
-    img_url: new FormControl('', [Validators.required]),
-    maxCandidates: new FormControl(50, [Validators.required, Validators.min(1)]),
     industry: new FormControl('TECHNOLOGY', [Validators.required]),
+    requiredSkills: new FormControl(''),
   });
 
   ngOnInit() {
@@ -98,23 +101,10 @@ export class CreateCompetition implements OnInit {
             title: comp.title || comp.name,
             description: comp.description,
             competitionType: comp.competitionType || comp.projectType || 'SKILL',
-            difficulty: comp.projectInfo?.difficulty || 'MEDIUM',
-            deadline: comp.projectInfo?.deadline
-              ? comp.projectInfo.deadline.split('T')[0]
-              : comp.deadline
-                ? comp.deadline.split('T')[0]
-                : '',
             startDate: comp.startDate ? comp.startDate.split('T')[0] : '',
             endDate: comp.endDate ? comp.endDate.split('T')[0] : '',
-            rules: comp.rules || (comp.responsibilities ? comp.responsibilities.join('\n') : ''),
-            requiredSkills: comp.requiredSkills
-              ? comp.requiredSkills.join(', ')
-              : comp.skillsRequired
-                ? comp.skillsRequired.join(', ')
-                : '',
-            img_url: comp.img_url || '',
-            maxCandidates: comp.projectInfo?.maxCandidates || comp.maxCandidates || 50,
             industry: comp.industry || 'TECHNOLOGY',
+            requiredSkills: comp.requiredSkills?.join(', ') || comp.skillsRequired?.join(', ') || '',
           });
           this.fetchingData = false;
         },
@@ -193,21 +183,15 @@ export class CreateCompetition implements OnInit {
       title: formVal.title,
       description: formVal.description,
       competitionType: formVal.competitionType,
-      rules: formVal.rules,
-      requiredSkills: formVal.requiredSkills?.split(',').map((s) => s.trim()) || [],
-      startDate: formVal.startDate ? new Date(formVal.startDate).toISOString() : null,
-      endDate: formVal.endDate ? new Date(formVal.endDate).toISOString() : null,
-      projectInfo: {
-        title: formVal.title,
-        difficulty: formVal.difficulty,
-        deadline: formVal.deadline ? new Date(formVal.deadline).toISOString() : null,
-        maxCandidates: formVal.maxCandidates || 50,
-        maxSubmissions: 1,
-      },
+      startDate: formVal.startDate ? this.toIsoFromDateString(formVal.startDate) : null,
+      endDate: formVal.endDate ? this.toIsoFromDateString(formVal.endDate) : null,
+      requiredSkills: formVal.requiredSkills
+        ?.split(',')
+        .map((skill) => skill.trim())
+        .filter(Boolean),
       status: this.isEditMode ? undefined : 'ACTIVE', // default to ACTIVE on creation
       visibility: 'public',
       companyName: this.companyName,
-      img_url: formVal.img_url,
       industry: formVal.industry,
     };
 
@@ -240,28 +224,48 @@ export class CreateCompetition implements OnInit {
 
   get startDateValue(): Date | null {
     const v = this.compForm.get('startDate')?.value;
-    return v ? new Date(v) : null;
+    return v ? this.parseLocalDate(v) : null;
   }
 
   get endDateValue(): Date | null {
     const v = this.compForm.get('endDate')?.value;
-    return v ? new Date(v) : null;
-  }
-
-  get deadlineValue(): Date | null {
-    const v = this.compForm.get('deadline')?.value;
-    return v ? new Date(v) : null;
+    return v ? this.parseLocalDate(v) : null;
   }
 
   onStartDateChange(date: Date | null) {
-    this.compForm.get('startDate')?.setValue(date ? date.toISOString().split('T')[0] : '');
+    this.compForm.get('startDate')?.setValue(date ? this.formatLocalDate(date) : '');
   }
 
   onEndDateChange(date: Date | null) {
-    this.compForm.get('endDate')?.setValue(date ? date.toISOString().split('T')[0] : '');
+    this.compForm.get('endDate')?.setValue(date ? this.formatLocalDate(date) : '');
   }
 
-  onDeadlineChange(date: Date | null) {
-    this.compForm.get('deadline')?.setValue(date ? date.toISOString().split('T')[0] : '');
+  private formatLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private parseLocalDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  addSuggestedSkill(skill: string) {
+    const currentValue = this.compForm.get('requiredSkills')?.value || '';
+    const skills = currentValue
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    if (!skills.includes(skill)) {
+      skills.push(skill);
+      this.compForm.get('requiredSkills')?.setValue(skills.join(', '));
+    }
+  }
+
+  private toIsoFromDateString(value: string): string {
+    return this.parseLocalDate(value).toISOString();
   }
 }

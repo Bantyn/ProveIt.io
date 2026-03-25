@@ -126,7 +126,7 @@ export class Company implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.isLoading = true;
-    this.subscription = this.api.streamCompanies().subscribe({
+    this.subscription = this.api.getCompanies().subscribe({
       next: (data) => {
         this.companies = data;
         this.isLoading = false;

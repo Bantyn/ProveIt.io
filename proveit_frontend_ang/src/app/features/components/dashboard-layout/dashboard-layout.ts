@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet, Router, RouterLink } from '@angular/router';
-import { NgFor, NgIf, SlicePipe, DatePipe } from '@angular/common';
+import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { Sidebar, SidebarBody, SidebarLink, Logo } from '../sidebar/sidebar';
 import { AuthService } from '../../../services/auth.service';
 import { ApiService } from '../../../services/api.service';
@@ -15,12 +15,13 @@ export interface NavItem {
   icon: string;
   badge?: number;
   superAdminOnly?: boolean;
+  requiredFeatureKey?: string;
 }
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, NgFor, NgIf, SlicePipe, DatePipe, Sidebar, SidebarBody, SidebarLink, Logo, LucideAngularModule],
+  imports: [RouterOutlet, RouterLink, NgFor, NgIf, DatePipe, Sidebar, SidebarBody, SidebarLink, Logo, LucideAngularModule],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.css',
 })
@@ -34,6 +35,7 @@ export class DashboardLayout implements OnInit {
   companyLogoUrl = '';
   userAvatarUrl = '';
   notifications: any[] = [];
+  currentPlanFeatures: any = null;
 
   constructor(
     private authService: AuthService,
@@ -44,6 +46,10 @@ export class DashboardLayout implements OnInit {
 
   get unreadNotifsCount() {
     return this.notifications.filter((n) => n.status === 'unread' || !n.status).length;
+  }
+
+  get previewNotifications() {
+    return this.notifications.slice(0, 5);
   }
 
   sidebarOpen = true;
@@ -73,6 +79,7 @@ export class DashboardLayout implements OnInit {
                 this.userName =
                   company.ownerName || company.contactPerson || user.displayName || this.companyName;
                 this.userInitials = this.getInitials(this.companyName);
+                this.loadCompanyPlanFeatures(company.plan || 'Starter');
                 this.cdr.detectChanges();
                 return;
               }
@@ -125,27 +132,30 @@ export class DashboardLayout implements OnInit {
     return '';
   }
 
+  get visibleNavItems() {
+    return this.navItems.filter((item) => this.isNavItemVisible(item));
+  }
+
   fetchNotifications() {
     if (this.role === 'admin') {
       this.apiService.getAdminNotifications().subscribe({
         next: (notifs: any[]) => {
-          this.notifications = (notifs || []).map((n: any) => ({
-            ...n,
-            status: n.status || 'unread',
-            createdAt: n.createdAt || n.timestamp
-          }));
+          this.notifications = this.normalizeNotifications(notifs || []);
           this.cdr.detectChanges();
         },
         error: (err) => {
           console.warn('Admin notifications API failed, falling back to logs.', err);
           // Fallback to logs if notifications endpoint doesn't exist yet
           this.apiService.getAdminLogs().subscribe((logs: any[]) => {
-            this.notifications = (logs || []).slice(0, 10).map((log: any) => ({
-              ...log,
-              message: log.description || log.action,
-              status: 'unread',
-              createdAt: log.createdAt || log.timestamp
-            }));
+            this.notifications = this.normalizeNotifications(
+              (logs || []).slice(0, 10).map((log: any) => ({
+                ...log,
+                title: log.action || 'Admin Update',
+                message: log.description || log.action,
+                status: 'unread',
+                createdAt: log.createdAt || log.timestamp,
+              })),
+            );
             this.cdr.detectChanges();
           });
         }
@@ -153,27 +163,44 @@ export class DashboardLayout implements OnInit {
     } else {
       this.authService.user$.pipe(take(1)).subscribe(user => {
         if (user) {
-          this.apiService.getCompanyByOwnerId(user.uid).subscribe(company => {
+          this.apiService.getCompanyByOwnerId(user.uid).subscribe({
+            next: (company) => {
             if (company && company.id) {
-               this.apiService.getCompanyDashboard(company.id).subscribe(dash => {
-                 if (dash && dash.recentApps) {
-                   this.notifications = dash.recentApps.map((app: any) => ({
-                     id: app.id,
-                     message: `New application received for ${app.competitionTitle || 'a competition'}`,
-                     createdAt: app.submittedAt,
-                     status: 'unread'
-                   }));
-                 }
-                 
-                 // If no recent apps, use dummy as fallback to keep UI alive
-                 if (this.notifications.length === 0) {
-                   this.notifications = this.dataService.notifications;
+               this.apiService.getCompanyDashboard(company.id).subscribe({
+                 next: (dash) => {
+                   if (dash?.recentApps?.length) {
+                     this.notifications = this.normalizeNotifications(
+                      dash.recentApps.map((app: any) => ({
+                        id: app.id,
+                        title: 'New Application',
+                        message: `New application received for ${app.competitionTitle || 'a competition'}`,
+                        createdAt: app.submittedAt,
+                        status: 'unread',
+                        type: 'info',
+                      })),
+                     );
+                   } else {
+                     this.notifications = this.normalizeNotifications(this.dataService.notifications);
+                   }
+                   this.cdr.detectChanges();
+                 },
+                 error: (err) => {
+                   console.warn('Company dashboard notifications failed, using fallback.', err);
+                   this.notifications = this.normalizeNotifications(this.dataService.notifications);
+                   this.cdr.detectChanges();
                  }
                });
             } else {
-              this.notifications = this.dataService.notifications;
+              this.notifications = this.normalizeNotifications(this.dataService.notifications);
+              this.cdr.detectChanges();
             }
-          });
+          },
+          error: (err) => {
+            console.warn('Company lookup failed for notifications, using fallback.', err);
+            this.notifications = this.normalizeNotifications(this.dataService.notifications);
+            this.cdr.detectChanges();
+          }
+        });
         }
       });
     }
@@ -195,6 +222,9 @@ export class DashboardLayout implements OnInit {
   toggleNotif() {
     this.notifOpen = !this.notifOpen;
     this.profileOpen = false;
+    if (this.notifOpen) {
+      this.fetchNotifications();
+    }
   }
 
   toggleProfile() {
@@ -239,5 +269,54 @@ export class DashboardLayout implements OnInit {
 
   logout() {
     this.authService.logOut();
+  }
+
+  private loadCompanyPlanFeatures(planName: string) {
+    this.apiService.getPlans().subscribe({
+      next: (plans: any[]) => {
+        const activePlan = (plans || []).find(
+          (plan: any) => plan.name?.toUpperCase() === String(planName || 'Starter').toUpperCase(),
+        );
+        this.currentPlanFeatures = activePlan?.features || null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error fetching plan features for dashboard nav:', err);
+        this.currentPlanFeatures = null;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private isNavItemVisible(item: NavItem): boolean {
+    if (!item.requiredFeatureKey || this.role !== 'company') {
+      return true;
+    }
+
+    return !!this.getFeatureValue(item.requiredFeatureKey);
+  }
+
+  private getFeatureValue(path: string): any {
+    const segments = path.split('.');
+    let value = this.currentPlanFeatures;
+
+    for (const segment of segments) {
+      value = value?.[segment];
+    }
+
+    return value;
+  }
+
+  private normalizeNotifications(items: any[]): any[] {
+    return (items || [])
+      .map((item: any, index: number) => ({
+        ...item,
+        id: item.id || `notif-${index}`,
+        title: item.title || item.type || 'Notification',
+        message: item.message || item.description || item.action || 'You have a new update.',
+        status: item.status || 'unread',
+        createdAt: item.createdAt || item.timestamp || new Date().toISOString(),
+      }))
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   }
 }

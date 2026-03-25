@@ -25,6 +25,7 @@
           <li *ngIf="p.features?.support?.prioritySupport"><i class="bi bi-check2 text-green-500 mr-2"></i>Priority Support</li>
           <li *ngIf="p.features?.interviews?.enabled"><i class="bi bi-check2 text-green-500 mr-2"></i>Interviews</li>
           <li *ngIf="p.features?.ai?.chatbotSupport"><i class="bi bi-check2 text-green-500 mr-2"></i>AI Support</li>
+          <li *ngIf="p.features?.pipeline?.enabled"><i class="bi bi-check2 text-green-500 mr-2"></i>Hiring Pipeline</li>
         </ul>
         <div class="plan-actions">
           <a [routerLink]="['/admin/billing/edit', p.id]" class="w-[30px] h-[30px] rounded-lg border-none cursor-pointer flex items-center justify-center text-[13px] transition-opacity hover:opacity-80 bg-blue-50 text-blue-500 no-underline shadow-sm"><i class="bi bi-pencil"></i></a>

@@ -9,356 +9,182 @@
 
     <main class="grow pt-24 pb-20 px-4 md:px-8">
         <div class="max-w-[80%] mx-auto">
-
-            <!-- Loading State -->
             <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-40">
                 <app-morph-loading size="md"></app-morph-loading>
                 <p class="mt-4 text-slate-500 font-medium">Loading your profile...</p>
             </div>
 
-            <!-- Main Content -->
             <div *ngIf="!isLoading" class="animate-fade-in">
-                <h1 class="text-2xl font-bold text-slate-900 mb-8">Edit Profile</h1>
+                <h1 class="text-2xl font-bold text-slate-900 mb-8">Candidate Profile</h1>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-                    <!-- LEFT COLUMN: Profile Preview -->
-                    <div class="lg:col-span-3 space-y-6 lg:sticky top-24">
-                        <div
-                            class="bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col pt-1">
-                            <!-- Banner -->
-                            <div class="h-28 w-full bg-slate-200 relative">
-                                <img *ngIf="profileForm.get('bannerUrl')?.value"
-                                    [src]="profileForm.get('bannerUrl')?.value" class="w-full h-full object-cover">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                            </div>
-                            <!-- Image -->
-                            <div class="px-6 relative flex justify-center -mt-14">
-                                <div
-                                    class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-white">
+                    <div class="lg:col-span-4 space-y-6 lg:sticky top-24">
+                        <div class="bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100">
+                            <div class="px-6 pt-8 flex justify-center">
+                                <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-slate-100">
                                     <img *ngIf="profileForm.get('profileImage')?.value"
                                         [src]="profileForm.get('profileImage')?.value"
                                         class="w-full h-full object-cover">
                                     <div *ngIf="!profileForm.get('profileImage')?.value"
-                                        class="w-full h-full bg-slate-100 flex items-center justify-center">
+                                        class="w-full h-full flex items-center justify-center">
                                         <i class="bi bi-person-fill text-4xl text-slate-300"></i>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Details -->
-                            <div class="p-6 pt-4 text-center">
-                                <h3 class="font-bold text-slate-900 text-lg">{{ profileForm.get('fullName')?.value ||
-                                    'Your Name' }}</h3>
-                                <p class="text-xs text-slate-500 font-medium -mt-0.5">{{
-                                    profileForm.get('experienceLevel')?.value || 'Fresher' }}</p>
 
-                                <div class="mt-3 flex flex-col gap-1.5 text-xs text-slate-500">
-                                    <div class="flex items-center justify-center gap-2 truncate">
-                                        <i class="bi bi-envelope-fill text-slate-400"></i>
-                                        <span>{{ profileForm.get('email')?.value }}</span>
-                                    </div>
-                                    <div *ngIf="profileForm.get('phone')?.value"
-                                        class="flex items-center justify-center gap-2">
-                                        <i class="bi bi-telephone-fill text-slate-400"></i>
-                                        <span>{{ profileForm.get('phone')?.value }}</span>
-                                    </div>
-                                </div>
+                            <div class="p-6 text-center">
+                                <h3 class="font-bold text-slate-900 text-lg">{{ profileForm.get('fullName')?.value || 'Your Name' }}</h3>
+                                <p class="text-xs text-slate-500 font-medium mt-1">{{ profileForm.get('email')?.value }}</p>
 
                                 <div class="my-4 h-px w-full bg-slate-100"></div>
 
-                                <div class="flex flex-col items-start gap-3 text-xs font-bold w-full pl-2">
-                                    <div class="flex items-start gap-3 text-slate-600 text-left">
-                                        <i class="bi bi-mortarboard-fill text-(--dd-blue) mt-0.5 text-sm"></i>
-                                        <div>
-                                            <p class="text-slate-800">{{ profileForm.get('degree')?.value || 'Degree' }}
-                                            </p>
-                                            <p class="text-[10px] text-slate-400 font-normal mt-0.5">Degree</p>
-                                        </div>
+                                <div class="space-y-3 text-left">
+                                    <div class="flex items-center gap-3 text-slate-600 text-sm">
+                                        <i class="bi bi-telephone-fill text-(--dd-blue)"></i>
+                                        <span>{{ profileForm.get('phone')?.value || 'Phone number not added' }}</span>
                                     </div>
-                                    <div class="flex items-start gap-3 text-slate-600 text-left">
-                                        <i class="bi bi-buildings-fill text-(--dd-blue) mt-0.5 text-sm"></i>
-                                        <div>
-                                            <p class="text-slate-800">{{ profileForm.get('college')?.value ||
-                                                'College/University' }}</p>
-                                            <p class="text-[10px] text-slate-400 font-normal mt-0.5">University/College
-                                            </p>
-                                        </div>
+                                    <div class="flex items-start gap-3 text-slate-600 text-sm">
+                                        <i class="bi bi-stars text-(--dd-blue) mt-1"></i>
+                                        <span>{{ profileForm.get('skills')?.value || 'Add a few core skills for your demo profile.' }}</span>
                                     </div>
-                                    <div class="flex items-start gap-3 text-slate-600 text-left"
-                                        *ngIf="profileForm.get('graduationYear')?.value">
-                                        <i class="bi bi-calendar-check-fill text-(--dd-blue) mt-0.5 text-sm"></i>
-                                        <div>
-                                            <p class="text-slate-800">{{ profileForm.get('graduationYear')?.value }}</p>
-                                            <p class="text-[10px] text-slate-400 font-normal mt-0.5">Graduation Year</p>
-                                        </div>
+                                    <div *ngIf="profileForm.get('github')?.value" class="flex items-center gap-3 text-slate-600 text-sm">
+                                        <i class="bi bi-github text-(--dd-blue)"></i>
+                                        <span class="truncate">{{ profileForm.get('github')?.value }}</span>
                                     </div>
-                                </div>
-
-                                <div class="my-4 h-px w-full bg-slate-100"></div>
-
-                                <div class="flex flex-wrap justify-center gap-1">
-                                    <ng-container *ngIf="profileForm.get('skills')?.value">
-                                        <span
-                                            *ngFor="let skill of (profileForm.get('skills')?.value || '').split(',').slice(0, 3)"
-                                            class="px-2 py-1 bg-slate-50 border border-slate-100 rounded text-[10px] font-bold text-slate-700"
-                                            [hidden]="!skill.trim()">
-                                            {{ skill.trim() }}
-                                        </span>
-                                        <span *ngIf="(profileForm.get('skills')?.value || '').split(',').length > 3"
-                                            class="px-2 py-1 bg-slate-50 border border-slate-100 rounded text-[10px] font-bold text-slate-400">
-                                            +{{ (profileForm.get('skills')?.value || '').split(',').length - 3 }}
-                                        </span>
-                                    </ng-container>
-                                    <span *ngIf="!profileForm.get('skills')?.value"
-                                        class="text-xs text-slate-400 italic">No skills added</span>
-                                </div>
-
-                                <div class="my-4 h-px w-full bg-slate-100"></div>
-
-                                <div class="flex justify-center gap-4">
-                                    <a *ngIf="profileForm.get('github')?.value"
-                                        [href]="profileForm.get('github')?.value" target="_blank"
-                                        class="w-8 h-8 rounded-full bg-slate-50 text-slate-700 flex items-center justify-center hover:bg-slate-200 transition-colors">
-                                        <i class="bi bi-github"></i>
-                                    </a>
-                                    <a *ngIf="profileForm.get('resumeUrl')?.value"
-                                        [href]="profileForm.get('resumeUrl')?.value" target="_blank"
-                                        class="w-8 h-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-100 transition-colors">
-                                        <i class="bi bi-file-earmark-pdf-fill"></i>
-                                    </a>
+                                    <div *ngIf="profileForm.get('resumeUrl')?.value" class="flex items-center gap-3 text-slate-600 text-sm">
+                                        <i class="bi bi-file-earmark-pdf-fill text-(--dd-blue)"></i>
+                                        <span class="truncate">{{ profileForm.get('resumeUrl')?.value }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- CENTER COLUMN: Profile Details Edit Form -->
-                    <div class="lg:col-span-6 space-y-6">
-
-                        <!-- SECTION 1: Avatar Upload -->
-                        <div
-                            class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center gap-8">
-                            <div class="relative group">
-                                <div
-                                    class="w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-400 shadow-md">
-                                    <img *ngIf="profileForm.get('profileImage')?.value"
-                                        [src]="profileForm.get('profileImage')?.value"
-                                        class="w-full h-full object-cover">
-                                    <div *ngIf="!profileForm.get('profileImage')?.value"
-                                        class="w-full h-full bg-slate-100 flex items-center justify-center">
-                                        <i class="bi bi-person-fill text-4xl text-slate-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grow">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <button type="button" (click)="toggleEdit('image')"
-                                        class="px-5 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
-                                        Upload new photo
-                                    </button>
-                                </div>
-                                <p class="text-xs text-slate-400">At least 800×800 px recommended. <br> JPG or PNG is
-                                    allowed</p>
-
-                                <!-- Expanded Image Fields -->
-                                <div *ngIf="editingSection === 'image'"
-                                    class="mt-4 animate-fade-in bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="block text-sm font-bold text-slate-500 mb-2">Profile
-                                                Image URL</label>
-                                            <input type="text" [formControl]="$any(profileForm.get('profileImage'))"
-                                                class="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-(--dd-blue) outline-none text-sm"
-                                                placeholder="https://...">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-bold text-slate-500 mb-2">Banner
-                                                Image URL</label>
-                                            <input type="text" [formControl]="$any(profileForm.get('bannerUrl'))"
-                                                class="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-(--dd-blue) outline-none text-sm"
-                                                placeholder="https://...">
-                                        </div>
-                                        <div class="flex justify-end gap-2 pt-2">
-                                            <button type="button" (click)="toggleEdit(null)"
-                                                class="text-sm rounded-xl font-bold text-[var(--dd-blue)] border border-[var(--dd-blue)] hover:bg-[var(--dd-blue)] hover:text-white px-4 py-2 transition-all">Cancel</button>
-                                            <button type="button" (click)="save()" class="action-button">Save
-                                                changes</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SECTION 2: Personal Info -->
+                    <div class="lg:col-span-5 space-y-6">
                         <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
                             <div class="flex justify-between items-center mb-8">
-                                <h2 class="text-lg font-bold text-slate-900">Personal Info</h2>
-                                <button type="button" (click)="toggleEdit('personal')"
+                                <div>
+                                    <h2 class="text-lg font-bold text-slate-900">Basic Info</h2>
+                                    <p class="text-sm text-slate-500 mt-1">Keep this light so it is fast to fill during your demo.</p>
+                                </div>
+                                <button type="button" (click)="toggleEdit('basic')"
                                     class="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
-                                    <i class="bi bi-pencil-square" *ngIf="editingSection !== 'personal'"></i>
-                                    {{ editingSection === 'personal' ? 'Cancel' : 'Edit' }}
+                                    <i class="bi bi-pencil-square" *ngIf="editingSection !== 'basic'"></i>
+                                    {{ editingSection === 'basic' ? 'Cancel' : 'Edit' }}
                                 </button>
                             </div>
 
-                            <div *ngIf="editingSection !== 'personal'" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div *ngIf="editingSection !== 'basic'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <p class="text-xs font-bold text-slate-400 mb-1">Full Name</p>
-                                    <p class="text-slate-900 font-bold">{{ profileForm.get('fullName')?.value || 'Not
-                                        set' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-bold text-slate-400 mb-1">Email</p>
-                                    <p class="text-slate-900 font-bold truncate">{{ profileForm.get('email')?.value }}
-                                    </p>
+                                    <p class="text-slate-900 font-bold">{{ profileForm.get('fullName')?.value || 'Not set' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs font-bold text-slate-400 mb-1">Phone</p>
-                                    <p class="text-slate-900 font-bold">{{ profileForm.get('phone')?.value || 'Not set'
-                                        }}</p>
+                                    <p class="text-slate-900 font-bold">{{ profileForm.get('phone')?.value || 'Not set' }}</p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <p class="text-xs font-bold text-slate-400 mb-1">Email</p>
+                                    <p class="text-slate-900 font-bold truncate">{{ profileForm.get('email')?.value }}</p>
                                 </div>
                             </div>
 
-                            <div *ngIf="editingSection === 'personal'" class="animate-fade-in space-y-6">
+                            <div *ngIf="editingSection === 'basic'" class="animate-fade-in space-y-6">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">Full
-                                            Name</label>
+                                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">Full Name</label>
                                         <input type="text" [formControl]="$any(profileForm.get('fullName'))"
                                             class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 focus:border-(--dd-blue) outline-none text-sm transition-all shadow-sm"
-                                            placeholder="Enter Full Name">
+                                            placeholder="Enter full name">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">Phone
-                                            Number</label>
+                                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">Phone Number</label>
                                         <input type="tel" [formControl]="$any(profileForm.get('phone'))"
-                                            class="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 focus:border-(--dd-blue) outline-none text-sm transition-all shadow-sm"
-                                            placeholder="Phone Number">
+                                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 focus:border-(--dd-blue) outline-none text-sm transition-all shadow-sm"
+                                            placeholder="Phone number">
                                     </div>
                                 </div>
                                 <div class="flex justify-end gap-3 mt-4">
                                     <button type="button" (click)="save()"
-                                        class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save
-                                        changes</button>
+                                        class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save changes</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- SECTION 3: Education / Professional -->
-                        <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
-                            <div class="flex justify-between items-center mb-8">
-                                <h2 class="text-lg font-bold text-slate-900">Academic & Career</h2>
-                                <button type="button" (click)="toggleEdit('professional')"
-                                    class="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
-                                    <i class="bi bi-pencil-square" *ngIf="editingSection !== 'professional'"></i>
-                                    {{ editingSection === 'professional' ? 'Cancel' : 'Edit' }}
-                                </button>
-                            </div>
-
-                            <div *ngIf="editingSection !== 'professional'"
-                                class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div
-                                    class="col-span-1 border border-slate-50 p-4 rounded-2xl bg-slate-50/30 flex items-center gap-3">
-                                    <div
-                                        class="w-10 h-10 rounded-xl bg-(--dd-blue)/10 flex items-center justify-center text-(--dd-blue)">
-                                        <i class="bi bi-mortarboard-fill"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-400 ml-0.5">Degree & College</p>
-                                        <p class="text-slate-900 font-bold text-sm">{{ profileForm.get('degree')?.value
-                                            }} - {{ profileForm.get('college')?.value }}</p>
-                                    </div>
-                                </div>
-                                <div
-                                    class="col-span-1 border border-slate-50 p-4 rounded-2xl bg-slate-50/30 flex items-center gap-3">
-                                    <div
-                                        class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600">
-                                        <i class="bi bi-briefcase-fill"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-400 ml-0.5">Experience</p>
-                                        <p class="text-slate-900 font-bold text-sm">{{
-                                            profileForm.get('experienceLevel')?.value }}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div *ngIf="editingSection === 'professional'" class="animate-fade-in space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-slate-500 mb-2 ml-1">University
-                                            / College</label>
-                                        <input type="text" [formControl]="$any(profileForm.get('college'))"
-                                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 outline-none text-sm transition-all"
-                                            placeholder="College name">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 mb-2 ml-1">Degree</label>
-                                        <input type="text" [formControl]="$any(profileForm.get('degree'))"
-                                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 outline-none text-sm transition-all"
-                                            placeholder="Degree">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 mb-2 ml-1">Experience
-                                            Level</label>
-                                        <app-fluid-dropdown [options]="experienceLevelOptions"
-                                            placeholder="Experience Level" [formControl]="$any(profileForm.get('experienceLevel'))">
-                                        </app-fluid-dropdown>
-                                    </div>
-                                </div>
-                                <div class="flex justify-end gap-3 mt-4">
-                                    <button type="button" (click)="save()"
-                                        class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save
-                                        changes</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SECTION 4: Bio & Skills -->
                         <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
                             <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-lg font-bold text-slate-900">Bio</h2>
-                                <button type="button" (click)="toggleEdit('bio')"
+                                <div>
+                                    <h2 class="text-lg font-bold text-slate-900">Skills</h2>
+                                    <p class="text-sm text-slate-500 mt-1">A short comma-separated list is enough for the viva.</p>
+                                </div>
+                                <button type="button" (click)="toggleEdit('skills')"
                                     class="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
-                                    <i class="bi bi-pencil-square" *ngIf="editingSection !== 'bio'"></i>
-                                    {{ editingSection === 'bio' ? 'Cancel' : 'Edit' }}
+                                    <i class="bi bi-pencil-square" *ngIf="editingSection !== 'skills'"></i>
+                                    {{ editingSection === 'skills' ? 'Cancel' : 'Edit' }}
                                 </button>
                             </div>
 
-                            <div *ngIf="editingSection !== 'bio'">
-                                <p class="text-sm text-slate-600 leading-relaxed mb-6 font-medium">
-                                    {{ profileForm.get('skills')?.value ? 'Passionate about ' +
-                                    profileForm.get('skills')?.value : 'Add your skills and bio to stand out to
-                                    employers.' }}
-                                </p>
+                            <div *ngIf="editingSection !== 'skills'">
                                 <div class="flex flex-wrap gap-2">
                                     <span *ngFor="let skill of (profileForm.get('skills')?.value || '').split(',')"
                                         class="px-4 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-xs font-bold text-slate-700"
                                         [hidden]="!skill.trim()">
                                         {{ skill.trim() }}
                                     </span>
+                                    <span *ngIf="!profileForm.get('skills')?.value" class="text-sm text-slate-400 italic">No skills added yet</span>
                                 </div>
                             </div>
 
-                            <div *ngIf="editingSection === 'bio'" class="animate-fade-in space-y-6">
+                            <div *ngIf="editingSection === 'skills'" class="animate-fade-in space-y-6">
                                 <div>
-                                    <label class="block text-sm font-bold text-slate-500 mb-3 ml-1">Skills
-                                        (Comma Separated)</label>
+                                    <label class="block text-sm font-bold text-slate-500 mb-3 ml-1">Skills</label>
                                     <textarea [formControl]="$any(profileForm.get('skills'))"
-                                        class="w-full px-5 py-4 rounded-[2rem] border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 outline-none text-sm transition-all min-h-[140px] resize-none"
-                                        placeholder="Angular, Node.js, UI Design..."></textarea>
+                                        class="w-full px-5 py-4 rounded-[2rem] border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 outline-none text-sm transition-all min-h-[120px] resize-none"
+                                        placeholder="Angular, Node.js, UI Design"></textarea>
                                 </div>
                                 <div class="flex justify-end gap-3 mt-4">
                                     <button type="button" (click)="save()"
-                                        class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save
-                                        changes</button>
+                                        class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save changes</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- SECTION 5: Links -->
                         <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
-                            <div class="flex justify-between items-center mb-8">
-                                <h2 class="text-lg font-bold text-slate-900">Project Links</h2>
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 class="text-lg font-bold text-slate-900">Profile Photo</h2>
+                                    <p class="text-sm text-slate-500 mt-1">Optional for the demo, but helpful for a polished preview.</p>
+                                </div>
+                                <button type="button" (click)="toggleEdit('image')"
+                                    class="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
+                                    <i class="bi bi-pencil-square" *ngIf="editingSection !== 'image'"></i>
+                                    {{ editingSection === 'image' ? 'Cancel' : 'Edit' }}
+                                </button>
+                            </div>
+
+                            <div *ngIf="editingSection !== 'image'" class="text-sm text-slate-600">
+                                {{ profileForm.get('profileImage')?.value || 'No photo URL added yet.' }}
+                            </div>
+
+                            <div *ngIf="editingSection === 'image'" class="animate-fade-in space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-500 mb-2">Profile Image URL</label>
+                                    <input type="text" [formControl]="$any(profileForm.get('profileImage'))"
+                                        class="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-(--dd-blue) outline-none text-sm"
+                                        placeholder="https://...">
+                                </div>
+                                <div class="flex justify-end gap-2 pt-2">
+                                    <button type="button" (click)="save()" class="action-button">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 class="text-lg font-bold text-slate-900">Links</h2>
+                                    <p class="text-sm text-slate-500 mt-1">Optional links you wanted back in the candidate profile.</p>
+                                </div>
                                 <button type="button" (click)="toggleEdit('links')"
                                     class="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
                                     <i class="bi bi-pencil-square" *ngIf="editingSection !== 'links'"></i>
@@ -366,58 +192,41 @@
                                 </button>
                             </div>
 
-                            <div *ngIf="editingSection !== 'links'" class="space-y-4">
-                                <div
-                                    class="flex items-center gap-3 p-3 rounded-2xl border border-slate-50 bg-slate-50/30">
-                                    <i class="bi bi-github text-xl text-slate-700"></i>
-                                    <p class="text-sm font-bold truncate text-(--dd-blue) underline">
-                                        {{ profileForm.get('github')?.value || 'GitHub not linked' }}
-                                    </p>
+                            <div *ngIf="editingSection !== 'links'" class="space-y-3 text-sm text-slate-600">
+                                <div class="flex items-center gap-3">
+                                    <i class="bi bi-github text-slate-700"></i>
+                                    <span class="truncate">{{ profileForm.get('github')?.value || 'GitHub link not added' }}</span>
                                 </div>
-                                <div
-                                    class="flex items-center gap-3 p-3 rounded-2xl border border-slate-50 bg-slate-50/30">
-                                    <i class="bi bi-file-earmark-pdf-fill text-xl text-rose-500"></i>
-                                    <p class="text-sm font-bold truncate text-(--dd-blue) underline">
-                                        {{ profileForm.get('resumeUrl')?.value || 'Resume not uploaded' }}
-                                    </p>
+                                <div class="flex items-center gap-3">
+                                    <i class="bi bi-file-earmark-pdf-fill text-rose-500"></i>
+                                    <span class="truncate">{{ profileForm.get('resumeUrl')?.value || 'Resume link not added' }}</span>
                                 </div>
                             </div>
 
                             <div *ngIf="editingSection === 'links'" class="animate-fade-in space-y-4">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
-                                        <i class="bi bi-github"></i>
-                                    </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-500 mb-2">GitHub Link</label>
                                     <input type="url" [formControl]="$any(profileForm.get('github'))"
-                                        class="flex-1 px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 outline-none text-sm transition-all"
-                                        placeholder="GitHub URL">
+                                        class="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-(--dd-blue) outline-none text-sm"
+                                        placeholder="https://github.com/username">
                                 </div>
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
-                                        <i class="bi bi-file-pdf"></i>
-                                    </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-500 mb-2">Resume Link</label>
                                     <input type="url" [formControl]="$any(profileForm.get('resumeUrl'))"
-                                        class="flex-1 px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 outline-none text-sm transition-all"
-                                        placeholder="Resume URL (PDF) Or Google Drive Link">
+                                        class="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-(--dd-blue) outline-none text-sm"
+                                        placeholder="https://drive.google.com/... or PDF link">
                                 </div>
-                                <div class="flex justify-end mt-4">
-                                    <button type="button" (click)="save()"
-                                        class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save
-                                        changes</button>
+                                <div class="flex justify-end gap-2 pt-2">
+                                    <button type="button" (click)="save()" class="action-button">Save changes</button>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    <!-- RIGHT COLUMN: Progress Sidebar -->
                     <div class="lg:col-span-3 sticky top-24">
-                        <div class="p-8 ">
-                            <h3 class="text-lg font-bold text-slate-900 mb-8">Complete your profile</h3>
+                        <div class="p-8">
+                            <h3 class="text-lg font-bold text-slate-900 mb-8">Profile completion</h3>
 
-                            <!-- Circular Progress -->
                             <div class="flex justify-center mb-10">
                                 <div class="relative w-40 h-40">
                                     <svg class="w-full h-full transform -rotate-90">
@@ -434,7 +243,6 @@
                                 </div>
                             </div>
 
-                            <!-- Checklist -->
                             <div class="space-y-4">
                                 <div *ngFor="let item of checklist" class="flex items-center justify-between group">
                                     <div class="flex items-center gap-3">
@@ -443,58 +251,25 @@
                                             <i class="bi" [ngClass]="item.complete ? 'bi-check-lg' : 'bi-x-lg'"></i>
                                         </div>
                                         <span class="text-sm font-bold transition-all"
-                                            [ngClass]="item.complete ? 'text-slate-900' : 'text-slate-400'">{{
-                                            item.label }}</span>
+                                            [ngClass]="item.complete ? 'text-slate-900' : 'text-slate-400'">{{ item.label }}</span>
                                     </div>
                                     <span class="text-xs font-black transition-all"
                                         [ngClass]="item.complete ? 'text-slate-300' : 'text-emerald-500'">+{{item.bonus}}%</span>
                                 </div>
                             </div>
 
-                            <!-- Action button for returnUrl if present -->
-                            <div *ngIf="profileCompletion >= 80 && returnUrl"
-                                class="mt-8 pt-8 border-t border-slate-50">
+                            <div *ngIf="profileCompletion >= 80 && returnUrl" class="mt-8 pt-8 border-t border-slate-50">
                                 <a [routerLink]="returnUrl"
                                     class="w-full block bg-emerald-500 text-white text-center font-bold py-4 rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-600 transition-all">
                                     Proceed to Competition
                                 </a>
                             </div>
                         </div>
-
-                        <!-- Hint Card -->
-                        <div class="mt-6 p-6 ">
-                            <div class="flex gap-4">
-                                <div
-                                    class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-(--dd-blue) shadow-sm shrink-0">
-                                    <i class="bi bi-lightbulb-fill"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-md font-bold text-slate-900 mb-1">Pro Tip</h4>
-                                    <p class="text-sm text-slate-500 leading-relaxed font-medium">Completing your
-                                        profile increases your chances of getting hired by 3x. Add a professional photo!
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
-
                 </div>
             </div>
         </div>
     </main>
 
     <app-footer></app-footer>
-
-    <!-- Global Success Toast -->
-    <div *ngIf="saved" class="fixed bottom-10 right-10 z-50 animate-fade-in">
-        <div
-            class="bg-(--dd-blue-dark) text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-(--dd-blue-dark)">
-            <div class="w-8 h-8 rounded-full bg-(--dd-blue) flex items-center justify-center">
-                <i class="bi bi-check2"></i>
-            </div>
-            <p class="font-bold">Profile updated successfully!</p>
-        </div>
-    </div>
-
 </div>

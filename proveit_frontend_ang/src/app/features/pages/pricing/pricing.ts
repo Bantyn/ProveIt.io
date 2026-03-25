@@ -66,6 +66,7 @@ export class Pricing implements OnInit {
     const analytics = f.analytics || {};
     const branding = f.branding || {};
     const ai = f.ai || {};
+    const pipeline = f.pipeline || {};
     const msg = f.messaging || {};
     const support = f.support || {};
 
@@ -96,6 +97,7 @@ export class Pricing implements OnInit {
     // Branding & AI
     if (branding.brandingCustomization) features.push('Custom Branding');
     if (ai.chatbotSupport) features.push('AI Chatbot Support');
+    if (pipeline.enabled) features.push('Hiring Pipeline');
 
     // Messaging
     if (msg.enabled) {

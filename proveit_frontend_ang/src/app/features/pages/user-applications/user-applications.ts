@@ -51,6 +51,7 @@ export class UserApplications implements OnInit {
     { value: 'Winner', label: 'Winner', icon: 'bi bi-trophy-fill' },
     { value: 'Interview Scheduled', label: 'Interview Scheduled', icon: 'bi bi-calendar-check-fill' },
     { value: 'Not Selected', label: 'Not Selected', icon: 'bi bi-x-circle-fill' },
+    { value: 'Rejected', label: 'Rejected', icon: 'bi bi-x-octagon-fill' },
   ];
   availableTypes: DropdownOption[] = [
     { value: 'SKILL', label: 'Skill Competition', icon: 'bi bi-lightning-fill' },
@@ -104,13 +105,13 @@ export class UserApplications implements OnInit {
                 app.feedback &&
                 app.feedback !== 'Project Automatically Submitted'
                   ? app.feedback
-                  : app.projectSummary || app.projectApproach || app.coverMessage || '';
+                  : app.projectSummary || '';
 
               return {
                 ...app,
                 feedback: feedbackText || 'Your submission summary will appear here once your project details are saved.',
                 competitionTitle: comp.title || 'Unknown Competition',
-                competitionImage: comp.imageUrl || 'assets/placeholder-comp.png',
+                competitionImage: comp.img_url || comp.imageUrl || 'assets/placeholder-comp.png',
                 competitionType: comp.competitionType || app.competitionType || 'SKILL',
                 companyName: comp.companyName || 'Unknown Company',
               };

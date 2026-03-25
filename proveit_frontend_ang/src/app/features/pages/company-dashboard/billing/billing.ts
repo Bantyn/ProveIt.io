@@ -112,6 +112,7 @@ export class CompanyBilling implements OnInit {
       { name: 'Leaderboard Access', key: 'analytics.leaderboardAccess' },
       { name: 'Custom Branding', key: 'branding.brandingCustomization' },
       { name: 'AI Chatbot Support', key: 'ai.chatbotSupport' },
+      { name: 'Hiring Pipeline', key: 'pipeline.enabled' },
       { name: 'Messaging (Candidates)', key: 'messaging.enabled' },
       { name: 'Priority Support', key: 'support.prioritySupport' },
     ];

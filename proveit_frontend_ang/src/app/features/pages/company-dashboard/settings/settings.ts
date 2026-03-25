@@ -34,22 +34,9 @@ export class CompanySettings implements OnInit {
   }
   profileForm: FormGroup = this.fb.group({
     companyName: ['', Validators.required],
-    ownerName: ['', Validators.required],
-    tagline: [''],
     industry: ['', Validators.required],
-    size: ['', Validators.required],
-    location: ['', Validators.required],
-    foundedYear: [''],
-    website: [''],
     email: ['', [Validators.required, Validators.email]],
-    description: ['', Validators.required],
-    mission: [''],
-    culture: [''],
-    benefits: [''],
     logoUrl: [''],
-    bannerUrl: [''],
-    linkedin: [''],
-    twitter: [''],
   });
 
   ngOnInit() {
@@ -59,11 +46,10 @@ export class CompanySettings implements OnInit {
           next: (data) => {
             this.company = data;
             this.profileForm.patchValue({
-              ...data,
-              benefits:
-                data.benefits && Array.isArray(data.benefits) ? data.benefits.join(', ') : '',
-              linkedin: data.socialLinks?.linkedin || '',
-              twitter: data.socialLinks?.twitter || '',
+              companyName: data.companyName || data.name || '',
+              industry: data.industry || '',
+              email: data.email || '',
+              logoUrl: data.logoUrl || '',
             });
             this.isLoading = false;
             this.cdr.detectChanges();
@@ -87,26 +73,14 @@ export class CompanySettings implements OnInit {
     this.isSaving = true;
     const formValue = this.profileForm.value;
 
-    const benefitsArray = formValue.benefits
-      ? formValue.benefits
-          .split(',')
-          .map((b: string) => b.trim())
-          .filter((b: string) => b)
-      : [];
-
     const updates = {
-      ...formValue,
-      benefits: benefitsArray,
-      socialLinks: {
-        linkedin: formValue.linkedin,
-        twitter: formValue.twitter,
-      },
+      companyName: formValue.companyName,
+      industry: formValue.industry,
+      email: formValue.email,
+      logoUrl: formValue.logoUrl,
       isProfileCompleted: true,
       updatedAt: new Date().toISOString(),
     };
-
-    delete updates.linkedin;
-    delete updates.twitter;
 
     this.api.updateCompany(this.company.id, updates).subscribe({
       next: (res) => {

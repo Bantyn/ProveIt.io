@@ -2,6 +2,29 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../config/firebase');
 const { checkShortlistLimit, checkApplicationLimit } = require('../utils/planLimits');
+const { normalizeApplicationPayload } = require('../utils/demoPayloads');
+
+const applicationResponseCache = new Map();
+const APPLICATION_CACHE_TTL_MS = 15000;
+
+function getCachedApplicationResponse(key) {
+    const cached = applicationResponseCache.get(key);
+    if (!cached) return null;
+
+    if (Date.now() - cached.createdAt > APPLICATION_CACHE_TTL_MS) {
+        applicationResponseCache.delete(key);
+        return null;
+    }
+
+    return cached.payload;
+}
+
+function setCachedApplicationResponse(key, payload) {
+    applicationResponseCache.set(key, {
+        payload,
+        createdAt: Date.now(),
+    });
+}
 
 // Get all applications
 router.get('/', async (req, res) => {
@@ -23,12 +46,19 @@ router.get('/', async (req, res) => {
 // Get application by ID
 router.get('/:id', async (req, res) => {
     try {
+        const cached = getCachedApplicationResponse(`applications:id:${req.params.id}`);
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         const appRef = db.collection('applications').doc(req.params.id);
         const doc = await appRef.get();
         if (!doc.exists) {
             return res.status(404).json({ error: 'Application not found' });
         }
-        res.status(200).json({ id: doc.id, ...doc.data() });
+        const payload = { id: doc.id, ...doc.data() };
+        setCachedApplicationResponse(`applications:id:${req.params.id}`, payload);
+        res.status(200).json(payload);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -56,6 +86,12 @@ router.get('/user/:userId', async (req, res) => {
 // Get applications by competition ID
 router.get('/competition/:competitionId', async (req, res) => {
     try {
+        const cacheKey = `applications:competition:${req.params.competitionId}`;
+        const cached = getCachedApplicationResponse(cacheKey);
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         const snapshot = await db.collection('applications')
             .where('competitionId', '==', req.params.competitionId)
             .get();
@@ -66,6 +102,7 @@ router.get('/competition/:competitionId', async (req, res) => {
         snapshot.forEach(doc => {
             applications.push({ id: doc.id, ...doc.data() });
         });
+        setCachedApplicationResponse(cacheKey, applications);
         res.status(200).json(applications);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -75,7 +112,7 @@ router.get('/competition/:competitionId', async (req, res) => {
 // Create application
 router.post('/', async (req, res) => {
     try {
-        const payload = req.body;
+        const payload = normalizeApplicationPayload(req.body);
         const { userId, competitionId, companyId } = payload;
 
         if (!userId) {
@@ -170,6 +207,12 @@ router.delete('/:id', async (req, res) => {
 router.get('/company/:companyId', async (req, res) => {
     try {
         const companyId = req.params.companyId;
+        const cacheKey = `applications:company:${companyId}`;
+        const cached = getCachedApplicationResponse(cacheKey);
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         const snapshot = await db.collection('applications')
             .where('companyId', '==', companyId)
             .get();
@@ -180,6 +223,7 @@ router.get('/company/:companyId', async (req, res) => {
         snapshot.forEach(doc => {
             applications.push({ id: doc.id, ...doc.data() });
         });
+        setCachedApplicationResponse(cacheKey, applications);
         res.status(200).json(applications);
     } catch (error) {
         res.status(500).json({ error: error.message });

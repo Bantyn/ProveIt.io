@@ -67,6 +67,7 @@ export class EditPlan implements OnInit {
     leaderboardAccess: new FormControl(false),
     brandingCustomization: new FormControl(false),
     chatbotSupport: new FormControl(false),
+    hiringPipelineEnabled: new FormControl(false),
     prioritySupport: new FormControl(false),
 
     // Messaging
@@ -105,6 +106,7 @@ export class EditPlan implements OnInit {
     const a = f.analytics || {};
     const b = f.branding || {};
     const ai = f.ai || {};
+    const pipeline = f.pipeline || {};
     const m = f.messaging || {};
     const s = f.support || {};
 
@@ -127,6 +129,7 @@ export class EditPlan implements OnInit {
       leaderboardAccess: a.leaderboardAccess ?? false,
       brandingCustomization: b.brandingCustomization ?? false,
       chatbotSupport: ai.chatbotSupport ?? false,
+      hiringPipelineEnabled: pipeline.enabled ?? false,
       prioritySupport: s.prioritySupport ?? false,
 
       messagingEnabled: m.enabled ?? false,
@@ -173,6 +176,9 @@ export class EditPlan implements OnInit {
         },
         ai: {
           chatbotSupport: v.chatbotSupport,
+        },
+        pipeline: {
+          enabled: v.hiringPipelineEnabled,
         },
         messaging: {
           enabled: v.messagingEnabled,

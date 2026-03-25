@@ -7,7 +7,6 @@ import { AuthService } from '../../../services/auth.service';
 import { ModalService } from '../../../services/modal.service';
 import { Navbar } from '../../components/navbar/navbar';
 import { Footer } from '../../components/footer/footer';
-import { FluidDropdown, DropdownOption } from '../../components/ui/fluid-dropdown/fluid-dropdown';
 import { MorphLoading } from '../../components/ui/morph-loading/morph-loading';
 import { take } from 'rxjs/operators';
 
@@ -23,7 +22,6 @@ import { take } from 'rxjs/operators';
     Navbar,
     Footer,
     RouterLink,
-    FluidDropdown,
     MorphLoading,
   ],
   templateUrl: './user-profile.html',
@@ -49,36 +47,20 @@ export class UserProfile implements OnInit {
   checklist: any[] = [
     { label: 'Setup account', bonus: 10, key: 'id', complete: true },
     { label: 'Upload your photo', bonus: 5, key: 'profileImage', complete: false },
-    { label: 'Personal Info', bonus: 10, key: 'fullName', complete: false },
-    { label: 'Degree & College', bonus: 20, key: 'college', complete: false },
-    { label: 'Biography / Skills', bonus: 15, key: 'skills', complete: false },
-    { label: 'GitHub Link', bonus: 10, key: 'github', complete: false },
-    { label: 'Resume', bonus: 30, key: 'resumeUrl', complete: false },
+    { label: 'Name', bonus: 35, key: 'fullName', complete: false },
+    { label: 'Phone', bonus: 25, key: 'phone', complete: false },
+    { label: 'Skills', bonus: 25, key: 'skills', complete: false },
   ];
 
   profileForm: FormGroup = this.fb.group({
-    fullName: [''],
+    fullName: ['', Validators.required],
     email: [{ value: '', disabled: true }],
-    phone: [''],
-    college: [''],
-    degree: [''],
-    graduationYear: [''],
-    experienceLevel: ['Fresher'],
-    skills: [''],
+    phone: ['', Validators.required],
+    skills: ['', Validators.required],
+    profileImage: [''],
     github: [''],
     resumeUrl: [''],
-    profileImage: [''],
-    bannerUrl: [''],
   });
-
-  experienceLevels = ['Fresher', 'Junior', 'Mid-Level', 'Senior', 'Lead'];
-  experienceLevelOptions: DropdownOption[] = [
-    { value: 'Fresher', label: 'Fresher', icon: 'bi bi-mortarboard-fill' },
-    { value: 'Junior', label: 'Junior', icon: 'bi bi-person-fill' },
-    { value: 'Mid-Level', label: 'Mid-Level', icon: 'bi bi-person-badge-fill' },
-    { value: 'Senior', label: 'Senior', icon: 'bi bi-award-fill' },
-    { value: 'Lead', label: 'Lead', icon: 'bi bi-star-fill' },
-  ];
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
@@ -93,7 +75,6 @@ export class UserProfile implements OnInit {
 
             const profileData = data.profile || {};
             const candidateProfile = data.candidateProfile || {};
-            const education = candidateProfile.education?.[0] || {};
 
             const skillsStr =
               candidateProfile.skills?.map((s: any) => s.name).join(', ') ||
@@ -104,16 +85,10 @@ export class UserProfile implements OnInit {
               fullName: data.fullName || authUser.displayName || '',
               email: data.email || authUser.email || '',
               phone: profileData.phone || data.phone || '',
-              college: data.college || education.college || '',
-              degree: data.degree || education.degree || '',
-              graduationYear: data.graduationYear || education.year || '',
-              experienceLevel:
-                data.experienceLevel || candidateProfile.experienceLevel || 'Fresher',
               skills: skillsStr,
+              profileImage: profileData.profileImage || data.profileImage || '',
               github: data.github || candidateProfile.github || '',
               resumeUrl: data.resumeUrl || candidateProfile.resumeUrl || '',
-              profileImage: profileData.profileImage || data.profileImage || '',
-              bannerUrl: data.bannerUrl || '',
             });
 
             this.calculateProgress();
@@ -194,15 +169,10 @@ export class UserProfile implements OnInit {
     const updates = {
       fullName: formValue.fullName,
       phone: formValue.phone,
-      college: formValue.college,
-      degree: formValue.degree,
-      graduationYear: formValue.graduationYear,
-      experienceLevel: formValue.experienceLevel,
       skills: skillsArray,
+      profileImage: formValue.profileImage,
       github: formValue.github,
       resumeUrl: formValue.resumeUrl,
-      profileImage: formValue.profileImage,
-      bannerUrl: formValue.bannerUrl,
       isProfileCompleted: true,
       updatedAt: new Date().toISOString(),
     };

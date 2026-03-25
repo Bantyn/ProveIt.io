@@ -103,6 +103,7 @@ export class AdminBilling implements OnInit {
     const analytics = plan.features.analytics || {};
     const branding = plan.features.branding || {};
     const ai = plan.features.ai || {};
+    const pipeline = plan.features.pipeline || {};
     const messaging = plan.features.messaging || {};
     const support = plan.features.support || {};
 
@@ -120,6 +121,7 @@ export class AdminBilling implements OnInit {
     if (analytics.leaderboardAccess) list.push('Leaderboard Access');
     if (branding.brandingCustomization) list.push('Custom Branding');
     if (ai.chatbotSupport) list.push('AI Chatbot Support');
+    if (pipeline.enabled) list.push('Hiring Pipeline');
     if (messaging.enabled) list.push('Messaging');
     if (support.prioritySupport) list.push('Priority Support');
 

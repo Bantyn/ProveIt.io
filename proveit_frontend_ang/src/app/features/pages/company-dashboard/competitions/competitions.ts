@@ -107,8 +107,8 @@ export class CompanyCompetitions implements OnInit {
     this.competitions = (competitions || []).map((c) => ({
       ...c,
       skills: c.requiredSkills || [],
-      deadline: c.projectInfo?.deadline ? new Date(c.projectInfo.deadline).toLocaleDateString() : 
-                c.deadline || 'N/A',
+      deadline: c.projectInfo?.deadline || c.deadline || null,
+      deadlineDisplay: c.projectInfo?.deadline || c.deadline || null,
       status: c.status?.toLowerCase() || 'draft',
       applicants: applicantCountByCompetition.get(c.id) ?? 0,
     }));
@@ -162,8 +162,8 @@ export class CompanyCompetitions implements OnInit {
       );
     }
     list.sort((a, b) => {
-      let valA = a[this.sortKey];
-      let valB = b[this.sortKey];
+      let valA = this.getSortValue(a, this.sortKey);
+      let valB = this.getSortValue(b, this.sortKey);
       if (typeof valA === 'string') valA = valA.toLowerCase();
       if (typeof valB === 'string') valB = valB.toLowerCase();
       if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
@@ -220,5 +220,13 @@ export class CompanyCompetitions implements OnInit {
     }
 
     this.router.navigate(['/company/dashboard/competitions/create']);
+  }
+
+  private getSortValue(competition: any, key: string) {
+    if (key === 'deadline' || key === 'postedAt') {
+      return competition[key] ? new Date(competition[key]).getTime() : 0;
+    }
+
+    return competition[key] ?? '';
   }
 }

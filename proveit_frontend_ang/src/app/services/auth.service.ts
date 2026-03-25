@@ -71,7 +71,7 @@ export class AuthService {
             ownerId: cred.user.uid,
             companyName: name, // Default to user full name
             industry: 'Technology', // Default value
-            size: '1-10', // Default value
+            email: email,
             verificationStatus: 'pending',
             isSuspended: false,
             jobCredits: 0,

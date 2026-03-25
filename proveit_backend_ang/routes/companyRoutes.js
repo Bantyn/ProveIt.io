@@ -11,9 +11,57 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+const dashboardCache = new Map();
+const DASHBOARD_CACHE_TTL_MS = 15000;
+const responseCache = new Map();
+const RESPONSE_CACHE_TTL_MS = 30000;
+
+function getCachedDashboard(companyId) {
+    const cached = dashboardCache.get(companyId);
+    if (!cached) return null;
+
+    if (Date.now() - cached.createdAt > DASHBOARD_CACHE_TTL_MS) {
+        dashboardCache.delete(companyId);
+        return null;
+    }
+
+    return cached.payload;
+}
+
+function setCachedDashboard(companyId, payload) {
+    dashboardCache.set(companyId, {
+        payload,
+        createdAt: Date.now(),
+    });
+}
+
+function getCachedResponse(key) {
+    const cached = responseCache.get(key);
+    if (!cached) return null;
+
+    if (Date.now() - cached.createdAt > RESPONSE_CACHE_TTL_MS) {
+        responseCache.delete(key);
+        return null;
+    }
+
+    return cached.payload;
+}
+
+function setCachedResponse(key, payload) {
+    responseCache.set(key, {
+        payload,
+        createdAt: Date.now(),
+    });
+}
+
 // Get all companies (Standard HTTP)
 router.get('/', async (req, res) => {
     try {
+        const cached = getCachedResponse('companies:list');
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         const companiesRef = db.collection('companies');
         const snapshot = await companiesRef.get();
         if (snapshot.empty) {
@@ -23,6 +71,7 @@ router.get('/', async (req, res) => {
         snapshot.forEach(doc => {
             companies.push({ id: doc.id, ...doc.data() });
         });
+        setCachedResponse('companies:list', companies);
         res.status(200).json(companies);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -66,6 +115,11 @@ router.get('/stream', (req, res) => {
 router.get('/owner/:ownerId', async (req, res) => {
     try {
         const ownerId = req.params.ownerId;
+        const cached = getCachedResponse(`companies:owner:${ownerId}`);
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         const snapshot = await db.collection('companies')
             .where('ownerId', '==', ownerId)
             .limit(1)
@@ -76,7 +130,9 @@ router.get('/owner/:ownerId', async (req, res) => {
         }
 
         const doc = snapshot.docs[0];
-        res.status(200).json({ id: doc.id, ...doc.data() });
+        const payload = { id: doc.id, ...doc.data() };
+        setCachedResponse(`companies:owner:${ownerId}`, payload);
+        res.status(200).json(payload);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -151,12 +207,19 @@ router.post('/:id/reviews', async (req, res) => {
 // Get company by ID
 router.get('/:id', async (req, res) => {
     try {
+        const cached = getCachedResponse(`companies:id:${req.params.id}`);
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         const companyRef = db.collection('companies').doc(req.params.id);
         const doc = await companyRef.get();
         if (!doc.exists) {
             return res.status(404).json({ error: 'Company not found' });
         }
-        res.status(200).json({ id: doc.id, ...doc.data() });
+        const payload = { id: doc.id, ...doc.data() };
+        setCachedResponse(`companies:id:${req.params.id}`, payload);
+        res.status(200).json(payload);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -166,6 +229,11 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/dashboard', async (req, res) => {
     try {
         const companyId = req.params.id;
+        const cachedDashboard = getCachedDashboard(companyId);
+
+        if (cachedDashboard) {
+            return res.status(200).json(cachedDashboard);
+        }
 
         // 1. Get recent competitions for this company
         const compsSnapshot = await db.collection('competitions')
@@ -270,11 +338,14 @@ router.get('/:id/dashboard', async (req, res) => {
         const averageRating = reviewCount > 0 ? Math.round((reviewSum / reviewCount) * 10) / 10 : 0;
         const recentReviews = allReviews.slice(0, 5);
 
-        // 4. Calculate Chart Analytics (Application Trends & Engagement)
+        // 4. Calculate Chart Analytics (single-pass aggregation)
         const labels = [];
         const dailyApplications = [];
         const dailyEngagement = [];
         const now = new Date();
+        const dayKeys = [];
+        const applicationCountByDay = new Map();
+        const engagementCountByDay = new Map();
 
         // Last 7 days
         for (let i = 6; i >= 0; i--) {
@@ -284,15 +355,22 @@ router.get('/:id/dashboard', async (req, res) => {
             const dayLabel = date.toLocaleDateString('en-US', { weekday: 'short' });
             
             labels.push(dayLabel);
-            
-            // Count applications for this day
-            const appsOnDay = applications.filter(app => {
-                if (!app.submittedAt) return false;
-                return app.submittedAt.startsWith(dateStr);
-            }).length;
-            dailyApplications.push(appsOnDay);
-            dailyEngagement.push(0); 
+            dayKeys.push(dateStr);
+            applicationCountByDay.set(dateStr, 0);
+            engagementCountByDay.set(dateStr, 0);
         }
+
+        applications.forEach((app) => {
+            const dateStr = app.submittedAt?.split('T')?.[0];
+            if (dateStr && applicationCountByDay.has(dateStr)) {
+                applicationCountByDay.set(dateStr, (applicationCountByDay.get(dateStr) || 0) + 1);
+            }
+        });
+
+        dayKeys.forEach((dateStr) => {
+            dailyApplications.push(applicationCountByDay.get(dateStr) || 0);
+            dailyEngagement.push(0);
+        });
 
         // 5. Fetch Interviews for Engagement Chart
         const interviewsSnap = await db.collection('interviews')
@@ -302,18 +380,16 @@ router.get('/:id/dashboard', async (req, res) => {
         if (!interviewsSnap.empty) {
             interviewsSnap.forEach(doc => {
                 const data = doc.data();
-                if (data.createdAt) {
-                    const dateStr = data.createdAt.split('T')[0];
-                    for (let i = 0; i < 7; i++) {
-                        const checkDate = new Date(now);
-                        checkDate.setDate(now.getDate() - (6 - i));
-                        if (checkDate.toISOString().split('T')[0] === dateStr) {
-                            dailyEngagement[i]++;
-                        }
-                    }
+                const dateStr = data.createdAt?.split('T')?.[0];
+                if (dateStr && engagementCountByDay.has(dateStr)) {
+                    engagementCountByDay.set(dateStr, (engagementCountByDay.get(dateStr) || 0) + 1);
                 }
             });
         }
+
+        dayKeys.forEach((dateStr, index) => {
+            dailyEngagement[index] = engagementCountByDay.get(dateStr) || 0;
+        });
 
         const analytics = {
             labels,
@@ -328,7 +404,10 @@ router.get('/:id/dashboard', async (req, res) => {
             { label: 'Reviews', value: reviewCount.toString(), icon: 'bi-star-fill', color: 'purple' },
         ];
 
-        res.status(200).json({ stats, recentComps, recentApps, recentReviews, averageRating, reviewCount, analytics });
+        const payload = { stats, recentComps, recentApps, recentReviews, averageRating, reviewCount, analytics };
+        setCachedDashboard(companyId, payload);
+
+        res.status(200).json(payload);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

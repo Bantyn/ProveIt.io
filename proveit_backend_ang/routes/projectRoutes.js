@@ -1,6 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../config/firebase');
+const { normalizeProjectPayload } = require('../utils/demoPayloads');
+
+const projectResponseCache = new Map();
+const PROJECT_CACHE_TTL_MS = 15000;
+
+function getCachedProjectResponse(key) {
+    const cached = projectResponseCache.get(key);
+    if (!cached) return null;
+
+    if (Date.now() - cached.createdAt > PROJECT_CACHE_TTL_MS) {
+        projectResponseCache.delete(key);
+        return null;
+    }
+
+    return cached.payload;
+}
+
+function setCachedProjectResponse(key, payload) {
+    projectResponseCache.set(key, {
+        payload,
+        createdAt: Date.now(),
+    });
+}
 
 // Get all projects
 router.get('/', async (req, res) => {
@@ -23,6 +46,12 @@ router.get('/', async (req, res) => {
 router.get('/company/:companyId', async (req, res) => {
     try {
         const companyId = req.params.companyId;
+        const cacheKey = `projects:company:${companyId}`;
+        const cached = getCachedProjectResponse(cacheKey);
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         // In the project schema, companyId is stored to easily filter projects for a company
         const snapshot = await db.collection('projects')
             .where('companyId', '==', companyId)
@@ -36,6 +65,7 @@ router.get('/company/:companyId', async (req, res) => {
         snapshot.forEach(doc => {
             projects.push({ id: doc.id, ...doc.data() });
         });
+        setCachedProjectResponse(cacheKey, projects);
         res.status(200).json(projects);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -45,11 +75,18 @@ router.get('/company/:companyId', async (req, res) => {
 // Get project by ID
 router.get('/:id', async (req, res) => {
     try {
+        const cached = getCachedProjectResponse(`projects:id:${req.params.id}`);
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         const doc = await db.collection('projects').doc(req.params.id).get();
         if (!doc.exists) {
             return res.status(404).json({ error: 'Project not found' });
         }
-        res.status(200).json({ id: doc.id, ...doc.data() });
+        const payload = { id: doc.id, ...doc.data() };
+        setCachedProjectResponse(`projects:id:${req.params.id}`, payload);
+        res.status(200).json(payload);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -58,7 +95,7 @@ router.get('/:id', async (req, res) => {
 // Create project
 router.post('/', async (req, res) => {
     try {
-        const payload = req.body;
+        const payload = normalizeProjectPayload(req.body);
         payload.createdAt = new Date().toISOString();
         payload.updatedAt = new Date().toISOString();
 
@@ -73,12 +110,16 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const projectId = req.params.id;
-        const updates = { ...req.body, updatedAt: new Date().toISOString() };
         const docRef = db.collection('projects').doc(projectId);
         const doc = await docRef.get();
         if (!doc.exists) {
             return res.status(404).json({ error: 'Project not found' });
         }
+
+        const updates = {
+            ...normalizeProjectPayload(req.body, doc.data()),
+            updatedAt: new Date().toISOString(),
+        };
 
         await docRef.update(updates);
         const updatedDoc = await docRef.get();

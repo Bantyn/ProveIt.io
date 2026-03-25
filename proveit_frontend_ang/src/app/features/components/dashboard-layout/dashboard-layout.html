@@ -34,7 +34,7 @@
 
         <!-- Navigation Links -->
         <div class="flex flex-col gap-1">
-          <app-sidebar-link *ngFor="let item of navItems" [link]="{ 
+          <app-sidebar-link *ngFor="let item of visibleNavItems" [link]="{ 
               label: item.label, 
               href: item.route, 
               icon: getLucideIcon(item.icon), 
@@ -99,6 +99,10 @@
             class="p-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all relative group">
             <lucide-icon name="bell"
               class="w-5 h-5 text-neutral-600 dark:text-neutral-400 group-hover:text-(--dd-blue) transition-colors"></lucide-icon>
+            <span *ngIf="unreadNotifsCount > 0"
+              class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-(--dd-red) text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
+              {{ unreadNotifsCount > 9 ? '9+' : unreadNotifsCount }}
+            </span>
           </button>
 
           <!-- Profile -->
@@ -119,8 +123,8 @@
     </header>
 
     <!-- Page Content -->
-    <main class="flex-1 p-6 md:p-10 overflow-y-auto overflow-x-hidden scrollbar-hide" data-lenis-prevent>
-      <div class="max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <main class="flex-1 p-6 md:p-8 overflow-y-auto overflow-x-hidden scrollbar-hide" data-lenis-prevent>
+      <div class="max-w-full mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
         <router-outlet></router-outlet>
       </div>
     </main>
@@ -137,13 +141,18 @@
       <h3 class="text-sm font-semibold mb-4 flex items-center justify-between">
         Notifications
         <span
-          class="text-[10px] bg-(--dd-blue-light)/30 text-(--dd-blue) px-2 py-0.5 rounded-full font-bold">Latest</span>
+          class="text-[10px] bg-(--dd-blue-light)/30 text-(--dd-blue) px-2 py-0.5 rounded-full font-bold">{{ unreadNotifsCount }} unread</span>
       </h3>
       <div class="space-y-3">
-        <div *ngFor="let n of notifications | slice:0:3"
+        <div *ngFor="let n of previewNotifications"
           class="p-3 bg-neutral-50 dark:bg-neutral-900 rounded-2xl border border-neutral-100 dark:border-neutral-800 transition-all hover:translate-x-1">
+          <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400 mb-1">{{ n.title }}</p>
           <p class="text-xs font-semibold text-slate-800 dark:text-neutral-200">{{ n.message }}</p>
-          <p class="text-[10px] text-neutral-400 mt-1">{{ (n.createdAt || n.timestamp) | date:'shortTime' }}</p>
+          <p class="text-[10px] text-neutral-400 mt-1">{{ (n.createdAt || n.timestamp) | date:'MMM d, h:mm a' }}</p>
+        </div>
+        <div *ngIf="previewNotifications.length === 0"
+          class="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-800 text-center">
+          <p class="text-xs font-semibold text-slate-500 dark:text-neutral-300">No notifications yet</p>
         </div>
       </div>
     </div>

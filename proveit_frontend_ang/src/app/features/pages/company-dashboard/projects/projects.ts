@@ -4,6 +4,7 @@ import { NgFor, NgClass, NgIf, TitleCasePipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../services/auth.service';
 import { MorphLoading } from '../../../../features/components/ui/morph-loading/morph-loading';
+import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -33,9 +34,27 @@ export class CompanyProjects implements OnInit {
         this.loading = true;
         this.api.getCompanyByOwnerId(user.uid).subscribe((company) => {
           if (company) {
-            this.api.getCompanyProjects(company.id).subscribe({
-              next: (data) => {
-                this.projects = data;
+            forkJoin({
+              projects: this.api.getCompanyProjects(company.id),
+              applications: this.api.getCompanyApplications(company.id),
+            }).subscribe({
+              next: ({ projects, applications }) => {
+                const applicationMap = new Map(
+                  (applications || []).map((application: any) => [application.id, application]),
+                );
+
+                this.projects = (projects || []).map((project: any) => {
+                  const linkedApplication = applicationMap.get(project.applicationId);
+                  return {
+                    ...project,
+                    applicationScore: this.parseNumericValue(
+                      linkedApplication?.score ?? linkedApplication?.evaluation?.manualScore,
+                    ),
+                    applicationRank: this.parseNumericValue(linkedApplication?.rank),
+                    applicationStatus: linkedApplication?.status || null,
+                    evaluationNotes: linkedApplication?.evaluation?.notes || '',
+                  };
+                });
                 this.loading = false;
                 this.cdr.detectChanges();
               },
@@ -75,7 +94,9 @@ export class CompanyProjects implements OnInit {
       list = list.filter(
         (p) => 
           p.title?.toLowerCase().includes(s) || 
+          p.submissionLink?.toLowerCase().includes(s) ||
           p.repoUrl?.toLowerCase().includes(s) ||
+          p.liveUrl?.toLowerCase().includes(s) ||
           p.candidateName?.toLowerCase().includes(s)
       );
     }
@@ -97,6 +118,15 @@ export class CompanyProjects implements OnInit {
 
   parsePlagiarism(val: string): number {
     return parseInt(val) || 0;
+  }
+
+  hasApplicationScore(value: any): boolean {
+    return typeof value === 'number' && Number.isFinite(value);
+  }
+
+  private parseNumericValue(value: any): number | null {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 
   reviewProject(project: any, event?: MouseEvent) {
