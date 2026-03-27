@@ -10,7 +10,7 @@
     <!-- FAQ list -->
     <ul class="space-y-3" *ngIf="filteredFaqs.length > 0">
         <li *ngFor="let item of filteredFaqs; let i = index; trackBy: trackByQuestion"
-            class="faq-card group relative overflow-hidden rounded-2xl border border-(--dd-blue)/10 bg-white transition-all duration-400 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-(--dd-blue)/10"
+            class="faq-card group relative overflow-hidden rounded-2xl border border-(--dd-blue)/10 bg-white dark:bg-(--dd-surface) transition-all duration-400 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-(--dd-blue)/10"
             [class.faq-card--open]="isOpen(i)">
 
             <button type="button" [attr.aria-expanded]="isOpen(i)" [attr.aria-controls]="'faq-panel-' + i"
@@ -38,7 +38,7 @@
                 <!-- Question + Meta -->
                 <div class="flex flex-1 flex-col gap-3">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                        <h3 class="text-base font-semibold text-slate-900 leading-snug sm:text-lg"
+                        <h3 class="text-base font-semibold text-slate-900 dark:text-white leading-snug sm:text-lg"
                             [class.text-transparent]="isOpen(i)" [class.bg-clip-text]="isOpen(i)"
                             [style]="isOpen(i) ? 'background-image: linear-gradient(to right, var(--dd-blue), var(--dd-blue-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;' : ''">
                             {{ item.question }}
@@ -51,7 +51,7 @@
 
                     <!-- Answer panel (animated height) -->
                     <div [id]="'faq-panel-' + i" role="region"
-                        class="overflow-hidden text-sm text-slate-500 leading-relaxed transition-all duration-500 ease-out"
+                        class="overflow-hidden text-sm text-slate-500 dark:text-violet-200 leading-relaxed transition-all duration-500 ease-out"
                         [style.maxHeight]="isOpen(i) ? '300px' : '0px'" [style.opacity]="isOpen(i) ? '1' : '0'">
                         <p class="pr-2 pt-1">{{ item.answer }}</p>
                     </div>

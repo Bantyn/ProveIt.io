@@ -1,140 +1,269 @@
-<!-- ================= HEADER ================= -->
-<header>
-    <app-navbar
-        [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
-</header>
+<!-- ================= SHADER HERO ================= -->
+<app-shader-hero
+    title="Get In Touch"
+    subtitle="We're here to help. Reach out for questions, feedback, or collaboration opportunities."
+    minHeight="130vh">
+    <header class="absolute top-0 left-0 w-full z-30 backdrop-blur-md">
+        <app-navbar [transparent]="true"
+            [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+    </header>
+</app-shader-hero>
 
-<div
-    class="min-h-screen bg-[var(--dd-cream)] w-full relative overflow-hidden flex flex-col items-center justify-center">
+<!-- ================= MAIN CONTENT ================= -->
+<div class="bg-(--dd-cream) relative">
 
-    <!-- Glowing background element -->
-    <div
-        class="absolute top-0 -right-50 w-[50%] h-full bg-gradient-to-br from-transparent to-(--dd-blue-light) rounded-full blur-3xl opacity-60 mix-blend-multiply">
-    </div>
+    <!-- ─── CONTACT SPLIT CARD ─── -->
+    <section class="max-w-6xl mx-auto px-4 md:px-6 mt-12 relative z-20 pb-16">
+        <div
+            class="bg-white dark:bg-(--dd-surface) rounded-3xl border border-gray-100 dark:border-(--dd-border) shadow-2xl dark:shadow-(--dd-blue-dark)/20 overflow-hidden">
 
-    <!-- Main two-column layout -->
-    <div class="relative z-10 w-full  max-w-6xl mx-auto px-6 py-24 flex flex-col items-center gap-16">
+            <div class="grid grid-cols-1 lg:grid-cols-5">
 
-        <div class="flex flex-col min-h-[50vh] gap-6  text-center items-center justify-center md:text-left">
-            <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
-                Feedback
-                <span class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-blue) to-(--dd-blue-light)">For ProveIt</span>
-            </h1>
-            <p class="text-slate-500 text-lg text-center">
-                We are available for questions, feedback, or collaboration opportunities.
-                Let us know how we can help!
-            </p>
-        </div>
-
-        <div class=" w-full p-10 border border-[var(--dd-blue)]/10 rounded-2xl -mt-20">
-            <form class="flex flex-col gap-5" (ngSubmit)="submitContactForm()">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-normal tracking-wider text-black ml-1">First Name</label>
-                        <input type="text" name="firstName" [(ngModel)]="form.firstName" placeholder="First Name"
-                            class="w-full py-3.5 px-5 rounded-2xl text-[14px] bg-white border border-blue-100/50 outline-none focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10">
+                <!-- ── LEFT: Info Panel ── -->
+                <div
+                    class="lg:col-span-2 p-8 md:p-10 lg:p-12 bg-linear-to-br from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-orange) text-white relative overflow-hidden">
+                    <!-- Decorative circles -->
+                    <div
+                        class="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white/5 blur-2xl pointer-events-none">
+                    </div>
+                    <div
+                        class="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-white/5 blur-2xl pointer-events-none">
                     </div>
 
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-normal tracking-wider text-black ml-1">Last Name</label>
-                        <input type="text" name="lastName" [(ngModel)]="form.lastName" placeholder="Last Name"
-                            class="w-full py-3.5 px-5 rounded-2xl text-[14px] bg-white border border-blue-100/50 outline-none focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10">
+                    <div class="relative z-10 flex flex-col h-full">
+                        <div class="mb-10">
+                            <h2 class="text-3xl md:text-4xl font-bold leading-tight mb-4">Let's start a
+                                conversation</h2>
+                            <p class="text-white/70 text-sm leading-relaxed">
+                                Ask about our platform, report a bug, or share feedback. We're always happy to hear from
+                                you.
+                            </p>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <div class="space-y-6 grow">
+                            <!-- Email -->
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                                    <i class="bi bi-envelope-fill text-lg text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-white/50 uppercase tracking-wider mb-0.5">Email
+                                    </p>
+                                    <a href="mailto:support@proveit.io"
+                                        class="text-sm font-semibold text-white hover:text-white/80 transition-colors">support&#64;proveit.io</a>
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                                    <i class="bi bi-geo-alt-fill text-lg text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-white/50 uppercase tracking-wider mb-0.5">
+                                        Location</p>
+                                    <span class="text-sm font-semibold text-white">Worldwide · Remote-first</span>
+                                </div>
+                            </div>
+
+                            <!-- Response Time -->
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                                    <i class="bi bi-clock-fill text-lg text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-white/50 uppercase tracking-wider mb-0.5">
+                                        Response Time</p>
+                                    <span class="text-sm font-semibold text-white">Under 24 hours</span>
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                                    <i class="bi bi-telephone-fill text-lg text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-white/50 uppercase tracking-wider mb-0.5">
+                                        Phone</p>
+                                    <span class="text-sm font-semibold text-white">Available on request</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Links -->
+                        <div class="mt-10 pt-8 border-t border-white/15">
+                            <p class="text-xs font-medium text-white/50 uppercase tracking-wider mb-4">Follow Us</p>
+                            <div class="flex gap-3">
+                                <a href="#"
+                                    class="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-twitter-x text-sm text-white"></i>
+                                </a>
+                                <a href="#"
+                                    class="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-linkedin text-sm text-white"></i>
+                                </a>
+                                <a href="#"
+                                    class="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-github text-sm text-white"></i>
+                                </a>
+                                <a href="#"
+                                    class="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all duration-200 hover:scale-110">
+                                    <i class="bi bi-instagram text-sm text-white"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[14px] font-normal tracking-wider text-black ml-1">Email</label>
-                    <input type="email" name="email" [(ngModel)]="form.email" placeholder="Email"
-                        class="w-full py-3.5 px-5 rounded-2xl text-[14px] bg-white border border-blue-100/50 outline-none focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10">
+                <!-- ── RIGHT: Form Panel ── -->
+                <div class="lg:col-span-3 p-8 md:p-10 lg:p-12">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Send us a message</h3>
+                        <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/60">
+                            Fill out the form and our team will get back to you within 24 hours.
+                        </p>
+                    </div>
+
+                    <form class="flex flex-col gap-5" (ngSubmit)="submitContactForm()">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="flex flex-col gap-1.5">
+                                <label
+                                    class="text-xs font-semibold text-gray-500 dark:text-(--dd-blue-light)/60 uppercase tracking-wider ml-1">First
+                                    Name *</label>
+                                <input type="text" name="firstName" [(ngModel)]="form.firstName" placeholder="John"
+                                    class="w-full py-3.5 px-5 rounded-xl text-sm bg-(--dd-cream) dark:bg-(--dd-surface-input) border border-(--dd-blue-ultra-light) dark:border-(--dd-border) outline-none focus:border-(--dd-blue-dark) focus:ring-4 focus:ring-(--dd-blue-dark)/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-(--dd-blue-light)/30 transition-all">
+                            </div>
+
+                            <div class="flex flex-col gap-1.5">
+                                <label
+                                    class="text-xs font-semibold text-gray-500 dark:text-(--dd-blue-light)/60 uppercase tracking-wider ml-1">Last
+                                    Name</label>
+                                <input type="text" name="lastName" [(ngModel)]="form.lastName" placeholder="Doe"
+                                    class="w-full py-3.5 px-5 rounded-xl text-sm bg-(--dd-cream) dark:bg-(--dd-surface-input) border border-(--dd-blue-ultra-light) dark:border-(--dd-border) outline-none focus:border-(--dd-blue-dark) focus:ring-4 focus:ring-(--dd-blue-dark)/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-(--dd-blue-light)/30 transition-all">
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label
+                                class="text-xs font-semibold text-gray-500 dark:text-(--dd-blue-light)/60 uppercase tracking-wider ml-1">Email
+                                *</label>
+                            <input type="email" name="email" [(ngModel)]="form.email" placeholder="you@example.com"
+                                class="w-full py-3.5 px-5 rounded-xl text-sm bg-(--dd-cream) dark:bg-(--dd-surface-input) border border-(--dd-blue-ultra-light) dark:border-(--dd-border) outline-none focus:border-(--dd-blue-dark) focus:ring-4 focus:ring-(--dd-blue-dark)/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-(--dd-blue-light)/30 transition-all">
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label
+                                class="text-xs font-semibold text-gray-500 dark:text-(--dd-blue-light)/60 uppercase tracking-wider ml-1">Subject
+                                *</label>
+                            <input type="text" name="subject" [(ngModel)]="form.subject"
+                                placeholder="What's this about?"
+                                class="w-full py-3.5 px-5 rounded-xl text-sm bg-(--dd-cream) dark:bg-(--dd-surface-input) border border-(--dd-blue-ultra-light) dark:border-(--dd-border) outline-none focus:border-(--dd-blue-dark) focus:ring-4 focus:ring-(--dd-blue-dark)/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-(--dd-blue-light)/30 transition-all">
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label
+                                class="text-xs font-semibold text-gray-500 dark:text-(--dd-blue-light)/60 uppercase tracking-wider ml-1">Message
+                                *</label>
+                            <textarea rows="5" name="message" [(ngModel)]="form.message"
+                                placeholder="Tell us how we can help..."
+                                class="w-full py-3.5 px-5 rounded-xl text-sm bg-(--dd-cream) dark:bg-(--dd-surface-input) border border-(--dd-blue-ultra-light) dark:border-(--dd-border) outline-none focus:border-(--dd-blue-dark) focus:ring-4 focus:ring-(--dd-blue-dark)/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-(--dd-blue-light)/30 resize-none transition-all"></textarea>
+                        </div>
+
+                        <p *ngIf="submitMessage"
+                            class="text-sm font-semibold"
+                            [class.text-emerald-600]="submitState === 'success'"
+                            [class.text-rose-500]="submitState === 'error'">
+                            {{ submitMessage }}
+                        </p>
+
+                        <button type="submit" [disabled]="isSubmitting"
+                            class="mt-2 w-full py-4 rounded-xl font-bold text-white bg-linear-to-r from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-orange) hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-(--dd-blue-dark)/25 disabled:opacity-50 flex items-center justify-center gap-2">
+                            <i *ngIf="!isSubmitting" class="bi bi-send-fill"></i>
+                            <i *ngIf="isSubmitting" class="bi bi-arrow-repeat animate-spin"></i>
+                            {{ isSubmitting ? 'Sending...' : 'Send Message' }}
+                        </button>
+
+                    </form>
                 </div>
-
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[14px] font-normal tracking-wider text-black ml-1">Subject</label>
-                    <input type="text" name="subject" [(ngModel)]="form.subject" placeholder="Subject"
-                        class="w-full py-3.5 px-5 rounded-2xl text-[14px] bg-white border border-blue-100/50 outline-none focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10">
-                </div>
-
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[14px] font-normal tracking-wider text-black ml-1">Message</label>
-                    <textarea rows="4" name="message" [(ngModel)]="form.message" placeholder="Type your message here ..."
-                        class="w-full py-3.5 px-5 rounded-2xl text-[14px] bg-white border border-blue-100/50 outline-none focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 resize-none"></textarea>
-                </div>
-
-                <p *ngIf="submitMessage"
-                    class="text-sm font-semibold"
-                    [class.text-emerald-600]="submitState === 'success'"
-                    [class.text-rose-600]="submitState === 'error'">
-                    {{ submitMessage }}
-                </p>
-
-                <button type="submit" [disabled]="isSubmitting"
-                    class="mt-4 w-full py-4 rounded-full font-bold text-white bg-gradient-to-r from-[var(--dd-blue-dark)] via-[var(--dd-orange)] to-[var(--dd-yellow)] active:scale-[0.98] transition-all">
-                    {{ isSubmitting ? 'Sending...' : 'Send Message' }}
-                </button>
-
-            </form>
-        </div>
-
-
-        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <!-- Heading -->
-            <h2 class="text-3xl md:text-4xl font-semibold leading-tight text-gray-400">
-                <span class="bg-gradient-to-r from-[var(--dd-blue-dark)] to-[var(--dd-blue)]
-                                 bg-clip-text text-transparent">
-                    Why modern
-                </span>
-                teams and ambitious talent choose ProveIt?
-            </h2>
-
-            <!-- Content -->
-            <div class="mt-8 space-y-10 text-gray-600 text-lg leading-relaxed">
-
-                <p>
-                    <span class="text-xl font-bold text-gray-800 tracking-wider">
-                        Industry-Driven Challenges
-                    </span><br />
-                    Every challenge on ProveIt is designed with real companies in mind —
-                    mirroring actual problems candidates will face on the job.
-                </p>
-
-                <p>
-                    <span class="text-xl font-bold text-gray-800 tracking-wider">
-                        Skill-First Hiring
-                    </span><br />
-                    We help companies move beyond resumes and credentials by evaluating
-                    candidates on what they can actually build, solve, and deliver.
-                </p>
-
-                <p>
-                    <span class="text-xl font-bold text-gray-800 tracking-wider">
-                        Built for Companies & Candidates
-                    </span><br />
-                    ProveIt creates value on both sides — giving companies confidence in
-                    hiring decisions and candidates a fair platform to prove their abilities.
-                </p>
-
-                <p>
-                    <span class="text-xl font-bold text-gray-800 tracking-wider">
-                        Secure & Transparent Evaluation
-                    </span><br />
-                    Our platform ensures unbiased assessments with secure submissions and
-                    transparent scoring systems you can trust.
-                </p>
-
-                <p>
-                    <span class="text-xl font-bold text-gray-800 tracking-wider">
-                        Modern, Scalable Platform
-                    </span><br />
-                    Powered by modern web technologies, ProveIt is fast, scalable, and
-                    designed to grow with your hiring needs.
-                </p>
 
             </div>
         </div>
+    </section>
 
-    </div>
+    <!-- ─── WHY PROVEIT SECTION ─── -->
+    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                <span class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-blue-dark) to-(--dd-orange)">Why
+                    modern</span>
+                teams choose ProveIt
+            </h2>
+            <p class="text-gray-500 dark:text-(--dd-blue-light)/60 mt-3 max-w-2xl mx-auto">
+                Built for companies and candidates who believe in proving skills through action.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+            <div
+                class="group bg-white dark:bg-(--dd-surface) rounded-2xl p-6 border border-gray-100 dark:border-(--dd-border) hover:border-(--dd-blue-light) dark:hover:border-(--dd-blue)/30 hover:-translate-y-1 hover:shadow-lg hover:shadow-(--dd-blue-dark)/5 transition-all duration-300">
+                <div
+                    class="w-12 h-12 rounded-xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-lightning-fill text-xl text-(--dd-blue-dark)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Industry-Driven Challenges</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Real problems mirroring actual job responsibilities.
+                </p>
+            </div>
+
+            <div
+                class="group bg-white dark:bg-(--dd-surface) rounded-2xl p-6 border border-gray-100 dark:border-(--dd-border) hover:border-(--dd-blue-light) dark:hover:border-(--dd-blue)/30 hover:-translate-y-1 hover:shadow-lg hover:shadow-(--dd-blue)/5 transition-all duration-300">
+                <div
+                    class="w-12 h-12 rounded-xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-person-check-fill text-xl text-(--dd-blue)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Skill-First Hiring</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Evaluate what candidates can actually build & deliver.
+                </p>
+            </div>
+
+            <div
+                class="group bg-white dark:bg-(--dd-surface) rounded-2xl p-6 border border-gray-100 dark:border-(--dd-border) hover:border-(--dd-blue-light) dark:hover:border-(--dd-blue)/30 hover:-translate-y-1 hover:shadow-lg hover:shadow-(--dd-blue)/5 transition-all duration-300">
+                <div
+                    class="w-12 h-12 rounded-xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-people-fill text-xl text-(--dd-orange)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Built for Both Sides</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Confidence for companies, fairness for candidates.
+                </p>
+            </div>
+
+            <div
+                class="group bg-white dark:bg-(--dd-surface) rounded-2xl p-6 border border-gray-100 dark:border-(--dd-border) hover:border-(--dd-yellow) dark:hover:border-(--dd-yellow)/30 hover:-translate-y-1 hover:shadow-lg hover:shadow-(--dd-yellow)/5 transition-all duration-300">
+                <div
+                    class="w-12 h-12 rounded-xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-yellow)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-shield-check text-xl text-(--dd-yellow-dark)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Secure & Transparent</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Unbiased scoring and secure submissions you can trust.
+                </p>
+            </div>
+
+        </div>
+    </section>
 
 </div>
+
+<!-- ================= FOOTER ================= -->
 <app-footer></app-footer>

@@ -1,51 +1,37 @@
-<app-navbar
-    [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+<app-shader-hero
+    title="Simple, Transparent Pricing"
+    subtitle="Choose the plan that's right for your business. No hidden fees, no surprises."
+    minHeight="130vh">
+    <header class="absolute top-0 left-0 w-full z-30 backdrop-blur-md">
+        <app-navbar [transparent]="true"
+            [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+    </header>
+</app-shader-hero>
 
-<main class="relative min-h-screen w-full overflow-hidden bg-(--dd-cream) flex flex-col items-center pt-32 pb-20 px-4">
-
-    <!-- Subtle dotted grid background -->
-    <div aria-hidden="true" class="pointer-events-none absolute inset-0 opacity-20"
-        style="background-image: radial-gradient(rgba(0,0,0,0.1) 0.8px, transparent 0.8px); background-size: 14px 14px; mask-image: radial-gradient(circle at 50% 10%, rgba(0,0,0,1), rgba(0,0,0,0.2) 40%, rgba(0,0,0,0) 70%);">
-    </div>
-
-    <!-- Radial spotlight -->
-    <div aria-hidden="true"
-        class="pointer-events-none absolute -top-1/2 left-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 rounded-full blur-[60px]"
-        style="background: radial-gradient(ellipse at center, rgba(var(--dd-blue-rgb, 154,140,255), 0.12), transparent 50%)">
-    </div>
-
-    <div class="relative z-10 text-center mb-16 max-w-4xl min-h-[50vh] flex flex-col justify-center items-center">
-        <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
-            Simple, Transparent <span
-                class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-orange) to-(--dd-yellow)">Pricing</span>
-        </h1>
-        <p class="text-slate-500 text-lg">
-            Choose the plan that's right for your business. No hidden fees, no surprises.
-        </p>
-    </div>
+<main class="relative min-h-screen w-full overflow-hidden bg-(--dd-cream) flex flex-col items-center pt-16 pb-20 px-4">
 
     <!-- Loading skeleton -->
     <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full">
         <div *ngFor="let i of [1,2,3]"
-            class="h-[500px] bg-white/60 rounded-3xl animate-pulse border border-slate-100"></div>
+            class="h-[500px] bg-white/60 dark:bg-(--dd-surface)/60 rounded-3xl animate-pulse border border-slate-100 dark:border-(--dd-border)"></div>
     </div>
 
     <!-- Plans Grid -->
     <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full relative z-10 items-stretch">
 
         <div *ngFor="let plan of plans"
-            class="flex flex-col group bg-white/70 backdrop-blur-xl border border-slate-200 p-1.5 rounded-3xl shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            class="flex flex-col group bg-white/70 dark:bg-(--dd-surface)/90 backdrop-blur-xl border border-slate-200 dark:border-(--dd-border) p-1.5 rounded-3xl shadow-xl dark:shadow-violet-900/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
             [ngClass]="{'border-(--dd-orange)/50 ring-1 ring-(--dd-orange)/20 scale-105 z-10': plan.popular}">
 
             <!-- Card Header -->
-            <div class="bg-slate-50 relative mb-4 rounded-2xl border border-slate-100 p-6">
+            <div class="bg-slate-50 dark:bg-(--dd-surface-secondary) relative mb-4 rounded-2xl border border-slate-100 dark:border-(--dd-border) p-6">
                 <!-- Top glass gradient -->
                 <div aria-hidden="true" class="absolute inset-x-0 top-0 h-32 rounded-[inherit]"
                     style="background: linear-gradient(180deg, color-mix(in srgb, var(--dd-orange) 5%, transparent) 0%, rgba(255,255,255,0) 100%)">
                 </div>
 
                 <div class="relative z-10 mb-8 flex items-center justify-between">
-                    <div class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                    <div class="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-violet-200">
                         <i class="bi bi-people-fill text-(--dd-orange)"></i>
                         <span>{{ plan.name }}</span>
                     </div>
@@ -55,9 +41,9 @@
                 </div>
 
                 <div class="relative z-10 mb-6 flex items-end gap-1">
-                    <span class="text-4xl font-black text-slate-900 tracking-tight">{{ plan.price }}</span>
-                    <span class="text-slate-500 pb-1 text-sm">{{ plan.period }}</span>
-                    <span *ngIf="plan.priceYearly" class="text-slate-400 ml-auto text-sm font-medium">
+                    <span class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{{ plan.price }}</span>
+                    <span class="text-slate-500 dark:text-violet-300/60 pb-1 text-sm">{{ plan.period }}</span>
+                    <span *ngIf="plan.priceYearly" class="text-slate-400 dark:text-violet-400/50 ml-auto text-sm font-medium">
                         {{ plan.priceYearly }}/yr
                     </span>
                 </div>
@@ -73,17 +59,17 @@
 
             <!-- Card Body -->
             <div class="space-y-5 p-6 grow blur-[2px] group-hover:blur-[0px] transition-all duration-500">
-                <p class="text-slate-600 text-sm leading-relaxed">{{ plan.description }}</p>
+                <p class="text-slate-600 dark:text-violet-200 text-sm leading-relaxed">{{ plan.description }}</p>
 
                 <ul class="space-y-3">
-                    <li *ngFor="let feature of plan.features" class="flex items-start gap-3 text-sm text-slate-600">
-                        <i class="bi bi-check-circle-fill text-green-500 mt-0.5 shrink-0"></i>
+                    <li *ngFor="let feature of plan.features" class="flex items-start gap-3 text-sm text-slate-600 dark:text-violet-200">
+                        <i class="bi bi-check-circle-fill text-green-500 dark:text-emerald-400 mt-0.5 shrink-0"></i>
                         <span>{{ feature }}</span>
                     </li>
                 </ul>
 
                 <!-- Empty state -->
-                <p *ngIf="!plan.features?.length" class="text-sm text-slate-400 italic">
+                <p *ngIf="!plan.features?.length" class="text-sm text-slate-400 dark:text-violet-300/50 italic">
                     Contact us for custom features.
                 </p>
             </div>
@@ -92,15 +78,15 @@
     </div>
 
     <!-- Bottom CTA -->
-    <p *ngIf="!loading" class="relative z-10 text-slate-400 text-sm mt-12">
+    <p *ngIf="!loading" class="relative z-10 text-slate-400 dark:text-violet-300/50 text-sm mt-12">
         All plans include a 14-day free trial. No credit card required.
     </p>
 
     <!-- How It Works Accordion -->
     <div class="max-w-7xl mx-auto px-6 py-12 w-full mt-24 mb-10">
         <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 border-b-2 border-orange-400 inline-block pb-2">Frequently Asked Questions</h2>
-            <p class="text-gray-500 mt-2">Got questions about our plans? We have answers.</p>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white border-b-2 border-orange-400 inline-block pb-2">Frequently Asked Questions</h2>
+            <p class="text-gray-500 dark:text-violet-300/60 mt-2">Got questions about our plans? We have answers.</p>
         </div>
         <app-faq-accordion [items]="howItWorksItems"></app-faq-accordion>
     </div>

@@ -5,11 +5,12 @@ import { Navbar } from '../../components/navbar/navbar';
 import { Footer } from '../../components/footer/footer';
 import { ApiService } from '../../../services/api.service';
 import { FaqAccordion, FaqItem } from '../../components/faq-accordion/faq-accordion';
+import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
 
 @Component({
   selector: 'app-pricing',
   standalone: true,
-  imports: [CommonModule, Navbar, Footer, FaqAccordion],
+  imports: [CommonModule, Navbar, Footer, FaqAccordion, ShaderHeroComponent],
   templateUrl: './pricing.html',
   styleUrl: './pricing.css',
 })

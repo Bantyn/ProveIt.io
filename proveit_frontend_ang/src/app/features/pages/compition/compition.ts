@@ -7,6 +7,7 @@ import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { FluidDropdown, DropdownOption } from '../../components/ui/fluid-dropdown/fluid-dropdown';
 import { FaqAccordion, FaqItem } from '../../components/faq-accordion/faq-accordion';
+import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
 
 interface Filters {
   search: string;
@@ -30,6 +31,7 @@ const MAX_RECENTLY_VIEWED = 10;
     RouterLink,
     FluidDropdown,
     FaqAccordion,
+    ShaderHeroComponent,
   ],
   templateUrl: './compition.html',
   styleUrl: './compition.css',

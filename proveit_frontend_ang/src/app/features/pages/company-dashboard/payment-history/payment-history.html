@@ -1,0 +1,83 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="text-[22px] font-bold text-slate-900">Payment History</h1>
+        <p class="text-[13px] text-slate-500 mt-0.5">View your invoices and payment records</p>
+    </div>
+</div>
+
+<!-- Subscription Info -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" *ngIf="sub?.status">
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Current Plan</p>
+        <p class="text-xl font-black text-slate-900">{{ sub.planName | titlecase }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Status</p>
+        <span class="inline-flex items-center gap-1.5 text-sm font-bold"
+            [ngClass]="sub.status === 'ACTIVE' ? 'text-emerald-600' : 'text-amber-600'">
+            <i class="bi" [ngClass]="sub.status === 'ACTIVE' ? 'bi-check-circle-fill' : 'bi-clock-fill'"></i>
+            {{ sub.status }}
+        </span>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Renewal Date</p>
+        <p class="text-lg font-bold text-slate-900">{{ sub.endDate }}</p>
+    </div>
+</div>
+
+<!-- Payment History Table -->
+<div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-sm text-left">
+            <thead>
+                <tr>
+                    <th class="p-4 border-b border-slate-100 text-slate-500 font-semibold">Description</th>
+                    <th class="p-4 border-b border-slate-100 text-slate-500 font-semibold">Amount</th>
+                    <th class="p-4 border-b border-slate-100 text-slate-500 font-semibold">Method</th>
+                    <th class="p-4 border-b border-slate-100 text-slate-500 font-semibold">Payment ID</th>
+                    <th class="p-4 border-b border-slate-100 text-slate-500 font-semibold">Date</th>
+                    <th class="p-4 border-b border-slate-100 text-slate-500 font-semibold">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of payments"
+                    class="hover:bg-slate-50/50 transition-colors border-b border-slate-50 last:border-none">
+                    <td class="p-4 font-semibold text-slate-800">{{ p.description }}</td>
+                    <td class="p-4 font-bold text-(--dd-blue-dark) text-[15px]">₹{{ p.amount | number }}</td>
+                    <td class="p-4">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-medium">
+                            <i class="bi bi-credit-card-fill text-slate-400"></i> {{ p.method }}
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <span *ngIf="p.razorpayPaymentId" class="text-[11px] font-mono text-slate-400 bg-slate-50 px-2 py-1 rounded-md">{{ p.razorpayPaymentId }}</span>
+                        <span *ngIf="!p.razorpayPaymentId" class="text-[11px] text-slate-300">{{ p.transactionId || '—' }}</span>
+                    </td>
+                    <td class="p-4 text-slate-600 font-medium">{{ p.date }}</td>
+                    <td class="p-4">
+                        <span
+                            class="text-[12px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap inline-flex items-center gap-1.5"
+                            [ngClass]="{
+                              'bg-emerald-50 text-emerald-600': p.status==='success',
+                              'bg-rose-50 text-rose-600': p.status==='refunded',
+                              'bg-amber-50 text-amber-600': p.status==='pending'
+                            }">
+                            <i class="bi bi-check-circle-fill text-[10px]" *ngIf="p.status==='success'"></i>
+                            <i class="bi bi-arrow-counterclockwise text-[10px]" *ngIf="p.status==='refunded'"></i>
+                            <i class="bi bi-clock-fill text-[10px]" *ngIf="p.status==='pending'"></i>
+                            {{ p.status | titlecase }}
+                        </span>
+                    </td>
+                </tr>
+                <tr *ngIf="payments.length === 0">
+                    <td colspan="6" class="p-12 text-center">
+                        <div class="flex flex-col items-center gap-3">
+                            <i class="bi bi-receipt text-4xl text-slate-200"></i>
+                            <p class="text-slate-400 text-sm">No payment history yet. Upgrade your plan to get started.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

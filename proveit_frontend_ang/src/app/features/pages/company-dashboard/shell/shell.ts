@@ -21,7 +21,6 @@ export class CompanyShell {
       label: 'Applications',
       route: '/company/dashboard/applications',
       icon: 'bi-file-earmark-person',
-      badge: 3,
     },
     { label: 'Projects', route: '/company/dashboard/projects', icon: 'bi-folder' },
     {
@@ -31,7 +30,8 @@ export class CompanyShell {
       requiredFeatureKey: 'pipeline.enabled',
     },
     { label: 'Interviews', route: '/company/dashboard/interviews', icon: 'bi-calendar' },
-    { label: 'Billing', route: '/company/dashboard/billing', icon: 'bi-credit-card-fill' },
+    { label: 'Plans', route: '/company/dashboard/billing', icon: 'bi-credit-card-fill' },
+    { label: 'Payment History', route: '/company/dashboard/payment-history', icon: 'bi-receipt' },
     { label: 'Reviews', route: '/company/dashboard/reviews', icon: 'bi-star-fill' },
     { label: 'Settings', route: '/company/dashboard/settings', icon: 'bi-gear-fill' },
   ];

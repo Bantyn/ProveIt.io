@@ -14,6 +14,7 @@ interface Filters {
   location: string;
   size: string;
 }
+import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
 
 @Component({
   selector: 'app-company',
@@ -29,6 +30,7 @@ interface Filters {
     RouterLink,
     FluidDropdown,
     FaqAccordion,
+    ShaderHeroComponent,
   ],
   templateUrl: './company.html',
   styleUrl: './company.css',

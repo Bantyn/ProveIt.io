@@ -4,10 +4,11 @@ import { Footer } from '../../components/footer/footer';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
+import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
 
 @Component({
   selector: 'app-feedback',
-  imports: [Navbar, Footer, FormsModule, NgIf],
+  imports: [Navbar, Footer, FormsModule, NgIf, ShaderHeroComponent],
   templateUrl: './feedback.html',
   styleUrl: './feedback.css',
 })

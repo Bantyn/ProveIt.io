@@ -24,6 +24,7 @@ export class CompetitionDetails implements OnInit {
   mongoUser: any = null;
   showProfilePrompt: boolean = false;
   isLoading: boolean = true;
+  hasAlreadyApplied: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -66,6 +67,17 @@ export class CompetitionDetails implements OnInit {
             this.cdr.detectChanges();
           },
         });
+
+        // Check if user has already applied to this competition
+        if (this.competitionId) {
+          this.api.getUserApplications(user.uid).pipe(take(1)).subscribe({
+            next: (apps) => {
+              this.hasAlreadyApplied = apps.some((app) => app.competitionId === this.competitionId);
+              this.cdr.detectChanges();
+            },
+            error: () => {},
+          });
+        }
       } else {
         this.mongoUser = null;
         this.cdr.detectChanges();

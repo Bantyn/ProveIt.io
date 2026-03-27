@@ -59,7 +59,8 @@
         <td class="py-4 border-b border-slate-50 text-[12px] text-slate-500 font-medium pr-4">{{ c.email }}</td>
         <td class="py-4 border-b border-slate-50 text-slate-600 pr-4">{{ c.industry }}</td>
         <td class="py-4 border-b border-slate-50 pr-4">
-          <span class="text-[12px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap bg-(--dd-blue-light)/20 text-(--dd-blue) border border-(--dd-blue)/10">{{ c.plan }}</span>
+          <span class="text-[12px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap"
+            [ngClass]="c.plan ? 'bg-(--dd-blue-light)/20 text-(--dd-blue) border border-(--dd-blue)/10' : 'bg-neutral-100 text-neutral-400 border border-neutral-200'">{{ c.plan || 'Free' }}</span>
         </td>
         <td class="py-4 border-b border-slate-50 pr-4">
           <span

@@ -36,6 +36,7 @@ export class DashboardLayout implements OnInit {
   userAvatarUrl = '';
   notifications: any[] = [];
   currentPlanFeatures: any = null;
+  pendingAppCount = 0;
 
   constructor(
     private authService: AuthService,
@@ -145,7 +146,6 @@ export class DashboardLayout implements OnInit {
         },
         error: (err) => {
           console.warn('Admin notifications API failed, falling back to logs.', err);
-          // Fallback to logs if notifications endpoint doesn't exist yet
           this.apiService.getAdminLogs().subscribe((logs: any[]) => {
             this.notifications = this.normalizeNotifications(
               (logs || []).slice(0, 10).map((log: any) => ({
@@ -168,9 +168,20 @@ export class DashboardLayout implements OnInit {
             if (company && company.id) {
                this.apiService.getCompanyDashboard(company.id).subscribe({
                  next: (dash) => {
+                   // Compute pending application badge from real data
+                   const pendingApps = (dash?.recentApps || []).filter(
+                     (a: any) => a.status === 'pending' || a.status === 'under_review'
+                   );
+                   this.pendingAppCount = pendingApps.length;
+                   // Update the Applications nav item badge dynamically
+                   const appNav = this.navItems.find(n => n.label === 'Applications');
+                   if (appNav) {
+                     appNav.badge = this.pendingAppCount > 0 ? this.pendingAppCount : undefined;
+                   }
+
                    if (dash?.recentApps?.length) {
                      this.notifications = this.normalizeNotifications(
-                      dash.recentApps.map((app: any) => ({
+                      dash.recentApps.slice(0, 5).map((app: any) => ({
                         id: app.id,
                         title: 'New Application',
                         message: `New application received for ${app.competitionTitle || 'a competition'}`,
@@ -180,24 +191,22 @@ export class DashboardLayout implements OnInit {
                       })),
                      );
                    } else {
-                     this.notifications = this.normalizeNotifications(this.dataService.notifications);
+                     this.notifications = [];
                    }
                    this.cdr.detectChanges();
                  },
-                 error: (err) => {
-                   console.warn('Company dashboard notifications failed, using fallback.', err);
-                   this.notifications = this.normalizeNotifications(this.dataService.notifications);
+                 error: () => {
+                   this.notifications = [];
                    this.cdr.detectChanges();
                  }
                });
             } else {
-              this.notifications = this.normalizeNotifications(this.dataService.notifications);
+              this.notifications = [];
               this.cdr.detectChanges();
             }
           },
-          error: (err) => {
-            console.warn('Company lookup failed for notifications, using fallback.', err);
-            this.notifications = this.normalizeNotifications(this.dataService.notifications);
+          error: () => {
+            this.notifications = [];
             this.cdr.detectChanges();
           }
         });
@@ -263,6 +272,9 @@ export class DashboardLayout implements OnInit {
       'bi-calendar-event': 'layers',
       'bi-award-fill': 'trophy',
       'bi-briefcase-fill': 'building-2',
+      'bi-folder': 'folder',
+      'bi-calendar': 'calendar',
+      'bi-diagram-3-fill': 'git-branch',
     };
     return mapping[biIcon] || 'code';
   }

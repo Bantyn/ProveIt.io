@@ -309,6 +309,26 @@ export class ApiService {
     return this.http.get<any[]>(`${this.baseUrl}/billing/payments/company/${companyId}`);
   }
 
+  createRazorpayOrder(payload: {
+    amount: number;
+    planName: string;
+    companyId: string;
+    companyName?: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/billing/create-order`, payload);
+  }
+
+  verifyRazorpayPayment(payload: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    companyId: string;
+    planName: string;
+    amount: number;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/billing/verify-payment`, payload);
+  }
+
   // ─── ADMIN ────────────────────────────────────────────────────────────────
   getAdminStats(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/admin/stats`);

@@ -31,6 +31,10 @@
     flex-direction: column;
 }
 
+:host-context(html.dark) .reveal-card-base {
+    background: var(--dd-surface);
+}
+
 .reveal-card-overlay {
     position: absolute;
     inset: 0;
@@ -54,6 +58,10 @@
 
 .reveal-card-overlay * {
     color: rgb(0, 0, 0) ;
+}
+
+:host-context(html.dark) .reveal-card-overlay * {
+    color: white;
 }
 
 .reveal-card-overlay .industry-tag {

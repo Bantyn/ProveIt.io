@@ -2,62 +2,12 @@
   <div>
     <h1
       class="text-3xl font-extrabold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
-      Billing & Transactions</h1>
-    <p class="text-[13px] text-black mt-1 font-medium">Monitor revenue, view all transactions, and issue refunds.</p>
-  </div>
-  <div
-    class="group relative inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-sm tracking-wide text-white bg-linear-to-r from-emerald-600 to-teal-600 shadow-lg shadow-emerald-200/40 transition-all duration-300 hover:scale-[1.03]">
-    <span class="relative z-10 flex items-center gap-2">
-      <i class="bi bi-wallet2"></i> Payout Status: Active
-    </span>
+      Manage Plans</h1>
+    <p class="text-[13px] text-black mt-1 font-medium">Configure and manage subscription plans. Changes reflect live on the Pricing page.</p>
   </div>
 </div>
-
-<div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
-  <!-- Total Revenue -->
-  <div class="stat-card relative overflow-hidden rounded-3xl h-[140px] flex shadow-sm cursor-pointer group bg-[#A5D1BF]">
-    <div class="relative z-10 flex flex-col justify-center pl-6 w-[60%]">
-      <p class="text-[14px] font-bold text-slate-800/60">Total Revenue</p>
-      <div class="text-[2.2rem] font-black mt-1 text-slate-900">₹{{ stats.totalRevenue | number }}</div>
-    </div>
-    <div class="stat-bg-right absolute top-0 -right-[15%] w-[65%] h-full z-0 bg-[#C8E7DD]"></div>
-    <div class="stat-icon absolute right-8 top-1/2 -translate-y-1/2 z-10 drop-shadow-sm">
-      <i class="bi bi-currency-rupee text-[4rem] opacity-20 group-hover:opacity-40 transition-opacity"></i>
-    </div>
-  </div>
-
-  <!-- Total Transactions -->
-  <div class="stat-card relative overflow-hidden rounded-3xl h-[140px] flex shadow-sm cursor-pointer group bg-[#96C8F5]">
-    <div class="relative z-10 flex flex-col justify-center pl-6 w-[60%]">
-      <p class="text-[14px] font-bold text-slate-800/60">Transactions</p>
-      <div class="text-[2.2rem] font-black mt-1 text-slate-900">{{ stats.totalTransactions || transactions.length }}</div>
-    </div>
-    <div class="stat-bg-right absolute top-0 -right-[15%] w-[65%] h-full z-0 bg-[#CBE4F8]"></div>
-    <div class="stat-icon absolute right-8 top-1/2 -translate-y-1/2 z-10 drop-shadow-sm">
-      <i class="bi bi-receipt text-[4rem] opacity-20 group-hover:opacity-40 transition-opacity"></i>
-    </div>
-  </div>
-
-  <!-- Refunds -->
-  <div class="stat-card relative overflow-hidden rounded-3xl h-[140px] flex shadow-sm cursor-pointer group bg-[#FDBA74]">
-    <div class="relative z-10 flex flex-col justify-center pl-6 w-[60%]">
-      <p class="text-[14px] font-bold text-slate-800/60">Refunds Issued</p>
-      <div class="text-[2.2rem] font-black mt-1 text-slate-900">{{ stats.refundsIssued }}</div>
-    </div>
-    <div class="stat-bg-right absolute top-0 -right-[15%] w-[65%] h-full z-0 bg-[#FED7AA]"></div>
-    <div class="stat-icon absolute right-8 top-1/2 -translate-y-1/2 z-10 drop-shadow-sm">
-      <i class="bi bi-arrow-counterclockwise text-[4rem] opacity-20 group-hover:opacity-40 transition-opacity"></i>
-    </div>
-  </div>
-</div>
-
 
 <!-- Available Plans — Pricing UI Format -->
-<div class="flex items-center justify-between mb-5 mt-6">
-  <h2 class="text-lg font-bold text-slate-900">Available Plans</h2>
-  <span class="text-xs text-slate-400 font-medium">Changes reflect live on the Pricing page</span>
-</div>
-
 <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
 
   <div *ngFor="let p of plans; let i = index"
@@ -138,68 +88,3 @@
   </div>
 
 </div>
-
-
-<div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-x-auto">
-
-  <div class="mb-6 flex justify-between items-center">
-    <h2 class="text-lg font-bold text-slate-900">All Transactions</h2>
-  </div>
-  <table class="w-full border-collapse text-[14px] text-left whitespace-nowrap">
-    <thead>
-      <tr>
-        <th class="text-slate-500 pb-3 border-b border-slate-100 font-semibold pr-4">Company ID</th>
-        <th class="text-slate-500 pb-3 border-b border-slate-100 font-semibold pr-4">Description</th>
-        <th class="text-slate-500 pb-3 border-b border-slate-100 font-semibold pr-4">Amount</th>
-        <th class="text-slate-500 pb-3 border-b border-slate-100 font-semibold pr-4">Method</th>
-        <th class="text-slate-500 pb-3 border-b border-slate-100 font-semibold pr-4">Date</th>
-        <th class="text-slate-500 pb-3 border-b border-slate-100 font-semibold pr-4">Status</th>
-        <th class="text-slate-500 pb-3 border-b border-slate-100 font-semibold pr-4 text-right">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of transactions"
-        class="group hover:bg-slate-50/50 transition-colors border-b border-slate-50 last:border-0">
-        <td class="font-semibold text-slate-800 py-4 pr-4">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-8 h-8 rounded-full bg-(--dd-blue-light)/20 text-(--dd-blue) flex items-center justify-center font-bold text-xs">
-              {{ p.companyIdInitials }}
-            </div>
-            {{ p.companyId }}
-          </div>
-        </td>
-        <td class="text-slate-600 py-4 pr-4">{{ p.description }}</td>
-        <td class="font-bold text-slate-900 py-4 pr-4">₹{{ p.amount | number }}</td>
-        <td class="py-4 pr-4">
-          <span
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-medium">
-            <i class="bi bi-credit-card-fill text-slate-400"></i> {{ p.method }}
-          </span>
-        </td>
-        <td class="text-[13px] text-slate-500 py-4 pr-4">{{ p.date }}</td>
-        <td class="py-4 pr-4">
-          <span
-            class="text-[12px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap inline-flex items-center gap-1.5"
-            [ngClass]="{
-              'bg-emerald-50 text-emerald-600': p.status === 'success',
-              'bg-rose-50 text-rose-600': p.status === 'refunded'
-            }">
-            <i class="bi bi-check-circle-fill text-[10px]" *ngIf="p.status === 'success'"></i>
-            <i class="bi bi-arrow-counterclockwise text-[10px]" *ngIf="p.status === 'refunded'"></i>
-            {{ p.status | titlecase }}
-          </span>
-        </td>
-        <td class="py-4 pr-4 text-right">
-          <button
-            class="w-8 h-8 rounded-xl border-none cursor-pointer inline-flex items-center justify-center text-sm transition-all hover:-translate-y-0.5"
-            [ngClass]="p.status === 'success' ? 'bg-rose-50 hover:bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
-            [disabled]="p.status !== 'success'" (click)="processRefund(p)" title="Refund Transaction">
-            <i class="bi bi-arrow-return-left"></i>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-

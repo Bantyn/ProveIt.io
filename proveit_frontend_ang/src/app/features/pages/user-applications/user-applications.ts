@@ -7,6 +7,7 @@ import { Footer } from '../../components/footer/footer';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
 import { FluidDropdown, DropdownOption } from '../../components/ui/fluid-dropdown/fluid-dropdown';
+import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
 
 import { take } from 'rxjs/operators';
 
@@ -22,6 +23,7 @@ import { take } from 'rxjs/operators';
     DatePipe,
     FormsModule,
     FluidDropdown,
+    ShaderHeroComponent,
   ],
   templateUrl: './user-applications.html',
   styleUrl: './user-applications.css',

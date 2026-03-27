@@ -6,17 +6,13 @@ import {
   NgClass,
   NgIf,
   NgStyle,
-  TitleCasePipe,
-  DecimalPipe,
-  SlicePipe,
 } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-billing',
   standalone: true,
-  imports: [NgFor, NgClass, NgIf, NgStyle, TitleCasePipe, DecimalPipe, FormsModule],
+  imports: [NgFor, NgClass, NgIf, NgStyle],
   templateUrl: './billing.html',
 })
 export class AdminBilling implements OnInit {
@@ -26,52 +22,15 @@ export class AdminBilling implements OnInit {
   private router = inject(Router);
 
   plans: any[] = [];
-  transactions: any[] = [];
-  stats: any = {
-    totalRevenue: 0,
-    activeSubscriptions: 0,
-    refundsIssued: 0,
-    totalTransactions: 0,
-  };
 
   ngOnInit() {
-    this.fetchBillingData();
+    this.fetchPlans();
   }
 
-  fetchBillingData() {
-    this.api.getAdminStats().subscribe({
-      next: (data) => {
-        this.stats = {
-          totalRevenue: data.totalRevenue || 0,
-          activeSubscriptions: data.activeSubscriptions || 0,
-          refundsIssued: data.refundsIssued || 0,
-          totalTransactions: data.totalTransactions || 0,
-        };
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error('Error fetching admin stats:', err),
-    });
-
-    this.api.getAdminPayments().subscribe({
-      next: (data) => {
-        this.transactions = (data || []).map((p: any) => {
-          const cid = String(p.companyId || 'NA');
-          return {
-            ...p,
-            companyIdInitials: cid.slice(0, 2).toUpperCase(),
-            description: p.description || 'Plan Upgrade',
-            method: p.method || 'UPI',
-            date: p.date || p.createdAt || 'N/A',
-          };
-        });
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error('Error fetching admin payments:', err),
-    });
-
+  fetchPlans() {
     this.api.getAdminPlans().subscribe({
       next: (data) => {
-        this.plans = data || []; // Removed .slice(0,3)
+        this.plans = data || [];
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Error fetching admin plans:', err),
@@ -84,12 +43,7 @@ export class AdminBilling implements OnInit {
       this.modal.alert('Plan ID not found. Please refresh the page.', 'Error');
       return;
     }
-    this.router.navigate(['/admin/billing/edit', plan.id]);
-  }
-
-  processRefund(transaction: any) {
-    transaction.status = 'refunded';
-    this.cdr.detectChanges();
+    this.router.navigate(['/admin/plans/edit', plan.id]);
   }
 
   /** Convert nested features object → readable string list for card display */

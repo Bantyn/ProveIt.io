@@ -1,326 +1,399 @@
-<div class="min-h-screen flex flex-col bg-[var(--dd-cream)]">
-  <div class="flex-grow">
-    <!-- ================= HEADER ================= -->
-    <header>
-      <app-navbar
-        [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+<!-- ================= SHADER HERO ================= -->
+<app-shader-hero
+    title="About ProveIt"
+    subtitle="We're building the future of skill-first hiring — where what you can do matters more than what's on your resume."
+    minHeight="130vh">
+    <header class="absolute top-0 left-0 w-full z-30 backdrop-blur-md">
+        <app-navbar [transparent]="true"
+            [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
     </header>
-<div class="px-3 md:px-30">
+</app-shader-hero>
 
-    <section class="mt-40 mx-auto px-3 md:px-20">
-      <!-- Title -->
-       <div class="relative z-10 mx-auto text-center mb-16 max-w-4xl min-h-[40vh] flex flex-col justify-center items-center">
-        <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
-            Know about <span
-                class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-orange) to-(--dd-yellow)">us</span>
-        </h1>
-        <p class="text-slate-500 text-lg">
-            Choose the plan that's right for your business. No hidden fees, no surprises.
-        </p>
-    </div>
+<!-- ================= MAIN CONTENT ================= -->
+<div class="bg-(--dd-cream)">
 
-      <!-- CONTENT -->
-      <div class="mt-24 w-full  mx-auto px-3 md:px-0 grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
-        <!-- LEFT : Text -->
-        <div class="space-y-8 text-lg text-gray-600 leading-relaxed">
-          <p>
-            <span class="font-semibold text-gray-900">ProveIt</span> is a
-            skill-first hiring platform built to redefine how companies discover
-            talent and how candidates prove their abilities.
-          </p>
+    <!-- ─── INTRO SECTION ─── -->
+    <section class="max-w-6xl mx-auto px-4 md:px-6 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <!-- Left: Content -->
+            <div>
+                <span
+                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 text-(--dd-blue-dark) dark:text-(--dd-blue-light) text-xs font-bold uppercase tracking-wider mb-6">
+                    <i class="bi bi-stars"></i> Our Platform
+                </span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
+                    Redefining how the world
+                    <span
+                        class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-blue-dark) to-(--dd-orange)">discovers
+                        talent</span>
+                </h2>
+                <p class="text-gray-600 dark:text-(--dd-blue-light)/70 text-lg leading-relaxed mb-4">
+                    <span class="font-semibold text-gray-900 dark:text-white">ProveIt</span> is a skill-first hiring
+                    platform built to replace
+                    resume-driven recruitment with real-world performance evaluation.
+                </p>
+                <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed mb-6">
+                    Companies post challenges that mirror actual job tasks. Candidates prove their skills by building,
+                    solving, and delivering — creating a fair, transparent, and efficient hiring process for everyone.
+                </p>
 
-          <p>
-            Instead of relying on resumes, credentials, or assumptions, ProveIt
-            enables candidates to demonstrate real-world skills through company-led
-            challenges that reflect actual job responsibilities.
-          </p>
+                <!-- Stats Row -->
+                <div class="flex flex-wrap gap-8 mt-8">
+                    <div>
+                        <span
+                            class="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue)">100+</span>
+                        <p class="text-xs text-gray-500 dark:text-(--dd-blue-light)/50 font-medium mt-1">Active Companies</p>
+                    </div>
+                    <div>
+                        <span
+                            class="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-(--dd-blue) to-(--dd-orange)">5K+</span>
+                        <p class="text-xs text-gray-500 dark:text-(--dd-blue-light)/50 font-medium mt-1">Skill Challenges</p>
+                    </div>
+                    <div>
+                        <span
+                            class="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-(--dd-orange) to-(--dd-yellow)">50K+</span>
+                        <p class="text-xs text-gray-500 dark:text-(--dd-blue-light)/50 font-medium mt-1">Candidates Evaluated
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-          <p>
-            For companies, ProveIt delivers measurable insights, transparent
-            evaluations, and faster hiring decisions — removing bias and guesswork
-            from the recruitment process.
-          </p>
+            <!-- Right: Visual Card -->
+            <div class="relative">
+                <div
+                    class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) shadow-xl dark:shadow-(--dd-blue-dark)/20 relative overflow-hidden">
+                    <!-- Decorative gradient blob -->
+                    <div
+                        class="absolute -top-10 -right-10 w-40 h-40 bg-linear-to-br from-(--dd-blue-dark)/20 to-(--dd-blue)/20 rounded-full blur-3xl pointer-events-none">
+                    </div>
+                    <div
+                        class="absolute -bottom-10 -left-10 w-36 h-36 bg-linear-to-br from-(--dd-orange)/15 to-(--dd-yellow)/15 rounded-full blur-3xl pointer-events-none">
+                    </div>
 
-          <p>
-            For candidates, ProveIt creates equal opportunity. Your background,
-            degree, or location matters less than what you can build, solve, and
-            deliver.
-          </p>
+                    <div class="relative z-10 space-y-6">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-linear-to-br from-(--dd-blue-dark) to-(--dd-blue) flex items-center justify-center">
+                                <i class="bi bi-rocket-takeoff-fill text-white text-sm"></i>
+                            </div>
+                            <span class="text-sm font-bold text-gray-900 dark:text-white">How it works</span>
+                        </div>
 
-          <p>
-            Built with modern technology and a focus on scalability, ProveIt
-            supports startups, growing teams, and enterprises looking to hire with
-            confidence and clarity.
-          </p>
+                        <div class="space-y-4">
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span
+                                        class="text-xs font-black text-(--dd-blue-dark)">1</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white">Companies post
+                                        challenges</h4>
+                                    <p class="text-xs text-gray-500 dark:text-(--dd-blue-light)/50 mt-0.5">Design real-world tasks that mirror actual job responsibilities.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span
+                                        class="text-xs font-black text-(--dd-blue)">2</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white">Candidates prove skills
+                                    </h4>
+                                    <p class="text-xs text-gray-500 dark:text-(--dd-blue-light)/50 mt-0.5">Submit solutions, code, designs, or strategies that demonstrate real ability.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span
+                                        class="text-xs font-black text-(--dd-orange)">3</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white">Hire with confidence
+                                    </h4>
+                                    <p class="text-xs text-gray-500 dark:text-(--dd-blue-light)/50 mt-0.5">Make data-driven decisions based on performance, not assumptions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- RIGHT : Visual -->
-        <div class="flex justify-center md:justify-end hidden md:block">
-          <img src="https://barbera.io/assets/f6-dc5627d6.svg" alt="About ProveIt illustration"
-            class="w-full max-w-md md:max-w-lg object-contain" />
-        </div>
-      </div>
     </section>
 
-    <section class="w-full py-20 px-3 md:px-16 lg:px-32">
-      <div class=" mx-auto flex flex-col lg:flex-row items-center gap-16">
-        <!-- LEFT : Visual -->
-        <div class="w-full lg:w-2/5 flex justify-center">
-          <img src="https://barbera.io/assets/f6-dc5627d6.svg" alt="Why ProveIt" class="w-full max-w-sm lg:max-w-md" />
-        </div>
-
-        <!-- RIGHT : Content -->
-        <div class="w-full lg:w-3/5">
-
-          <!-- Heading -->
-          <h2 class="text-3xl md:text-4xl font-semibold leading-tight text-gray-400">
-            <span class="bg-gradient-to-r from-[var(--dd-blue-dark)] to-[var(--dd-orange)]
-                                 bg-clip-text text-transparent">
-              Why modern
+    <!-- ─── WHY PROVEIT - BENTO GRID ─── -->
+    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+        <div class="text-center mb-14">
+            <span
+                class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 text-(--dd-blue-dark) dark:text-(--dd-blue-light) text-xs font-bold uppercase tracking-wider mb-4">
+                <i class="bi bi-grid-3x3-gap-fill"></i> Why ProveIt
             </span>
-            teams and ambitious talent choose ProveIt?
-          </h2>
-
-          <!-- Content -->
-          <div class="mt-8 space-y-6 text-gray-600 text-lg leading-relaxed">
-
-            <p>
-              <span class="font-semibold text-gray-800">
-                Industry-Driven Challenges
-              </span><br />
-              Every challenge on ProveIt is designed with real companies in mind —
-              mirroring actual problems candidates will face on the job.
-            </p>
-
-            <p>
-              <span class="font-semibold text-gray-800">
-                Skill-First Hiring
-              </span><br />
-              We help companies move beyond resumes and credentials by evaluating
-              candidates on what they can actually build, solve, and deliver.
-            </p>
-
-            <p>
-              <span class="font-semibold text-gray-800">
-                Built for Companies & Candidates
-              </span><br />
-              ProveIt creates value on both sides — giving companies confidence in
-              hiring decisions and candidates a fair platform to prove their abilities.
-            </p>
-
-            <p>
-              <span class="font-semibold text-gray-800">
-                Secure & Transparent Evaluation
-              </span><br />
-              Our platform ensures unbiased assessments with secure submissions and
-              transparent scoring systems you can trust.
-            </p>
-
-            <p>
-              <span class="font-semibold text-gray-800">
-                Modern, Scalable Platform
-              </span><br />
-              Powered by modern web technologies, ProveIt is fast, scalable, and
-              designed to grow with your hiring needs.
-            </p>
-
-          </div>
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                Why modern teams and ambitious talent
+                <span class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-blue-dark) to-(--dd-orange)">choose
+                    ProveIt</span>
+            </h2>
         </div>
-      </div>
+
+        <!-- Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+            <!-- Large Card -->
+            <div
+                class="md:col-span-2 lg:col-span-2 bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300 relative overflow-hidden group">
+                <div
+                    class="absolute -top-20 -right-20 w-60 h-60 bg-(--dd-blue-ultra-light)/50 dark:bg-(--dd-blue-dark)/5 rounded-full blur-3xl group-hover:bg-(--dd-blue-light)/50 dark:group-hover:bg-(--dd-blue-dark)/10 transition-colors duration-500">
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="bi bi-lightning-charge-fill text-2xl text-(--dd-blue-dark)"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Industry-Driven Challenges</h3>
+                    <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed max-w-lg">
+                        Every challenge on ProveIt is designed with real companies in mind — mirroring actual problems
+                        candidates will face on the job. No trick questions, no theoretical puzzles.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Regular Card -->
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300 group">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-person-badge-fill text-2xl text-(--dd-blue)"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Skill-First Hiring</h3>
+                <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Move beyond resumes and credentials. Evaluate candidates on what they can actually build, solve, and
+                    deliver.
+                </p>
+            </div>
+
+            <!-- Regular Card -->
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300 group">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-people-fill text-2xl text-(--dd-orange)"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Built for Both Sides</h3>
+                <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    ProveIt creates value for companies and candidates — giving confidence in hiring decisions and a fair
+                    platform to prove abilities.
+                </p>
+            </div>
+
+            <!-- Regular Card -->
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300 group">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-yellow)/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-shield-lock-fill text-2xl text-(--dd-yellow-dark)"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Secure & Transparent</h3>
+                <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Unbiased assessments with secure submissions and transparent scoring systems you can trust.
+                </p>
+            </div>
+
+            <!-- Accent Card -->
+            <div
+                class="bg-linear-to-br from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-orange) rounded-3xl p-8 text-white relative overflow-hidden group">
+                <div
+                    class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none">
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="bi bi-gear-wide-connected text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Modern & Scalable</h3>
+                    <p class="text-white/70 leading-relaxed">
+                        Powered by cutting-edge web technologies, ProveIt is fast, reliable, and designed to grow with
+                        your hiring needs. From startups to enterprises.
+                    </p>
+                </div>
+            </div>
+
+        </div>
     </section>
 
-    <section class="w-full py-28 px-3 md:px-24 bg-[var(--dd-cream)]">
-      <div class=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+    <!-- ─── MISSION & STORY ─── -->
+    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <!-- LEFT : Text Content -->
-        <div>
-          <h2 class="text-4xl md:text-5xl font-semibold leading-tight text-gray-400">
-            <span class="bg-gradient-to-r from-[var(--dd-blue-dark)] to-[var(--dd-orange)]
-                                 bg-clip-text text-transparent">
-              Advantages of using
-            </span>
-            ProveIt
-          </h2>
+            <!-- Mission Card -->
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-10 border border-gray-100 dark:border-(--dd-border) relative overflow-hidden group hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300">
+                <div
+                    class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue) rounded-t-3xl">
+                </div>
+                <div
+                    class="w-12 h-12 rounded-xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-6">
+                    <i class="bi bi-bullseye text-xl text-(--dd-blue-dark)"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our Mission</h2>
+                <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed mb-3">
+                    At <span class="font-semibold text-gray-900 dark:text-white">ProveIt</span>, our mission is to
+                    transform hiring into a skill-first, fair, and transparent process. We empower companies to evaluate
+                    real talent through practical challenges while giving candidates a platform to prove their abilities
+                    beyond resumes.
+                </p>
+                <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    By replacing assumptions with real-world performance, ProveIt helps organizations hire with
+                    confidence,
+                    reduce bias, and build stronger teams.
+                </p>
+            </div>
 
-          <div class="mt-10 space-y-8 text-lg text-gray-600 leading-relaxed">
-
-            <p>
-              <span class="font-semibold text-gray-900">
-                Real-World Skill Validation
-              </span><br />
-              Candidates solve real company challenges, proving how they think,
-              build, and deliver — not just what’s written on a resume.
-            </p>
-
-            <p>
-              <span class="font-semibold text-gray-900">
-                Faster, Smarter Hiring
-              </span><br />
-              Skip resume screening and focus on outcomes. ProveIt helps companies
-              identify top performers with measurable results.
-            </p>
-
-            <p>
-              <span class="font-semibold text-gray-900">
-                Fair & Equal Opportunity
-              </span><br />
-              Every candidate is evaluated based on performance, giving freshers and
-              experienced professionals an equal chance to shine.
-            </p>
-
-            <p>
-              <span class="font-semibold text-gray-900">
-                Transparent & Bias-Free Evaluation
-              </span><br />
-              Standardized challenges, secure submissions, and clear scoring ensure
-              objective hiring decisions.
-            </p>
-
-            <p>
-              <span class="font-semibold text-gray-900">
-                Built for Scale
-              </span><br />
-              From startups to enterprises, ProveIt grows with your hiring needs —
-              fast, secure, and scalable.
-            </p>
-
-          </div>
+            <!-- Story Card -->
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-10 border border-gray-100 dark:border-(--dd-border) relative overflow-hidden group hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300">
+                <div
+                    class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-(--dd-orange) to-(--dd-yellow) rounded-t-3xl">
+                </div>
+                <div
+                    class="w-12 h-12 rounded-xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 flex items-center justify-center mb-6">
+                    <i class="bi bi-book-half text-xl text-(--dd-orange)"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our Story</h2>
+                <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed mb-3">
+                    ProveIt was founded on the belief that traditional hiring methods no longer reflect how modern teams
+                    work. Resumes and credentials often fail to predict real performance.
+                </p>
+                <p class="text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    From the beginning, we partnered with hiring managers, founders, and engineers to design challenges
+                    that mirror real job responsibilities. Today, ProveIt helps companies hire faster and smarter.
+                </p>
+            </div>
         </div>
-
-        <!-- RIGHT : Image -->
-        <div class="flex justify-center">
-          <img src="https://barbera.io/assets/beauty4-ef8ea43b.jpg" alt="ProveIt advantages illustration"
-            class="w-full max-w-md md:max-w-lg object-contain" />
-        </div>
-
-      </div>
     </section>
 
-    <section class="w-full py-28 px-3 md:px-24 bg-[var(--dd-cream)]">
-      <div class=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-20">
-
-        <!-- LEFT : Mission -->
-        <div>
-          <h2 class="text-4xl md:text-5xl font-semibold text-gray-400">
-            <span class="bg-gradient-to-r from-[var(--dd-blue-dark)] to-[var(--dd-orange)]
-                                 bg-clip-text text-transparent">
-              Our Mission
+    <!-- ─── HOW PROVEIT HELPS YOU GROW ─── -->
+    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-24">
+        <div class="text-center mb-14">
+            <span
+                class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 text-(--dd-blue-dark) dark:text-(--dd-blue-light) text-xs font-bold uppercase tracking-wider mb-4">
+                <i class="bi bi-graph-up-arrow"></i> Growth
             </span>
-          </h2>
-
-          <p class="mt-8 text-lg text-gray-600 leading-relaxed">
-            At <span class="font-semibold text-gray-900">ProveIt</span>, our mission is to
-            transform hiring into a skill-first, fair, and transparent process.
-            We empower companies to evaluate real talent through practical challenges
-            while giving candidates a platform to prove their abilities beyond resumes.
-          </p>
-
-          <p class="mt-4 text-lg text-gray-600 leading-relaxed">
-            By replacing assumptions with real-world performance, ProveIt helps
-            organizations hire with confidence, reduce bias, and build stronger teams.
-          </p>
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                How ProveIt helps you
+                <span class="text-transparent bg-clip-text bg-linear-to-r from-(--dd-blue-dark) to-(--dd-orange)">grow</span>
+            </h2>
         </div>
 
-        <!-- RIGHT : Story -->
-        <div>
-          <h2 class="text-4xl md:text-5xl font-semibold text-gray-400">
-            <span class="bg-gradient-to-r from-[var(--dd-yellow)] to-[var(--dd-orange)]
-                                 bg-clip-text text-transparent">
-              Our Story
-            </span>
-          </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-          <p class="mt-8 text-lg text-gray-600 leading-relaxed">
-            ProveIt was founded on the belief that traditional hiring methods no longer
-            reflect how modern teams work. Resumes and credentials often fail to predict
-            real performance.
-          </p>
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <div
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-patch-check-fill text-lg text-(--dd-blue-dark)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Hire with Confidence</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Evaluate candidates through real-world challenges that reflect actual job responsibilities.
+                </p>
+            </div>
 
-          <p class="mt-4 text-lg text-gray-600 leading-relaxed">
-            From the beginning, we partnered with hiring managers, founders, and
-            engineers to design challenges that mirror real job responsibilities.
-            Today, ProveIt helps companies hire faster and smarter while enabling
-            candidates to unlock opportunities through proof of work.
-          </p>
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <div
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-speedometer2 text-lg text-(--dd-blue)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Faster, Smarter Hiring</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Reduce time-to-hire by focusing on candidates who've already demonstrated real skills.
+                </p>
+            </div>
+
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <div
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-heart-fill text-lg text-(--dd-orange)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Fair & Bias-Free</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Standardized challenges and transparent scoring ensure equal opportunity for everyone.
+                </p>
+            </div>
+
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <div
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-yellow)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-hand-thumbs-up-fill text-lg text-(--dd-yellow-dark)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Better Experience</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Meaningful challenges instead of repetitive interviews — a respectful hiring journey.
+                </p>
+            </div>
+
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <div
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-bar-chart-fill text-lg text-(--dd-blue-dark)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Scalable for Teams</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    From startups to enterprises, ProveIt scales across roles, teams, and industries.
+                </p>
+            </div>
+
+            <div
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <div
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-cpu-fill text-lg text-(--dd-blue)"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">Future of Work</h3>
+                <p class="text-sm text-gray-500 dark:text-(--dd-blue-light)/50 leading-relaxed">
+                    Powered by modern technology and performance insights for a skill-driven landscape.
+                </p>
+            </div>
+
         </div>
-
-      </div>
     </section>
 
-
-    <section class="">
-      <!-- card1 -->
-      <div class="min-h-105 bg-[var(--dd-cream)]/30 w-full py-28 px-3 md:px-24 ">
-        <div class=" mx-auto">
-
-          <!-- Title -->
-          <h2 class="text-4xl md:text-5xl font-semibold text-gray-400">
-            <span class="bg-gradient-to-r from-[var(--dd-blue-dark)] to-[var(--dd-orange)]
-                               bg-clip-text text-transparent">
-              How ProveIt Helps You Grow
-            </span>
-          </h2>
-
-          <!-- Content Grid -->
-          <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-14 text-lg text-gray-600">
-
-            <div>
-              <span class="font-semibold text-gray-900">Hire with Confidence</span>
-              <p class="mt-2 leading-relaxed">
-                Evaluate candidates through real-world challenges that reflect actual
-                job responsibilities and problem-solving scenarios.
-              </p>
+    <!-- ─── CTA BANNER ─── -->
+    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+        <div
+            class="bg-linear-to-r from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-orange) rounded-3xl p-10 md:p-14 text-center text-white relative overflow-hidden">
+            <div
+                class="absolute -top-20 -left-20 w-60 h-60 bg-white/5 rounded-full blur-3xl pointer-events-none">
             </div>
-
-            <div>
-              <span class="font-semibold text-gray-900">Faster, Smarter Hiring</span>
-              <p class="mt-2 leading-relaxed">
-                Reduce time-to-hire by focusing only on candidates who have already
-                demonstrated real skills and measurable outcomes.
-              </p>
+            <div
+                class="absolute -bottom-20 -right-20 w-60 h-60 bg-white/5 rounded-full blur-3xl pointer-events-none">
             </div>
-
-            <div>
-              <span class="font-semibold text-gray-900">Fair & Bias-Free Evaluation</span>
-              <p class="mt-2 leading-relaxed">
-                Standardized challenges and transparent scoring ensure equal opportunity
-                for freshers, career switchers, and experienced professionals.
-              </p>
+            <div class="relative z-10">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to prove what you can do?</h2>
+                <p class="text-white/70 max-w-xl mx-auto mb-8">
+                    Whether you're a company looking for top talent or a candidate ready to showcase your skills —
+                    ProveIt is your platform.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a routerLink="/user/compition"
+                        class="px-8 py-3.5 rounded-xl bg-white text-(--dd-blue-dark) font-bold text-sm hover:bg-white/90 transition-all shadow-lg">
+                        Browse Challenges
+                    </a>
+                    <a routerLink="/contact"
+                        class="px-8 py-3.5 rounded-xl bg-white/10 backdrop-blur-sm text-white font-bold text-sm border border-white/20 hover:bg-white/20 transition-all">
+                        Get in Touch
+                    </a>
+                </div>
             </div>
-
-            <div>
-              <span class="font-semibold text-gray-900">Better Candidate Experience</span>
-              <p class="mt-2 leading-relaxed">
-                Candidates participate in meaningful challenges instead of repetitive
-                interviews, creating a more engaging and respectful hiring journey.
-              </p>
-            </div>
-
-            <div>
-              <span class="font-semibold text-gray-900">Scalable for Modern Teams</span>
-              <p class="mt-2 leading-relaxed">
-                From startups to enterprises, ProveIt scales with your hiring needs
-                across roles, teams, and industries.
-              </p>
-            </div>
-
-            <div>
-              <span class="font-semibold text-gray-900">Built for the Future of Work</span>
-              <p class="mt-2 leading-relaxed">
-                Powered by modern technology and performance insights, ProveIt enables
-                organizations to adapt to a skill-driven hiring landscape.
-              </p>
-            </div>
-
-          </div>
         </div>
-
-      </div>
     </section>
+
 </div>
 
-  </div>
-
-  <!-- ================= FOOTER ================= -->
-  <app-footer></app-footer>
-</div>
+<!-- ================= FOOTER ================= -->
+<app-footer></app-footer>

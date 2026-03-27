@@ -203,7 +203,7 @@ export class Home implements OnInit, AfterViewInit {
           ease: 'power3.out',
         });
 
-        gsap.to('.animated-text-2 span:nth-child(12)', {
+        gsap.to('.animated-text-2 .gear-icon', {
           y: 0,
           x: 0,
           scale: 1,

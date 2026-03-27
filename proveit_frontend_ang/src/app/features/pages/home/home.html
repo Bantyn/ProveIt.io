@@ -27,7 +27,7 @@
             </div>
 
             <div class="flex flex-col space-y-10 items-center">
-                <h1 class="text-[3rem] md:text-[15rem] text-(--dd-dark) font-bold hero mt-10 md:mt-30 text-start">
+                <h1 class="text-[3rem] md:text-[12.5rem] text-(--dd-dark) font-bold hero mt-10 md:mt-30 text-start">
                     <div class="animated-text-container">
                         <span class="animated-text">
                             <span *ngFor="let char of heroLine1">{{char === ' ' ? '&nbsp;' : char}}</span>
@@ -37,11 +37,11 @@
                     <div class="animated-text-container">
                         <span class="animated-text-2">
                             <span *ngFor="let char of heroLine2Part1">{{char === ' ' ? '&nbsp;' : char}}</span>
-
+                            <span>&nbsp;</span>
                             <span *ngFor="let char of heroLine2Part2">{{char === ' ' ? '&nbsp;' : char}}</span>
 
-                            <span class="gear-icon ml-10">
-                                <i class="bi bi-gear-wide text-[2rem] md:text-[10rem] animate-spinner align-middle"></i>
+                            <span class="gear-icon inline-flex items-center ml-2 md:ml-4">
+                                <i class="bi bi-gear-wide text-[2rem] md:text-[9rem] animate-spinner align-middle"></i>
                             </span>
 
                             <span>r</span>

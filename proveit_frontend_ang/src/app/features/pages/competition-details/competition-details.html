@@ -25,7 +25,7 @@
             </div>
 
             <!-- Competition Details -->
-            <div *ngIf="!isLoading && competition" class="max-w-[90%] mx-auto p-5 md:p-10 mb-20 bg-white">
+            <div *ngIf="!isLoading && competition" class="max-w-[90%] mx-auto p-5 md:p-10 mb-20 bg-white dark:bg-(--dd-surface) rounded-2xl dark:border dark:border-(--dd-border)">
                 <!-- Header Image & Basic Info -->
                 <div class="flex flex-col md:flex-row gap-8">
                     <div class="w-full md:w-1/3">
@@ -35,13 +35,13 @@
                     <div class="w-full md:w-2/3 flex flex-col justify-center">
                         <div class="flex items-center gap-3">
                             <span
-                                class="px-3 py-1 bg-(--dd-blue-dark) text-(--dd-cream) rounded-full text-sm tracking-wider font-bold">{{
+                                class="px-3 py-1 bg-(--dd-blue-dark) text-(--dd-cream) dark:text-white rounded-full text-sm tracking-wider font-bold">{{
                                 competition.competitionType }}</span>
                             <span *ngIf="competition.jobId"
-                                class="px-3 py-1 bg-orange-50 text-(--dd-orange) rounded-full text-sm font-bold border tracking-wider border-(--dd-orange)">Hiring
+                                class="px-3 py-1 bg-orange-50 dark:bg-orange-500/10 text-(--dd-orange) rounded-full text-sm font-bold border tracking-wider border-(--dd-orange) dark:border-orange-500/30">Hiring
                                 Role</span>
                             <span *ngIf="competition.industry"
-                                class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-sm font-bold border tracking-wider border-emerald-200">{{
+                                class="px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-sm font-bold border tracking-wider border-emerald-200 dark:border-emerald-500/30">{{
                                 competition.industry }}</span>
                         </div>
 
@@ -51,12 +51,12 @@
                                 competition.companyName || 'Unknown' }}</span></p>
 
                         <div class="flex flex-wrap gap-4 mt-6">
-                            <div class="flex items-center gap-2 text-gray-700 bg-gray-50 px-4 py-2 rounded-lg"
+                            <div class="flex items-center gap-2 text-gray-700 dark:text-violet-200 bg-gray-50 dark:bg-(--dd-surface-secondary) px-4 py-2 rounded-lg"
                                 *ngIf="competition.projectInfo?.difficulty">
                                 <i class="bi bi-star-fill text-(--dd-orange)"></i>
                                 <span class="font-semibold">{{ competition.projectInfo?.difficulty }}</span>
                             </div>
-                            <div class="flex items-center gap-2 text-gray-700 bg-gray-50 px-4 py-2 rounded-lg"
+                            <div class="flex items-center gap-2 text-gray-700 dark:text-violet-200 bg-gray-50 dark:bg-(--dd-surface-secondary) px-4 py-2 rounded-lg"
                                 *ngIf="competition.startDate">
                                 <i class="bi bi-calendar-event text-(--dd-orange)"></i>
                                 <span class="font-semibold">{{ competition.startDate | date:'mediumDate' }} - {{
@@ -65,20 +65,28 @@
                         </div>
 
                         <div class="mt-8 flex gap-6 items-center" *ngIf="!showProfilePrompt">
-                            <app-slide-button 
+                            <!-- Already Submitted State -->
+                            <button *ngIf="hasAlreadyApplied" disabled
+                                class="px-8 py-3.5 rounded-full bg-emerald-500 text-white font-bold text-sm flex items-center gap-2 opacity-90 cursor-not-allowed shadow-lg shadow-emerald-500/20">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Already Submitted
+                            </button>
+
+                            <!-- Normal Slide to Submit -->
+                            <app-slide-button *ngIf="!hasAlreadyApplied"
                                 text="Slide to Submit" 
                                 (onComplete)="applyToEvent()">
                             </app-slide-button>
 
                             <button routerLink="/user/compition"
-                                class="px-8 py-3 rounded-full border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all">
+                                class="px-8 py-3 rounded-full border border-gray-300 dark:border-(--dd-border) text-gray-700 dark:text-violet-200 font-bold hover:bg-gray-50 dark:hover:bg-(--dd-surface-secondary) transition-all">
                                 Back
                             </button>
                         </div>
 
                         <!-- Profile Prompt -->
                         <div *ngIf="showProfilePrompt"
-                            class="mt-8 p-5 bg-orange-50 border border-orange-200 rounded-xl space-y-4 animate-fade-in shadow-sm">
+                            class="mt-8 p-5 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/25 rounded-xl space-y-4 animate-fade-in shadow-sm">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-exclamation-triangle-fill text-xl text-(--dd-orange)"></i>
                                 <div>
@@ -95,7 +103,7 @@
                                     Update Profile
                                 </button>
                                 <button (click)="showProfilePrompt = false"
-                                    class="px-6 py-2 rounded-full border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all text-sm bg-white">
+                                    class="px-6 py-2 rounded-full border border-gray-300 dark:border-(--dd-border) text-gray-700 dark:text-violet-200 font-bold hover:bg-gray-50 dark:hover:bg-(--dd-surface-secondary) transition-all text-sm bg-white dark:bg-(--dd-surface)">
                                     Cancel
                                 </button>
                             </div>
@@ -103,7 +111,7 @@
                     </div>
                 </div>
 
-                <hr class="my-10 border-gray-200">
+                <hr class="my-10 border-gray-200 dark:border-(--dd-border)">
 
                 <!-- Deep Details -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -127,8 +135,8 @@
                     <!-- Right Column: Info Cards -->
                     <div class="space-y-6">
                         <!-- Requirements Card -->
-                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-sm">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Requirements</h3>
+                        <div class="bg-gray-50 dark:bg-(--dd-surface-secondary) rounded-2xl p-6 border border-gray-100 dark:border-(--dd-border) shadow-sm">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b dark:border-(--dd-border) pb-2">Requirements</h3>
                             <div class="space-y-4">
                                 <div>
                                     <p class="text-xs text-gray-500 uppercase font-semibold">Max Submissions</p>
@@ -139,7 +147,7 @@
                                     <p class="text-xs text-gray-500 uppercase font-semibold">Required Skills</p>
                                     <div class="flex flex-wrap gap-2 mt-2">
                                         <span *ngFor="let skill of competition.requiredSkills"
-                                            class="px-2 py-1 bg-white border border-gray-200 text-gray-700 text-xs rounded-md shadow-sm">
+                                            class="px-2 py-1 bg-white dark:bg-(--dd-surface) border border-gray-200 dark:border-(--dd-border) text-gray-700 dark:text-violet-200 text-xs rounded-md shadow-sm">
                                             {{ skill }}
                                         </span>
                                     </div>
@@ -149,8 +157,8 @@
 
                         <!-- Important Dates Card -->
                         <div
-                            class="bg-linear-to-br from-(--dd-orange)/10 to-(--dd-yellow)/10 rounded-2xl p-6 border border-orange-100 shadow-sm">
-                            <h3 class="text-lg font-bold text-(--dd-orange) mb-4 border-b border-orange-200 pb-2">
+                            class="bg-linear-to-br from-(--dd-orange)/10 to-(--dd-yellow)/10 dark:from-orange-500/10 dark:to-amber-500/5 rounded-2xl p-6 border border-orange-100 dark:border-orange-500/20 shadow-sm">
+                            <h3 class="text-lg font-bold text-(--dd-orange) mb-4 border-b border-orange-200 dark:border-orange-500/20 pb-2">
                                 Important
                                 Dates</h3>
                             <div class="space-y-4">

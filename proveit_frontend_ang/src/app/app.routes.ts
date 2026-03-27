@@ -161,6 +161,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'payment-history',
+        loadComponent: () =>
+          import('./features/pages/company-dashboard/payment-history/payment-history').then(
+            (m) => m.CompanyPaymentHistory,
+          ),
+      },
+      {
         path: 'reviews',
         loadComponent: () =>
           import('./features/pages/company-dashboard/reviews/reviews').then(
@@ -216,7 +223,7 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'billing',
+        path: 'plans',
         children: [
           {
             path: '',
@@ -233,6 +240,13 @@ export const routes: Routes = [
               ),
           },
         ],
+      },
+      {
+        path: 'revenue',
+        loadComponent: () =>
+          import('./features/pages/admin-dashboard/revenue/revenue').then(
+            (m) => m.AdminRevenue,
+          ),
       },
       {
         path: 'logs',

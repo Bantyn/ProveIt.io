@@ -1,134 +1,232 @@
-<div class="fixed top-0 z-50 w-full select-none bg-white/95 backdrop-blur-sm">
-  <nav class="mx-auto w-full border-b border-gray-100 px-4 sm:px-6 md:px-12 xl:px-40">
-    <div class="flex min-h-14 items-center justify-between gap-3 py-2 text-xs tracking-wider md:min-h-12 md:py-0">
-      <a routerLink="/" (click)="closeMobileMenu()" class="flex items-center gap-2 text-xl font-bold text-gray-900">
+<!-- ─── NAVBAR WRAPPER ─────────────────────────────────────────────────────── -->
+<div
+  class="w-full select-none"
+  [ngClass]="transparent ? 'relative' : 'fixed top-0 z-50 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 shadow-sm'">
+  <nav class="mx-auto w-full px-4 sm:px-6 md:px-12 xl:px-40">
+    <div class="flex min-h-[60px] items-center justify-between gap-4 py-2 md:py-0">
+
+      <!-- ── LOGO ── -->
+      <a routerLink="/" (click)="closeMobileMenu()"
+        class="group flex shrink-0 items-center gap-2.5 text-xl font-bold">
         <img class="block h-6 dark:hidden" src="assets/logo/favicon_light.ico" alt="ProveIt">
         <img class="hidden h-6 dark:block" src="assets/logo/favicon_dark.ico" alt="ProveIt">
-        <span class="text-sm font-bold text-gray-800">ProveIt<span class="text-(--dd-orange)">.io</span></span>
+        <span class="text-sm font-bold tracking-tight"
+          [ngClass]="transparent ? 'text-white' : 'text-gray-900 dark:text-white'">
+          ProveIt<span class="text-(--dd-orange)">.io</span>
+        </span>
       </a>
 
-      <div class="hidden items-center gap-6 font-medium md:flex">
-        <a *ngFor="let m of menus" [routerLink]="getRoute(m)" routerLinkActive="text-(--dd-blue) font-bold"
-          class="text-sm text-gray-600 transition hover:text-gray-900">
-          {{ m.label }}
-        </a>
+      <!-- ── DESKTOP NAV ── -->
+      <div class="hidden md:flex">
+        <!-- Pill container -->
+        <div
+          class="relative flex items-center gap-0.5 rounded-full p-1"
+          [ngClass]="transparent
+            ? 'border border-white/20 bg-white/10 backdrop-blur-md'
+            : 'border border-black/6 dark:border-white/10 bg-black/3 dark:bg-white/5'"
+          #navPillContainer>
+
+          <!-- Sliding background pill -->
+          <span
+            #slidingPill
+            class="nav-pill-slider absolute left-0 top-0 rounded-full"
+            [ngClass]="transparent
+              ? 'bg-white/25 shadow-inner shadow-white/10'
+              : 'bg-white dark:bg-neutral-700 shadow-sm shadow-black/10'"
+            style="opacity:0;width:0;height:0;"
+          ></span>
+
+          <a
+            *ngFor="let m of menus; let i = index"
+            [routerLink]="getRoute(m)"
+            routerLinkActive
+            #rla="routerLinkActive"
+            [routerLinkActiveOptions]="{exact: false}"
+            (click)="onNavClick(i); closeMobileMenu()"
+            [attr.data-nav-index]="i"
+            class="nav-link relative z-10 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-150 cursor-pointer"
+            [ngClass]="transparent
+              ? (rla.isActive ? 'text-white' : 'text-white/70 hover:text-white')
+              : (rla.isActive ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white')"
+          >
+            {{ m.label }}
+          </a>
+        </div>
       </div>
 
-      <div class="hidden items-center gap-3 md:flex">
+      <!-- ── RIGHT ACTIONS ── -->
+      <div class="hidden items-center gap-2 md:flex">
+
+        <!-- Theme Toggle -->
+        <button
+          type="button"
+          (click)="theme.toggle()"
+          class="group relative flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 focus:outline-none"
+          [ngClass]="transparent
+            ? 'text-white/80 hover:bg-white/15 hover:text-white'
+            : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-neutral-800 hover:text-slate-700 dark:hover:text-white'"
+          [attr.aria-label]="'Switch theme'">
+          <i class="bi text-[14px] transition-transform duration-300 group-hover:rotate-[20deg]"
+            [ngClass]="{
+              'bi-sun-fill text-amber-500': theme.mode() === 'light',
+              'bi-moon-stars-fill text-indigo-400': theme.mode() === 'dark',
+              'bi-circle-half': theme.mode() === 'system'
+            }"></i>
+        </button>
+
+        <!-- Guest CTAs -->
         <ng-container *ngIf="!isLoggedIn">
-          <a routerLink="/auth" class="text-sm font-medium text-gray-600 transition hover:text-gray-900">
+          <a routerLink="/auth"
+            class="text-[13px] font-medium transition-colors duration-150 px-2 py-1"
+            [ngClass]="transparent
+              ? 'text-white/80 hover:text-white'
+              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'">
             Sign in
           </a>
-          <a routerLink="/auth" class="rounded-full bg-linear-to-r from-(--dd-blue) via-(--dd-orange) to-(--dd-yellow) px-4 py-1.5 text-sm font-bold tracking-tight text-white transition-opacity duration-200 hover:opacity-90">
+          <a routerLink="/auth"
+            class="relative overflow-hidden rounded-full bg-gradient-to-r from-(--dd-blue) via-(--dd-orange) to-(--dd-yellow) px-4 py-1.5 text-[13px] font-semibold text-white transition-all duration-200 hover:opacity-90 hover:shadow-md hover:shadow-(--dd-blue)/30 active:scale-95">
             Get Started
           </a>
         </ng-container>
 
+        <!-- Logged-in User Dropdown -->
         <div *ngIf="isLoggedIn" class="relative">
           <button (click)="toggleDropdown()"
-            class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-600 transition hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-(--dd-blue) focus:ring-offset-2">
-            <i class="bi bi-person-fill text-lg"></i>
+            class="flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-medium transition-all duration-200 focus:outline-none"
+            [ngClass]="transparent
+              ? 'border border-white/25 bg-white/15 text-white hover:bg-white/25'
+              : 'border border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-neutral-700'">
+            <div class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[10px] font-bold text-white uppercase">
+              {{ (userName || role || 'U').charAt(0) }}
+            </div>
+            <span class="max-w-[80px] truncate">{{ userName || (role | titlecase) }}</span>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" [class.rotate-180]="showProfileDropdown"></i>
           </button>
 
+          <!-- Dropdown -->
           <div *ngIf="showProfileDropdown"
-            class="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-xl border border-slate-100 bg-white py-2 shadow-lg">
-            <div class="border-b border-slate-50 bg-slate-50/50 px-4 py-3">
-              <p class="text-xs font-normal tracking-wider text-black/50">Signed in as</p>
-              <p class="text-sm font-semibold text-slate-800">{{ userName || (role | titlecase) }}</p>
-              <p *ngIf="userName" class="text-[10px] font-medium text-slate-400">{{ role | titlecase }}</p>
+            class="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-slate-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl shadow-black/10 ring-1 ring-black/5">
+            <!-- Header -->
+            <div class="border-b border-slate-100 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-800/50 px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[13px] font-bold text-white uppercase">
+                  {{ (userName || role || 'U').charAt(0) }}
+                </div>
+                <div class="min-w-0">
+                  <p class="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-100">{{ userName || (role | titlecase) }}</p>
+                  <p class="text-[11px] text-slate-400 dark:text-slate-500 capitalize">{{ role }}</p>
+                </div>
+              </div>
             </div>
-
-            <a [routerLink]="getDashboardRoute()" (click)="showProfileDropdown = false"
-              class="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-(--dd-blue)">
-              <i class="bi bi-file-earmark-text"></i> Applications
-            </a>
-
-            <a *ngIf="role === 'candidate'" routerLink="/user/profile" (click)="showProfileDropdown = false"
-              class="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-(--dd-blue)">
-              <i class="bi bi-person"></i> My Profile
-            </a>
-
-            <a *ngIf="role === 'company'" routerLink="/company/dashboard/settings" (click)="showProfileDropdown = false"
-              class="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-(--dd-blue)">
-              <i class="bi bi-building"></i> Company Profile
-            </a>
-
-            <div class="my-1 h-px bg-slate-100"></div>
-
-            <button (click)="logout(); showProfileDropdown = false"
-              class="flex w-full cursor-pointer items-center gap-3 border-none bg-transparent px-4 py-2.5 text-left text-sm font-medium text-rose-600 transition hover:bg-rose-50">
-              <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
+            <!-- Links -->
+            <div class="py-1.5">
+              <a [routerLink]="getDashboardRoute()" (click)="showProfileDropdown = false"
+                class="flex cursor-pointer items-center gap-3 px-4 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-(--dd-blue) transition-colors">
+                <i class="bi bi-grid text-[14px] w-4 text-center"></i> Dashboard
+              </a>
+              <a *ngIf="role === 'candidate'" routerLink="/user/profile" (click)="showProfileDropdown = false"
+                class="flex cursor-pointer items-center gap-3 px-4 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-(--dd-blue) transition-colors">
+                <i class="bi bi-person text-[14px] w-4 text-center"></i> My Profile
+              </a>
+              <a *ngIf="role === 'company'" routerLink="/company/dashboard/settings" (click)="showProfileDropdown = false"
+                class="flex cursor-pointer items-center gap-3 px-4 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-(--dd-blue) transition-colors">
+                <i class="bi bi-building text-[14px] w-4 text-center"></i> Company Profile
+              </a>
+              <div class="my-1 mx-3 h-px bg-slate-100 dark:bg-neutral-800"></div>
+              <button (click)="logout(); showProfileDropdown = false"
+                class="flex w-full items-center gap-3 border-none bg-transparent px-4 py-2 text-left text-[13px] font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer">
+                <i class="bi bi-box-arrow-right text-[14px] w-4 text-center"></i> Sign out
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- ── MOBILE HAMBURGER ── -->
       <button type="button" (click)="toggleMobileMenu()"
-        class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 md:hidden"
+        class="flex h-9 w-9 items-center justify-center rounded-full transition md:hidden focus:outline-none"
+        [ngClass]="transparent
+          ? 'border border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20'
+          : 'border border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-slate-700 dark:text-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-700'"
         [attr.aria-expanded]="mobileMenuOpen" aria-label="Toggle navigation">
-        <i class="bi text-lg" [ngClass]="mobileMenuOpen ? 'bi-x-lg' : 'bi-list'"></i>
+        <i class="bi text-lg transition-transform duration-200"
+          [class.rotate-90]="mobileMenuOpen"
+          [ngClass]="mobileMenuOpen ? 'bi-x-lg' : 'bi-list'"></i>
       </button>
     </div>
 
-    <div *ngIf="mobileMenuOpen" class="border-t border-gray-100 py-4 md:hidden">
-      <div class="flex flex-col gap-2">
+    <!-- ── MOBILE MENU ── -->
+    <div *ngIf="mobileMenuOpen"
+      class="border-t border-gray-100 dark:border-neutral-800 py-4 md:hidden overflow-hidden">
+      <div class="flex flex-col gap-1">
+        <!-- Theme toggle -->
+        <button type="button" (click)="theme.toggle()"
+          class="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-[13px] font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-neutral-800">
+          <i class="bi w-5 text-center text-base"
+            [ngClass]="{
+              'bi-sun-fill text-amber-500': theme.mode() === 'light',
+              'bi-moon-stars-fill text-indigo-400': theme.mode() === 'dark',
+              'bi-circle-half text-slate-500': theme.mode() === 'system'
+            }"></i>
+          Theme: {{ theme.mode() | titlecase }}
+        </button>
+
         <a *ngFor="let m of menus" [routerLink]="getRoute(m)" (click)="closeMobileMenu()"
-          routerLinkActive="bg-slate-100 text-(--dd-blue) font-semibold"
-          class="rounded-2xl px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+          routerLinkActive="bg-gradient-to-r from-(--dd-blue)/10 to-(--dd-orange)/5 text-(--dd-blue) dark:from-(--dd-blue)/20 dark:to-(--dd-orange)/10 font-semibold"
+          [routerLinkActiveOptions]="{exact: false}"
+          class="rounded-2xl px-4 py-2.5 text-[13px] font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-neutral-800">
           {{ m.label }}
         </a>
       </div>
 
-      <div *ngIf="!isLoggedIn" class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <!-- Mobile Auth -->
+      <div *ngIf="!isLoggedIn" class="mt-4 grid grid-cols-2 gap-2">
         <a routerLink="/auth" (click)="closeMobileMenu()"
-          class="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+          class="rounded-2xl border border-slate-200 dark:border-neutral-700 px-4 py-2.5 text-center text-[13px] font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-50 dark:hover:bg-neutral-800">
           Sign in
         </a>
         <a routerLink="/auth" (click)="closeMobileMenu()"
-          class="rounded-2xl bg-linear-to-r from-(--dd-blue) via-(--dd-orange) to-(--dd-yellow) px-4 py-3 text-center text-sm font-bold text-white transition-opacity hover:opacity-90">
+          class="rounded-2xl bg-gradient-to-r from-(--dd-blue) via-(--dd-orange) to-(--dd-yellow) px-4 py-2.5 text-center text-[13px] font-bold text-white transition-opacity hover:opacity-90">
           Get Started
         </a>
       </div>
 
-      <div *ngIf="isLoggedIn" class="mt-4 rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
-        <div class="mb-3 flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm">
-            <i class="bi bi-person-fill"></i>
+      <!-- Mobile logged-in profile -->
+      <div *ngIf="isLoggedIn" class="mt-4 rounded-2xl border border-slate-100 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 overflow-hidden">
+        <div class="flex items-center gap-3 border-b border-slate-100 dark:border-neutral-800 px-4 py-3">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-sm font-bold text-white uppercase">
+            {{ (userName || role || 'U').charAt(0) }}
           </div>
           <div>
-            <p class="text-xs tracking-wider text-slate-400">Signed in as</p>
-            <p class="text-sm font-semibold text-slate-800">{{ userName || (role | titlecase) }}</p>
-            <p *ngIf="userName" class="text-[11px] font-medium text-slate-500">{{ role | titlecase }}</p>
+            <p class="text-[13px] font-semibold text-slate-800 dark:text-slate-100">{{ userName || (role | titlecase) }}</p>
+            <p class="text-[11px] text-slate-400 capitalize">{{ role }}</p>
           </div>
         </div>
-
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1 p-2">
           <a [routerLink]="getDashboardRoute()" (click)="closeMobileMenu()"
-            class="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
+            class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-neutral-800 transition">
             <i class="bi bi-grid"></i> Dashboard
           </a>
-
           <a *ngIf="role === 'candidate'" routerLink="/user/profile" (click)="closeMobileMenu()"
-            class="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
+            class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-neutral-800 transition">
             <i class="bi bi-person"></i> My Profile
           </a>
-
           <a *ngIf="role === 'company'" routerLink="/company/dashboard/settings" (click)="closeMobileMenu()"
-            class="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
+            class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-neutral-800 transition">
             <i class="bi bi-building"></i> Company Profile
           </a>
-
           <button type="button" (click)="logout()"
-            class="flex items-center gap-3 rounded-2xl bg-rose-50 px-4 py-3 text-left text-sm font-semibold text-rose-600 transition hover:bg-rose-100">
-            <i class="bi bi-box-arrow-right"></i> Logout
+            class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition border-none bg-transparent text-left cursor-pointer">
+            <i class="bi bi-box-arrow-right"></i> Sign out
           </button>
         </div>
       </div>
     </div>
   </nav>
 
-  <div
-    class="relative flex h-9 w-full items-center justify-center overflow-hidden border-b border-gray-200 bg-(--dd-cream) px-4">
-    <p class="animate-pulse text-center text-xs tracking-wider text-gray-500">{{ adv }}</p>
+  <!-- ── AD BANNER ── -->
+  <div *ngIf="!transparent"
+    class="relative flex h-8 w-full items-center justify-center overflow-hidden border-b border-gray-200 dark:border-neutral-800 bg-(--dd-cream) dark:bg-neutral-900/50 px-4">
+    <p class="animate-pulse text-center text-[11px] tracking-wide text-gray-500 dark:text-gray-500">{{ adv }}</p>
   </div>
 </div>

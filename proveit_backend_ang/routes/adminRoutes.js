@@ -74,43 +74,53 @@ async function ensureRoles() {
     return rolesRef.get();
 }
 
+// ── In-memory stats cache (60s TTL) ─────────────────────────────────────────
+let statsCache = { data: null, fetchedAt: 0 };
+const STATS_CACHE_TTL = 60000;
+
 // Get global admin dashboard statistics
 router.get('/stats', async (req, res) => {
     try {
-        const [usersSnap, companiesSnap, competitionsSnap, applicationsSnap, paymentsSnap, subscriptionsSnap] = await Promise.all([
-            db.collection('users').get(),
-            db.collection('companies').get(),
-            db.collection('competitions').get(),
-            db.collection('applications').get(),
-            db.collection('payments').where('status', '==', 'SUCCESS').get(),
+        const now = Date.now();
+        if (statsCache.data && (now - statsCache.fetchedAt) < STATS_CACHE_TTL) {
+            return res.status(200).json(statsCache.data);
+        }
+
+        const [usersSnap, companiesSnap, competitionsSnap, applicationsSnap, allPaymentsSnap, subscriptionsSnap] = await Promise.all([
+            db.collection('users').select().get(),
+            db.collection('companies').select().get(),
+            db.collection('competitions').select().get(),
+            db.collection('applications').select().get(),
+            db.collection('payments').get(),
             db.collection('subscriptions').where('status', '==', 'ACTIVE').get()
         ]);
 
-        const totalUsers = usersSnap.size;
-        const totalCompanies = companiesSnap.size;
-        const totalCompetitions = competitionsSnap.size;
-        const totalApplications = applicationsSnap.size;
-        const activeSubscriptions = subscriptionsSnap.size;
-
         let totalRevenue = 0;
-        paymentsSnap.forEach(doc => {
-            totalRevenue += (doc.data().amount || 0);
+        let totalTransactions = 0;
+        let refundsIssued = 0;
+        allPaymentsSnap.forEach(doc => {
+            const d = doc.data();
+            const s = (d.status || '').toLowerCase();
+            totalTransactions++;
+            if (s === 'success') totalRevenue += (d.amount || 0);
+            if (s === 'refunded') refundsIssued++;
         });
 
-        // Mock growth metrics (could be calculated based on createdAt timestamps)
-        const userGrowth = 12; // Example %
-        const revenueGrowth = 18; // Example %
-
-        res.status(200).json({
-            totalUsers,
-            totalCompanies,
-            totalCompetitions,
-            totalApplications,
-            activeSubscriptions,
+        const result = {
+            totalUsers: usersSnap.size,
+            totalCompanies: companiesSnap.size,
+            totalCompetitions: competitionsSnap.size,
+            totalApplications: applicationsSnap.size,
+            activeSubscriptions: subscriptionsSnap.size,
             totalRevenue,
-            userGrowth,
-            revenueGrowth
-        });
+            totalTransactions,
+            refundsIssued,
+            userGrowth: 12,
+            revenueGrowth: 18
+        };
+
+        statsCache = { data: result, fetchedAt: now };
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -451,6 +461,38 @@ router.get('/payments', async (req, res) => {
         let payments = [];
         snapshot.forEach(doc => payments.push({ id: doc.id, ...doc.data() }));
         res.status(200).json(payments);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete a single payment record
+router.delete('/payments/:id', async (req, res) => {
+    try {
+        await db.collection('payments').doc(req.params.id).delete();
+        statsCache = { data: null, fetchedAt: 0 }; // bust cache
+        res.status(200).json({ message: 'Payment deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete stale payments without a razorpayPaymentId
+router.delete('/payments-cleanup/stale', async (req, res) => {
+    try {
+        const snapshot = await db.collection('payments').get();
+        const batch = db.batch();
+        let count = 0;
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            if (!d.razorpayPaymentId && d.method !== 'RAZORPAY') {
+                batch.delete(doc.ref);
+                count++;
+            }
+        });
+        if (count > 0) await batch.commit();
+        statsCache = { data: null, fetchedAt: 0 }; // bust cache
+        res.status(200).json({ message: `Deleted ${count} stale payment records` });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

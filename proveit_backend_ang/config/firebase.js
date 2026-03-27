@@ -34,4 +34,9 @@ try {
 
 const db = admin.firestore();
 
+// Firestore performance settings
+db.settings({
+    ignoreUndefinedProperties: true,
+});
+
 module.exports = { admin, db };

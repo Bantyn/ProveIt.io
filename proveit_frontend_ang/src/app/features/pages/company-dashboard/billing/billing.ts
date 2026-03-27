@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { DummyDataService } from '../../../../services/dummy-data.service';
-import { NgFor, NgClass, NgIf, TitleCasePipe, DecimalPipe } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../services/auth.service';
 import { ApiService } from '../../../../services/api.service';
@@ -14,15 +14,13 @@ import {
   PlanLevel,
 } from '../../../components/ui/pricing-table/pricing-table';
 
+declare var Razorpay: any;
+
 @Component({
   selector: 'app-company-billing',
   standalone: true,
   imports: [
-    NgFor,
-    NgClass,
     NgIf,
-    TitleCasePipe,
-    DecimalPipe,
     FormsModule,
     MorphLoading,
     PricingTable,
@@ -46,22 +44,16 @@ export class CompanyBilling implements OnInit {
   sub: any = {};
   current: any = {};
 
-  // OTP Flow State
+  // Upgrade Flow State
   showUpgradeConfirmModal = false;
-  showOtpModal = false;
-  verifying = false;
-  requestingOtp = false;
-  otpValue = '';
+  processingPayment = false;
   selectedPlan: any = null;
 
   features: PricingFeature[] = [];
-
   pricingPlans: PricingPlan[] = [];
 
   handlePlanSelected(level: PlanLevel) {
-    // Search for plan matching the level dynamically
     const matchedPlan = this.plans.find((p) => p.name.toLowerCase() === level.toLowerCase());
-    
     if (matchedPlan) {
       this.upgrade(matchedPlan);
     } else {
@@ -70,27 +62,22 @@ export class CompanyBilling implements OnInit {
   }
 
   ngOnInit() {
-    // 1. Fetch plans dynamically from backend API
     this.api.getPlans().subscribe({
       next: (apiPlans) => {
         this.plans = apiPlans || [];
 
-        // 2. Map backend plans to PricingPlan interface
         this.pricingPlans = this.plans.map((p) => ({
           id: p.id,
           name: p.name,
           level: p.name.toLowerCase() as PlanLevel,
           price: {
-            monthly: p.priceMonthly ?? p.price ?? 0, // Admin uses priceMonthly, defaults use price
+            monthly: p.priceMonthly ?? p.price ?? 0,
           },
           popular: p.popular || (p.name.toUpperCase() === 'GROWTH'),
           description: p.description || '',
         }));
 
-        // 3. Populate features dynamically based on what's enabled in any plan
         this.buildDynamicFeatures();
-
-        // 4. Sync current plan once user profile is loaded
         this.loadProfileAndSync();
       },
       error: (err) => {
@@ -101,7 +88,6 @@ export class CompanyBilling implements OnInit {
   }
 
   private buildDynamicFeatures() {
-    // 1. Initial list of features we expect
     const standardFeatures = [
       { name: 'Monthly Competitions', key: 'competitions.maxCompetitionsPerMonth' },
       { name: 'Active Competitions', key: 'competitions.maxActiveCompetitions' },
@@ -120,7 +106,6 @@ export class CompanyBilling implements OnInit {
     const dynamicFeatures: PricingFeature[] = [];
 
     standardFeatures.forEach(feat => {
-      // Find FIRST plan that has this feature enabled
       const firstPlan = this.plans.find(p => {
         const keys = feat.key.split('.');
         let val = p.features;
@@ -138,7 +123,6 @@ export class CompanyBilling implements OnInit {
       }
     });
 
-    // 2. Fallback if no features were found (ensures table is never empty)
     if (dynamicFeatures.length === 0) {
       this.features = [
         { name: 'Competitions Access', included: 'starter' },
@@ -165,16 +149,14 @@ export class CompanyBilling implements OnInit {
             if (profile) {
               this.companyProfile = profile;
 
-              // Resolve active plan dynamically from the fetched plans
               const activePlanName = (profile.plan || 'Starter').toUpperCase();
               this.current =
                 this.plans.find((p) => p.name.toUpperCase() === activePlanName) ||
                 this.plans[0];
 
-              // Fetch real subscription
               this.api.getCompanySubscription(profile.id).subscribe((sub) => {
-                const start = sub?.startDate || profile.createdAt;
-                const end = sub?.endDate || (profile.updatedAt
+                const start = sub?.startDate || sub?.validFrom || profile.createdAt;
+                const end = sub?.endDate || sub?.validTo || (profile.updatedAt
                     ? new Date(new Date(profile.updatedAt).setMonth(new Date(profile.updatedAt).getMonth() + 1)).toISOString()
                     : 'N/A');
 
@@ -187,7 +169,6 @@ export class CompanyBilling implements OnInit {
                 this.cdr.detectChanges();
               });
 
-              // Fetch real payments
               this.api.getCompanyPayments(profile.id).subscribe((payments) => {
                 this.payments = (payments || []).map((p: any) => ({
                   ...p,
@@ -214,59 +195,131 @@ export class CompanyBilling implements OnInit {
       this.modalService.alert('Error: User email not found', 'Email Error');
       return;
     }
+
+    // Free plans don't need payment
+    const price = plan.priceMonthly ?? plan.price ?? 0;
+    if (price === 0) {
+      this.modalService.alert('This is a free plan. You are already on it or can switch directly.', 'Free Plan');
+      return;
+    }
+
     this.selectedPlan = plan;
     this.showUpgradeConfirmModal = true;
     this.cdr.detectChanges();
   }
 
   confirmUpgrade() {
-    this.showUpgradeConfirmModal = false;
-    this.requestingOtp = true;
+    if (!this.selectedPlan || !this.companyProfile?.id) return;
 
-    // Request OTP from backend
-    this.api.requestPlanChangeOtp(this.userEmail).subscribe({
-      next: () => {
-        this.requestingOtp = false;
-        this.otpValue = '';
-        this.showOtpModal = true;
+    const amount = this.selectedPlan.priceMonthly ?? this.selectedPlan.price ?? 0;
+    if (amount <= 0) return;
+
+    this.showUpgradeConfirmModal = false;
+    this.processingPayment = true;
+    this.cdr.detectChanges();
+
+    // Step 1: Create Razorpay order on backend
+    this.api.createRazorpayOrder({
+      amount,
+      planName: this.selectedPlan.name,
+      companyId: this.companyProfile.id,
+      companyName: this.companyProfile.name || this.companyProfile.companyName,
+    }).subscribe({
+      next: (order) => {
+        this.processingPayment = false;
         this.cdr.detectChanges();
+
+        // Step 2: Open Razorpay checkout
+        this.openRazorpayCheckout(order);
       },
       error: (err) => {
-        this.requestingOtp = false;
-        this.modalService.alert('Failed to request OTP: ' + err.message, 'Error');
+        this.processingPayment = false;
         this.cdr.detectChanges();
+        console.error('Create order failed:', err);
+        this.modalService.alert(
+          'Failed to initiate payment. Please try again.\n' + (err.error?.error || err.message),
+          'Payment Error'
+        );
       },
     });
   }
 
-  verifyOtpAndUpgrade() {
-    if (!this.otpValue || this.otpValue.length !== 6) {
-      this.modalService.alert('Please enter a valid 6-digit OTP.', 'Verification Failed');
-      return;
-    }
-    if (!this.companyProfile?.id || !this.selectedPlan) return;
-
-    this.verifying = true;
-
-    const payload = {
-      email: this.userEmail,
-      otp: this.otpValue,
-      companyId: this.companyProfile.id,
-      newPlan: this.selectedPlan.name,
+  private openRazorpayCheckout(order: any) {
+    const options = {
+      key: order.keyId,
+      amount: order.amount,
+      currency: order.currency || 'INR',
+      name: 'ProveIt.io',
+      description: `${this.selectedPlan.name} Plan Subscription`,
+      order_id: order.orderId,
+      prefill: {
+        email: this.userEmail,
+        contact: '',
+      },
+      theme: {
+        color: '#7a6cf0', // --dd-blue-dark
+      },
+      handler: (response: any) => {
+        // Step 3: Verify payment on backend
+        this.verifyPayment(response);
+      },
+      modal: {
+        ondismiss: () => {
+          this.modalService.alert('Payment was cancelled.', 'Payment Cancelled');
+        },
+      },
     };
 
-    this.api.verifyPlanChangeOtp(payload).subscribe({
-      next: (res) => {
-        this.verifying = false;
-        this.showOtpModal = false;
+    try {
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', (response: any) => {
+        console.error('Razorpay payment failed:', response.error);
+        this.modalService.alert(
+          `Payment failed: ${response.error.description || 'Unknown error'}`,
+          'Payment Failed'
+        );
+      });
+      rzp.open();
+    } catch (err) {
+      console.error('Razorpay open error:', err);
+      this.modalService.alert(
+        'Could not open payment gateway. Please check your internet connection and try again.',
+        'Error'
+      );
+    }
+  }
 
-        // Update local UI state safely
+  private verifyPayment(response: any) {
+    this.processingPayment = true;
+    this.cdr.detectChanges();
+
+    const amount = this.selectedPlan.priceMonthly ?? this.selectedPlan.price ?? 0;
+
+    this.api.verifyRazorpayPayment({
+      razorpay_order_id: response.razorpay_order_id,
+      razorpay_payment_id: response.razorpay_payment_id,
+      razorpay_signature: response.razorpay_signature,
+      companyId: this.companyProfile.id,
+      planName: this.selectedPlan.name,
+      amount,
+    }).subscribe({
+      next: (res) => {
+        this.processingPayment = false;
+
+        // Update local UI state
         if (this.companyProfile) this.companyProfile.plan = res.newPlan;
         this.current = this.selectedPlan;
 
         // Re-fetch subscription and payments to update UI tables
         this.api.getCompanySubscription(this.companyProfile.id).subscribe((sub) => {
-          if (sub) this.sub = sub;
+          if (sub) {
+            this.sub = {
+              ...sub,
+              status: sub.status || 'ACTIVE',
+              startDate: sub.validFrom ? new Date(sub.validFrom).toLocaleDateString() : 'N/A',
+              endDate: sub.validTo ? new Date(sub.validTo).toLocaleDateString() : 'N/A',
+            };
+          }
           this.cdr.detectChanges();
         });
         this.api.getCompanyPayments(this.companyProfile.id).subscribe((payments) => {
@@ -279,18 +332,19 @@ export class CompanyBilling implements OnInit {
         });
 
         this.modalService.alert(
-          `Successfully upgraded to the ${res.newPlan} plan!`,
+          `Successfully upgraded to the ${res.newPlan} plan! Payment ID: ${res.paymentId}`,
           'Upgrade Successful',
         );
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.verifying = false;
-        this.modalService.alert(
-          'OTP Verification Failed: ' + (err.error?.error || err.message),
-          'Error',
-        );
+        this.processingPayment = false;
         this.cdr.detectChanges();
+        this.modalService.alert(
+          'Payment was received but verification failed. Please contact support with your payment ID.\n' +
+          (err.error?.error || err.message),
+          'Verification Error',
+        );
       },
     });
   }

@@ -1,0 +1,20 @@
+/* ── Sliding nav pill ──────────────────────────────────────────────────────── */
+.nav-pill-slider {
+  /* Only animate position/size — NOT all properties */
+  transition:
+    left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease;
+  will-change: left, width;
+  pointer-events: none;
+  contain: strict;
+}
+
+/* Prevent nav links from causing layout shifts during animation */
+a.nav-link {
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}

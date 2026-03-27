@@ -72,6 +72,9 @@ import {
   Cpu,
   ShieldCheck,
   House,
+  Folder,
+  Calendar,
+  GitBranch,
 } from 'lucide-angular';
 import { importProvidersFrom } from '@angular/core';
 
@@ -114,6 +117,9 @@ export const appConfig: ApplicationConfig = {
         Cpu,
         ShieldCheck,
         House,
+        Folder,
+        Calendar,
+        GitBranch,
       }),
     ),
     {
