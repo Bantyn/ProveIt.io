@@ -13,8 +13,11 @@
             <ng-container *ngIf="role === 'company' || role === 'admin'; else defaultSidebarLogo">
               <a [routerLink]="role === 'company' ? '/company/dashboard/home' : '/admin/overview'" class="flex items-center gap-3 px-1 py-1 no-underline group">
                 <div class="h-10 w-10 rounded-2xl border border-neutral-200 bg-white shadow-sm shrink-0 overflow-hidden flex items-center justify-center">
-                  <img src="assets/logo/favicon_light.ico" [alt]="getSidebarTitle()" class="block h-6 w-6 object-contain dark:hidden">
-                  <img src="assets/logo/favicon_dark.ico" [alt]="getSidebarTitle()" class="hidden h-6 w-6 object-contain dark:block">
+                  <img *ngIf="companyLogoUrl" [src]="companyLogoUrl" [alt]="getSidebarTitle()" class="h-full w-full object-cover">
+                  <ng-container *ngIf="!companyLogoUrl">
+                    <img src="assets/logo/favicon_light.ico" [alt]="getSidebarTitle()" class="block h-6 w-6 object-contain dark:hidden">
+                    <img src="assets/logo/favicon_dark.ico" [alt]="getSidebarTitle()" class="hidden h-6 w-6 object-contain dark:block">
+                  </ng-container>
                 </div>
                 <div
                   class="transition-all duration-500"
@@ -108,7 +111,8 @@
           <!-- Profile -->
           <button (click)="toggleProfile()"
             class="flex items-center gap-3 p-1.5 pr-4 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all border border-transparent hover:border-neutral-200/50 dark:hover:border-neutral-700/50">
-            <div
+            <img *ngIf="companyLogoUrl || userAvatarUrl" [src]="companyLogoUrl || userAvatarUrl" class="w-9 h-9 rounded-full object-cover shadow-lg shadow-(--dd-blue)/20" alt="">
+            <div *ngIf="!companyLogoUrl && !userAvatarUrl"
               class="w-9 h-9 rounded-full bg-linear-to-tr from-(--dd-blue) to-(--dd-blue-dark) flex items-center justify-center text-white font-semibold text-xs shadow-lg shadow-(--dd-blue)/20">
               {{ userInitials }}
             </div>

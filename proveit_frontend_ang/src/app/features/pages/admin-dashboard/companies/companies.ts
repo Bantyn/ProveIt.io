@@ -1,12 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ApiService } from '../../../../services/api.service';
-import { NgFor, NgClass, TitleCasePipe } from '@angular/common';
+import { NgFor, NgIf, NgClass, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-companies',
   standalone: true,
-  imports: [NgFor, NgClass, TitleCasePipe, FormsModule],
+  imports: [NgFor, NgIf, NgClass, TitleCasePipe, FormsModule],
   templateUrl: './companies.html',
 })
 export class AdminCompanies implements OnInit {

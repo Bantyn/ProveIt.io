@@ -47,7 +47,8 @@
         <td class="py-4 border-b border-slate-50 pr-4">
           <a [routerLink]="['/user/applications', a.id, 'details']" target="_blank" 
              class="flex items-center gap-3 no-underline group/link">
-            <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-[16px] group-hover/link:bg-(--dd-blue-light)/20 group-hover/link:text-(--dd-blue) transition-colors font-bold">
+            <img *ngIf="a.profileImage" [src]="a.profileImage" class="w-9 h-9 rounded-xl object-cover group-hover/link:ring-2 ring-(--dd-blue-light)/40 transition-all" alt="">
+            <div *ngIf="!a.profileImage" class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-[16px] group-hover/link:bg-(--dd-blue-light)/20 group-hover/link:text-(--dd-blue) transition-colors font-bold">
               {{ a.candidateName?.charAt(0) || 'U' }}
             </div>
             <span class="font-semibold text-slate-900 group-hover/link:text-(--dd-blue) transition-colors">{{ a.candidateName }}</span>

@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgIf, NgFor, NgClass, DatePipe, TitleCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Location } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
 import { ModalService } from '../../../services/modal.service';
 import { AuthService } from '../../../services/auth.service';
@@ -33,6 +34,7 @@ export class ApplicationDetails implements OnInit {
   private auth = inject(AuthService);
   private modalService = inject(ModalService);
   private cdr = inject(ChangeDetectorRef);
+  private location = inject(Location);
 
   application: any = null;
   candidate: any = null;
@@ -42,6 +44,10 @@ export class ApplicationDetails implements OnInit {
   isLoading = true;
   error = '';
   activeTab = 'overview';
+
+  goBack() {
+    this.location.back();
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');

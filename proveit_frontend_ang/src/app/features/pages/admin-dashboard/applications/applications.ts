@@ -1,13 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { ApiService } from '../../../../services/api.service';
-import { NgFor, NgClass, TitleCasePipe } from '@angular/common';
+import { NgFor, NgIf, NgClass, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-admin-applications',
   standalone: true,
-  imports: [NgFor, NgClass, TitleCasePipe, FormsModule, RouterLink],
+  imports: [NgFor, NgIf, NgClass, TitleCasePipe, FormsModule, RouterLink],
   templateUrl: './applications.html',
 })
 export class AdminApplications implements OnInit {

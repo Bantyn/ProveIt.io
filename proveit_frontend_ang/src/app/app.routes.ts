@@ -51,6 +51,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'user/compition/:id/leaderboard',
+    loadComponent: () =>
+      import('./features/pages/competition-leaderboard/competition-leaderboard').then(
+        (l) => l.CompetitionLeaderboard,
+      ),
+  },
+  {
     path: 'pricing',
     loadComponent: () => import('./features/pages/pricing/pricing').then((l) => l.Pricing),
   },

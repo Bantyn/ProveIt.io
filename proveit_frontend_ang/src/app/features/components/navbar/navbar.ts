@@ -45,6 +45,7 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   readonly theme = inject(ThemeService);
 
   userName: string | null = null;
+  userProfileImage: string = '';
 
   @Input() menus: { label: string; route: string }[] = [];
   @Input() transparent = false;
@@ -193,7 +194,10 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
     this.authService.user$.pipe(take(1)).subscribe((user: any) => {
       if (user) {
         this.apiService.getUser(user.uid).subscribe((data: any) => {
-          if (data) this.userName = data.fullName || data.name || user.displayName;
+          if (data) {
+            this.userName = data.fullName || data.name || user.displayName;
+            this.userProfileImage = data.profileImage || data.logoUrl || data.imageUrl || user.photoURL || '';
+          }
         });
       }
     });
@@ -268,6 +272,13 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
       case 'admin': return '/admin/overview';
       default: return '/auth';
     }
+  }
+
+  goToLogin() {
+    this.authService.loginForm = true;
+    this.authService.regForm = false;
+    this.closeMobileMenu();
+    this.router.navigate(['/auth']);
   }
 
   logout() { this.authService.logOut(); this.mobileMenuOpen = false; }

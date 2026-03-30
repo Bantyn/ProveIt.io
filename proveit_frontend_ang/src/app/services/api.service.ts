@@ -9,7 +9,8 @@ import { environment } from '../environments/eniroment';
 })
 export class ApiService {
   private baseUrl = environment.apiUrl;
-  private requestCache = new Map<string, Observable<any>>();
+  private requestCache = new Map<string, { obs: Observable<any>; timestamp: number }>();
+  private readonly CACHE_TTL_MS = 30000; // 30 seconds
 
   constructor(
     private http: HttpClient,
@@ -18,12 +19,13 @@ export class ApiService {
 
   private cachedGet<T>(key: string, factory: () => Observable<T>): Observable<T> {
     const existing = this.requestCache.get(key);
-    if (existing) {
-      return existing as Observable<T>;
+    if (existing && Date.now() - existing.timestamp < this.CACHE_TTL_MS) {
+      return existing.obs as Observable<T>;
     }
 
+    // Expired or missing — create fresh observable
     const request$ = factory().pipe(shareReplay(1));
-    this.requestCache.set(key, request$);
+    this.requestCache.set(key, { obs: request$, timestamp: Date.now() });
     return request$;
   }
 
@@ -33,6 +35,11 @@ export class ApiService {
         this.requestCache.delete(key);
       }
     }
+  }
+
+  /** Force-clear all cached data (useful after major mutations) */
+  clearAllCaches() {
+    this.requestCache.clear();
   }
 
   // ─── AUTHENTICATION ────────────────────────────────────────────────────────
@@ -297,7 +304,13 @@ export class ApiService {
   }
 
   createInterview(interview: any): Observable<any> {
+    this.clearCache(['interviews:', 'applications:', 'dashboard:']);
     return this.http.post<any>(`${this.baseUrl}/interviews`, interview);
+  }
+
+  updateInterview(id: string, updates: any): Observable<any> {
+    this.clearCache(['interviews:', 'applications:', 'dashboard:']);
+    return this.http.put<any>(`${this.baseUrl}/interviews/${id}`, updates);
   }
 
   // ─── BILLING ──────────────────────────────────────────────────────────────

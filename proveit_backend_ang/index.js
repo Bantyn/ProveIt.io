@@ -8,7 +8,23 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
+
+// Global error handler for malformed JSON / body-parsing failures (Express 5)
+app.use((err, req, res, next) => {
+    if (err.type === 'entity.parse.failed' || err.status === 400) {
+        return res.status(400).json({
+            error: 'Invalid request body. Please send valid JSON.',
+            details: err.message,
+        });
+    }
+    if (err.type === 'entity.too.large') {
+        return res.status(413).json({
+            error: 'Request body too large. Maximum size is 1MB.',
+        });
+    }
+    next(err);
+});
 
 const maintenanceSettingsCache = {
     value: null,

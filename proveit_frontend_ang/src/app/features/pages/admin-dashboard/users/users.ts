@@ -51,8 +51,14 @@ export class AdminUsers implements OnInit {
   }
 
   get filtered() {
-    let list =
-      this.filter === 'all' ? this.users : this.users.filter((u) => u.status === this.filter);
+    let list = this.users.filter((u) => {
+      const role = u.role?.toLowerCase();
+      return role !== 'admin' && role !== 'company';
+    });
+
+    if (this.filter !== 'all') {
+      list = list.filter((u) => u.status === this.filter);
+    }
 
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();

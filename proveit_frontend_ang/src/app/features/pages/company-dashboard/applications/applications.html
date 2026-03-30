@@ -1,33 +1,178 @@
-<div class="flex flex-wrap items-center justify-between gap-3 mb-8">
-    <div>
-        <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
-            Applications Management</h1>
-        <p class="text-[13px] text-black mt-1 font-medium">Review projects, give manual scores, and let ranks update automatically</p>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- COMPETITION CARDS VIEW (default — no competition selected)            -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div *ngIf="!selectedCompetition && !loading">
+
+    <!-- Header -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+                Applications Management</h1>
+            <p class="text-[13px] text-black mt-1 font-medium">Select a competition to review its candidate submissions</p>
+        </div>
+
+        <!-- Stats Chips -->
+        <div class="flex flex-wrap gap-2.5">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">
+                <i class="bi bi-trophy text-(--dd-blue) text-sm"></i>
+                <span class="text-[12px] font-bold text-slate-500">Competitions</span>
+                <strong class="text-[14px] font-semibold text-slate-900">{{ competitions.length }}</strong>
+            </div>
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">
+                <i class="bi bi-file-earmark-text text-(--dd-blue) text-sm"></i>
+                <span class="text-[12px] font-bold text-slate-500">Total Applications</span>
+                <strong class="text-[14px] font-semibold text-slate-900">{{ applications.length }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Competition Search  -->
+    <div class="bg-white rounded-3xl p-4 mb-6 border border-slate-100 shadow-sm">
+        <div class="relative max-w-md">
+            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="text" [(ngModel)]="competitionSearchTerm"
+                class="w-full py-3 pl-11 pr-5 rounded-2xl text-[13px] bg-slate-50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-slate-400"
+                placeholder="Search competitions..." />
+        </div>
+    </div>
+
+    <!-- Competition Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div *ngFor="let c of filteredCompetitions" (click)="selectCompetition(c)"
+            class="group relative bg-white rounded-[28px] border border-slate-200 p-6 shadow-sm cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-(--dd-blue-light) overflow-hidden">
+
+            <!-- Accent glow on hover -->
+            <div class="absolute -top-8 -right-8 w-28 h-28 rounded-full bg-(--dd-blue)/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+            <!-- Title Row -->
+            <div class="flex items-start justify-between gap-3 mb-4">
+                <div class="min-w-0 flex-1">
+                    <h3 class="text-[16px] font-bold text-slate-900 leading-6 break-words group-hover:text-(--dd-blue) transition-colors">
+                        {{ c.title || c.name || 'Untitled Competition' }}
+                    </h3>
+                    <p class="text-[12px] text-slate-500 font-medium mt-1.5">
+                        {{ c.postedAt | date:'MMM d, yyyy' }}
+                    </p>
+                </div>
+                <span class="shrink-0 px-3 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase"
+                    [ngClass]="{
+                        'bg-emerald-50 text-emerald-600 border border-emerald-200': getCompetitionStatus(c) === 'active',
+                        'bg-slate-100 text-slate-500 border border-slate-200': getCompetitionStatus(c) === 'closed',
+                        'bg-amber-50 text-amber-600 border border-amber-200': getCompetitionStatus(c) === 'draft'
+                    }">
+                    {{ getCompetitionStatus(c) | titlecase }}
+                </span>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-3 gap-3">
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-3 text-center">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Applications</p>
+                    <p class="text-[20px] font-bold text-slate-900 mt-1">{{ c.applicationCount }}</p>
+                </div>
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-3 text-center">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">End Date</p>
+                    <p class="text-[12px] font-bold text-slate-700 mt-2">{{ c.endDate ? (c.endDate | date:'MMM d') : '—' }}</p>
+                </div>
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-3 text-center">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Prize</p>
+                    <p class="text-[12px] font-bold text-slate-700 mt-2 truncate">{{ c.prize || c.prizePool || '—' }}</p>
+                </div>
+            </div>
+
+            <!-- CTA hint -->
+            <div class="mt-4 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-[12px] font-semibold text-(--dd-blue) opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span>Review Applications</span>
+                    <i class="bi bi-arrow-right transition-transform group-hover:translate-x-1"></i>
+                </div>
+                <button (click)="$event.stopPropagation(); openLeaderboardFor(c)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-600 border border-amber-200 cursor-pointer hover:bg-amber-100 transition-all opacity-0 group-hover:opacity-100">
+                    <i class="bi bi-bar-chart-fill"></i>
+                    <span>Leaderboard</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredCompetitions.length === 0 && !loading" class="bg-white rounded-[28px] border border-slate-100 shadow-sm p-16 text-center mt-4">
+        <div class="flex flex-col items-center opacity-50">
+            <i class="bi bi-trophy text-5xl text-slate-300 mb-4"></i>
+            <p class="text-sm font-bold text-slate-500">No competitions found</p>
+            <p class="text-xs text-slate-400 mt-1">Create a competition to start receiving applications</p>
+        </div>
     </div>
 </div>
 
-<!-- Datatable Filters & Search -->
-<div class="bg-white dark:bg-neutral-900 rounded-4xl p-4 mb-8 border border-neutral-100 dark:border-neutral-800 shadow-sm">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-        <!-- Status Filters -->
-        <div class="flex items-center gap-2 p-1 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl border border-neutral-200/50 dark:border-neutral-700">
-            <button *ngFor="let f of statusFilters"
-                class="text-[14px] font-semibold px-5 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
-                [ngClass]="filter === f ? 'bg-white dark:bg-neutral-900 text-(--dd-blue) shadow-sm' : 'bg-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'"
-                (click)="setFilter(f)">
-                {{ f | titlecase }}
+<!-- Loading State -->
+<div *ngIf="loading" class="min-h-[420px] flex items-center justify-center bg-white border border-slate-100 rounded-[28px] shadow-sm">
+    <div class="flex flex-col items-center justify-center">
+        <app-morph-loading size="md"></app-morph-loading>
+        <p class="text-sm font-bold text-black animate-pulse mt-4">Loading applications...</p>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- DRILL-DOWN VIEW (competition selected — show filtered applications)    -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div *ngIf="selectedCompetition && !loading && !fullReviewApplication && !showLeaderboard">
+
+    <!-- Header with Back button -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <div class="flex items-center gap-4">
+            <button (click)="backToCompetitions()"
+                class="flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-(--dd-blue) hover:border-(--dd-blue-light) transition-all cursor-pointer shadow-sm">
+                <i class="bi bi-arrow-left text-lg"></i>
             </button>
+            <div>
+                <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+                    {{ selectedCompetition.title || selectedCompetition.name }}</h1>
+                <p class="text-[13px] text-black mt-1 font-medium">Review projects, give manual scores, and let ranks update automatically</p>
+            </div>
         </div>
-
-        <!-- Search Bar -->
-        <div class="relative min-w-[320px] flex-1 md:flex-none">
-            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
-            <input type="text" [(ngModel)]="searchTerm"
-                class="w-full py-3.5 pl-11 pr-5 rounded-2xl text-[13px] bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-neutral-400 dark:text-white"
-                placeholder="Search by candidate or competition..." />
+        <div class="flex gap-2.5">
+            <button
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-[13px] bg-linear-to-r from-amber-500 to-yellow-500 text-white border-none cursor-pointer hover:from-amber-600 hover:to-yellow-600 transition-colors shadow-lg shadow-amber-500/30"
+                (click)="showLeaderboard = true">
+                <i class="bi bi-bar-chart-fill"></i>
+                <span>Leaderboard</span>
+            </button>
+            <button
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-[13px] bg-amber-500 text-white border-none cursor-pointer hover:bg-amber-600 transition-colors shadow-lg shadow-amber-500/30"
+                (click)="completeReviewPeriod()">
+                <i class="bi bi-check2-all"></i>
+                <span>Complete Review Period</span>
+            </button>
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">
+                <span class="text-[12px] font-bold text-slate-500">Applications</span>
+                <strong class="text-[14px] font-semibold text-slate-900">{{ filtered.length }}</strong>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- Datatable Filters & Search -->
+    <div class="bg-white rounded-4xl p-4 mb-8 border border-slate-100 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <!-- Status Filters -->
+            <div class="flex items-center gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-200/50">
+                <button *ngFor="let f of statusFilters"
+                    class="text-[14px] font-semibold px-5 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
+                    [ngClass]="filter === f ? 'bg-white text-(--dd-blue) shadow-sm' : 'bg-transparent text-slate-400 hover:text-slate-600'"
+                    (click)="setFilter(f)">
+                    {{ f | titlecase }}
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative min-w-[320px] flex-1 md:flex-none">
+                <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" [(ngModel)]="searchTerm"
+                    class="w-full py-3.5 pl-11 pr-5 rounded-2xl text-[13px] bg-slate-50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-slate-400"
+                    placeholder="Search by candidate name..." />
+            </div>
+        </div>
+    </div>
 
 <!-- Table Card -->
 <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-x-auto relative min-h-[400px]">
@@ -80,11 +225,17 @@
         </thead>
         <tbody *ngIf="!loading && filtered.length > 0">
             <tr *ngFor="let a of filtered"
-                class="group hover:bg-slate-50/50 transition-colors">
+                class="group transition-colors"
+                [ngClass]="{
+                    'bg-emerald-50/60 hover:bg-emerald-50': a.status === 'selected' || a.status === 'winner',
+                    'bg-rose-50/40 hover:bg-rose-50': a.status === 'rejected' || a.status === 'not_selected',
+                    'hover:bg-slate-50/50': a.status !== 'selected' && a.status !== 'winner' && a.status !== 'rejected' && a.status !== 'not_selected'
+                }">
                 <td class="py-4 border-b border-slate-50 pr-4">
                     <a [routerLink]="['/user/applications', a.id, 'details']" target="_blank" 
                        class="flex items-center gap-3 no-underline group/link">
-                        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-[18px] group-hover/link:bg-(--dd-blue-light)/20 group-hover/link:text-(--dd-blue) transition-colors">
+                        <img *ngIf="a.profileImage" [src]="a.profileImage" class="w-9 h-9 rounded-xl object-cover group-hover/link:ring-2 ring-(--dd-blue-light)/40 transition-all" alt="">
+                        <div *ngIf="!a.profileImage" class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-[18px] group-hover/link:bg-(--dd-blue-light)/20 group-hover/link:text-(--dd-blue) transition-colors">
                             <i class="bi bi-person"></i>
                         </div>
                         <span class="font-semibold text-slate-900 group-hover/link:text-(--dd-blue) transition-colors">{{ a.candidateName }}</span>
@@ -109,40 +260,22 @@
                         [ngClass]="{
                             'bg-blue-50 text-blue-600 border border-blue-100': a.status === 'applied',
                             'bg-amber-50 text-amber-600 border border-amber-100': a.status === 'under_review',
-                            'bg-emerald-50 text-emerald-600 border border-emerald-100': a.status === 'accepted' || a.status === 'winner',
+                            'bg-emerald-50 text-emerald-600 border border-emerald-100': a.status === 'accepted' || a.status === 'winner' || a.status === 'selected',
                             'bg-indigo-50 text-indigo-600 border border-indigo-100': a.status === 'submitted',
                             'bg-orange-50 text-orange-600 border border-orange-100': a.status === 'under_evaluation',
                             'bg-cyan-50 text-cyan-600 border border-cyan-100': a.status === 'interview_scheduled',
                             'bg-rose-50 text-rose-600 border border-rose-100': a.status === 'not_selected' || a.status === 'rejected'
                         }">{{ a.status | titlecase }}</span>
                 </td>
-                <td class="py-4 border-b border-slate-50 text-right align-top min-w-[420px]">
+                <td class="py-4 border-b border-slate-50 text-right align-top">
                     <div class="flex flex-col items-end gap-3">
                         <div class="flex flex-wrap gap-2 justify-end">
-                            <a *ngIf="a.submissionLink" [href]="a.submissionLink" target="_blank"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                title="View Submission">
-                                <i class="bi bi-link-45deg"></i>
-                                <span>View Work</span>
-                            </a>
-                            <a *ngIf="a.project?.repoUrl" [href]="a.project.repoUrl" target="_blank"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                title="Open Repository">
-                                <i class="bi bi-github"></i>
-                                <span>Repo</span>
-                            </a>
-                            <a *ngIf="a.project?.liveUrl" [href]="a.project.liveUrl" target="_blank"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
-                                title="Open Live Demo">
-                                <i class="bi bi-window"></i>
-                                <span>Demo</span>
-                            </a>
-                            <a [routerLink]="['/user/applications', a.id, 'details']" target="_blank"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-blue-50 text-blue-700 hover:bg-blue-100 no-underline"
-                                title="Open full review">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                                <span>Full Review</span>
-                            </a>
+                            <button
+                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                                (click)="openFullReview(a)" title="Open review">
+                                <i class="bi bi-eye"></i>
+                                <span>Review</span>
+                            </button>
                             <button *ngIf="a.status === 'submitted' || a.status === 'under_evaluation' || a.status === 'winner' || a.status === 'interview_scheduled' || a.status === 'not_selected' || a.status === 'rejected'"
                                 class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                 (click)="openEvaluationModal(a)" title="Open manual evaluation">
@@ -176,34 +309,16 @@
                                 class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-orange-50 text-orange-600 hover:bg-orange-100"
                                 (click)="updateStatus(a, 'under_evaluation')" title="Start Evaluation">
                                 <i class="bi bi-play-fill"></i>
-                                <span>Evaluate</span>
+                                <span>Start Evaluation</span>
                             </button>
 
-                            <button *ngIf="a.status === 'under_evaluation'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-yellow-50 text-yellow-600 hover:bg-yellow-100"
-                                (click)="updateStatus(a, 'winner')" title="Mark as Winner">
-                                <i class="bi bi-trophy-fill"></i>
-                                <span>Winner</span>
-                            </button>
-                            <button *ngIf="a.status === 'under_evaluation'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-slate-100 text-slate-600 hover:bg-slate-200"
-                                (click)="updateStatus(a, 'not_selected')" title="Not Selected">
-                                <i class="bi bi-slash-circle"></i>
-                                <span>Skip</span>
-                            </button>
-
-                            <button *ngIf="a.status === 'winner'"
+                            <button *ngIf="a.status === 'winner' || a.status === 'selected'"
                                 class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
-                                (click)="scheduleInterview(a)" title="Schedule Interview">
+                                (click)="navigateToPipelineFor(a)" title="Schedule Interview">
                                 <i class="bi bi-calendar-plus-fill"></i>
                                 <span>Schedule Interview</span>
                             </button>
-                            <button *ngIf="a.status === 'winner'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-slate-100 text-slate-600 hover:bg-slate-200"
-                                (click)="updateStatus(a, 'not_selected')" title="Revoke Winner">
-                                <i class="bi bi-x-circle-fill"></i>
-                                <span>Revoke</span>
-                            </button>
+
                         </div>
                     </div>
                 </td>
@@ -231,6 +346,297 @@
             </tr>
         </tbody>
     </table>
+</div>
+
+</div> <!-- end selectedCompetition drill-down wrapper -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LEADERBOARD VIEW                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div *ngIf="showLeaderboard && selectedCompetition && !loading && !fullReviewApplication">
+
+    <!-- Header -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <div class="flex items-center gap-4">
+            <button (click)="showLeaderboard = false"
+                class="flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-(--dd-blue) hover:border-(--dd-blue-light) transition-all cursor-pointer shadow-sm">
+                <i class="bi bi-arrow-left text-lg"></i>
+            </button>
+            <div>
+                <h1 class="text-3xl font-bold bg-linear-to-r from-amber-600 via-yellow-500 to-amber-600 bg-clip-text text-transparent">
+                    🏆 Leaderboard</h1>
+                <p class="text-[13px] text-black mt-1 font-medium">{{ selectedCompetition.title || selectedCompetition.name }} — Ranked by score</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Podium — Top 3 -->
+    <div *ngIf="leaderboardData.length >= 1" class="mb-8">
+        <div class="flex items-end justify-center gap-5 pt-4 pb-2">
+
+            <!-- 2nd Place -->
+            <div *ngIf="leaderboardData.length >= 2" class="flex flex-col items-center">
+                <img *ngIf="leaderboardData[1].profileImage" [src]="leaderboardData[1].profileImage" class="w-20 h-20 rounded-full object-cover shadow-lg border-4 border-white" alt="">
+                <div *ngIf="!leaderboardData[1].profileImage" class="w-20 h-20 rounded-full bg-linear-to-br from-slate-300 to-slate-400 text-white flex items-center justify-center text-xl font-bold shadow-lg border-4 border-white">
+                    {{ getInitials(leaderboardData[1].candidateName) }}
+                </div>
+                <div class="mt-3 text-center">
+                    <p class="text-2xl font-black text-slate-400">🥈</p>
+                    <p class="text-sm font-bold text-slate-800 mt-1">{{ leaderboardData[1].candidateName }}</p>
+                    <p class="text-xs font-bold text-slate-500 mt-0.5">{{ leaderboardData[1].score }}/100</p>
+                </div>
+                <div class="mt-3 w-24 h-28 rounded-t-2xl bg-linear-to-b from-slate-200 to-slate-300 flex items-center justify-center">
+                    <span class="text-4xl font-black text-white/80">2</span>
+                </div>
+            </div>
+
+            <!-- 1st Place -->
+            <div class="flex flex-col items-center">
+                <img *ngIf="leaderboardData[0].profileImage" [src]="leaderboardData[0].profileImage" class="w-24 h-24 rounded-full object-cover shadow-xl border-4 border-white ring-4 ring-amber-200" alt="">
+                <div *ngIf="!leaderboardData[0].profileImage" class="w-24 h-24 rounded-full bg-linear-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center text-2xl font-bold shadow-xl border-4 border-white ring-4 ring-amber-200">
+                    {{ getInitials(leaderboardData[0].candidateName) }}
+                </div>
+                <div class="mt-3 text-center">
+                    <p class="text-3xl font-black text-amber-500">🥇</p>
+                    <p class="text-base font-bold text-slate-900 mt-1">{{ leaderboardData[0].candidateName }}</p>
+                    <p class="text-sm font-bold text-amber-600 mt-0.5">{{ leaderboardData[0].score }}/100</p>
+                    <span *ngIf="leaderboardData[0].status === 'selected' || leaderboardData[0].status === 'winner'" class="inline-block mt-1 px-3 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 border border-emerald-200">Selected</span>
+                </div>
+                <div class="mt-3 w-28 h-36 rounded-t-2xl bg-linear-to-b from-amber-300 to-amber-400 flex items-center justify-center">
+                    <span class="text-5xl font-black text-white/80">1</span>
+                </div>
+            </div>
+
+            <!-- 3rd Place -->
+            <div *ngIf="leaderboardData.length >= 3" class="flex flex-col items-center">
+                <img *ngIf="leaderboardData[2].profileImage" [src]="leaderboardData[2].profileImage" class="rounded-full object-cover shadow-lg border-4 border-white" style="width:72px;height:72px;" alt="">
+                <div *ngIf="!leaderboardData[2].profileImage" class="w-18 h-18 rounded-full bg-linear-to-br from-amber-600 to-amber-700 text-white flex items-center justify-center text-lg font-bold shadow-lg border-4 border-white" style="width:72px;height:72px;">
+                    {{ getInitials(leaderboardData[2].candidateName) }}
+                </div>
+                <div class="mt-3 text-center">
+                    <p class="text-2xl font-black text-amber-700">🥉</p>
+                    <p class="text-sm font-bold text-slate-800 mt-1">{{ leaderboardData[2].candidateName }}</p>
+                    <p class="text-xs font-bold text-slate-500 mt-0.5">{{ leaderboardData[2].score }}/100</p>
+                </div>
+                <div class="mt-3 w-20 h-20 rounded-t-2xl bg-linear-to-b from-amber-500 to-amber-600 flex items-center justify-center">
+                    <span class="text-3xl font-black text-white/80">3</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Remaining Positions Table -->
+    <div *ngIf="leaderboardData.length > 3" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-x-auto">
+        <table class="w-full border-collapse text-[13px] text-left whitespace-nowrap">
+            <thead>
+                <tr>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Rank</th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Candidate</th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Score</th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let a of leaderboardData.slice(3)" class="hover:bg-slate-50/50 transition-colors">
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-600 text-sm font-bold">
+                            {{ a.leaderboardRank }}
+                        </span>
+                    </td>
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <div class="flex items-center gap-3">
+                            <img *ngIf="a.profileImage" [src]="a.profileImage" class="w-9 h-9 rounded-xl object-cover" alt="">
+                            <div *ngIf="!a.profileImage" class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-sm font-bold">
+                                {{ getInitials(a.candidateName) }}
+                            </div>
+                            <span class="font-semibold text-slate-900">{{ a.candidateName }}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <span class="text-sm font-bold" [ngClass]="a.score >= 90 ? 'text-emerald-600' : a.score >= 80 ? 'text-amber-600' : 'text-rose-500'">{{ a.score }}/100</span>
+                    </td>
+                    <td class="py-4 border-b border-slate-50">
+                        <span class="text-[10px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap"
+                            [ngClass]="{
+                                'bg-emerald-50 text-emerald-600 border border-emerald-100': a.status === 'selected' || a.status === 'winner',
+                                'bg-rose-50 text-rose-600 border border-rose-100': a.status === 'rejected' || a.status === 'not_selected',
+                                'bg-slate-50 text-slate-500 border border-slate-200': a.status !== 'selected' && a.status !== 'winner' && a.status !== 'rejected' && a.status !== 'not_selected'
+                            }">{{ a.status | titlecase }}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="leaderboardData.length === 0" class="bg-white rounded-[28px] border border-slate-100 shadow-sm p-16 text-center">
+        <div class="flex flex-col items-center opacity-50">
+            <i class="bi bi-bar-chart text-5xl text-slate-300 mb-4"></i>
+            <p class="text-sm font-bold text-slate-500">No scores yet</p>
+            <p class="text-xs text-slate-400 mt-1">Score candidates to see them on the leaderboard</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- INLINE FULL REVIEW VIEW                                                -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div *ngIf="fullReviewApplication && !loading">
+
+    <!-- Header with Back -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <div class="flex items-center gap-4">
+            <button (click)="closeFullReview()"
+                class="flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-(--dd-blue) hover:border-(--dd-blue-light) transition-all cursor-pointer shadow-sm">
+                <i class="bi bi-arrow-left text-lg"></i>
+            </button>
+            <div>
+                <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+                    Candidate Review</h1>
+                <p class="text-[13px] text-black mt-1 font-medium">Review candidate details, submission, and take action</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Profile Card -->
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-6">
+        <div class="flex flex-wrap items-start justify-between gap-6">
+            <div class="flex items-start gap-5">
+                <img *ngIf="fullReviewApplication.profileImage" [src]="fullReviewApplication.profileImage" class="w-16 h-16 rounded-2xl object-cover shadow-md" alt="">
+                <div *ngIf="!fullReviewApplication.profileImage" class="w-16 h-16 rounded-2xl bg-linear-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-md">
+                    {{ getInitials(fullReviewApplication.candidateName) }}
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">{{ fullReviewApplication.candidateName }}</h2>
+                    <p class="text-sm text-slate-500 mt-1">{{ fullReviewApplication.candidateEmail || 'No email available' }}</p>
+                    <p class="text-sm font-semibold text-slate-600 mt-2">
+                        <i class="bi bi-trophy text-slate-400 mr-1"></i>
+                        {{ fullReviewApplication.competitionTitle }}
+                    </p>
+                </div>
+            </div>
+            <span class="text-[11px] font-bold px-4 py-2 rounded-xl uppercase tracking-wider"
+                [ngClass]="{
+                    'bg-blue-50 text-blue-600 border border-blue-100': fullReviewApplication.status === 'applied',
+                    'bg-amber-50 text-amber-600 border border-amber-100': fullReviewApplication.status === 'under_review',
+                    'bg-emerald-50 text-emerald-600 border border-emerald-100': fullReviewApplication.status === 'winner' || fullReviewApplication.status === 'selected',
+                    'bg-indigo-50 text-indigo-600 border border-indigo-100': fullReviewApplication.status === 'submitted',
+                    'bg-orange-50 text-orange-600 border border-orange-100': fullReviewApplication.status === 'under_evaluation',
+                    'bg-cyan-50 text-cyan-600 border border-cyan-100': fullReviewApplication.status === 'interview_scheduled',
+                    'bg-rose-50 text-rose-600 border border-rose-100': fullReviewApplication.status === 'not_selected' || fullReviewApplication.status === 'rejected'
+                }">
+                {{ fullReviewApplication.status | titlecase }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 text-center">
+            <p class="text-[10px] font-bold tracking-[0.14em] text-slate-400 uppercase">Score</p>
+            <p class="mt-3 text-3xl font-bold" [ngClass]="{
+                'text-emerald-600': hasScore(fullReviewApplication.score) && fullReviewApplication.score >= 90,
+                'text-amber-600': hasScore(fullReviewApplication.score) && fullReviewApplication.score >= 80 && fullReviewApplication.score < 90,
+                'text-rose-600': hasScore(fullReviewApplication.score) && fullReviewApplication.score < 80,
+                'text-slate-300': !hasScore(fullReviewApplication.score)
+            }">
+                {{ hasScore(fullReviewApplication.score) ? fullReviewApplication.score + '/100' : 'Pending' }}
+            </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 text-center">
+            <p class="text-[10px] font-bold tracking-[0.14em] text-slate-400 uppercase">Rank</p>
+            <p class="mt-3 text-3xl font-bold text-slate-900">
+                {{ hasScore(fullReviewApplication.rank) ? ('#' + fullReviewApplication.rank) : '—' }}
+            </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 text-center">
+            <p class="text-[10px] font-bold tracking-[0.14em] text-slate-400 uppercase">Submitted</p>
+            <p class="mt-3 text-sm font-bold text-slate-700">
+                {{ fullReviewApplication.submittedAt | date:'MMM d, yyyy h:mm a' }}
+            </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 text-center">
+            <p class="text-[10px] font-bold tracking-[0.14em] text-slate-400 uppercase">Status</p>
+            <p class="mt-3 text-sm font-bold" [ngClass]="{
+                'text-emerald-600': fullReviewApplication.status === 'winner' || fullReviewApplication.status === 'selected',
+                'text-rose-600': fullReviewApplication.status === 'rejected' || fullReviewApplication.status === 'not_selected',
+                'text-cyan-600': fullReviewApplication.status === 'interview_scheduled',
+                'text-slate-700': fullReviewApplication.status !== 'winner' && fullReviewApplication.status !== 'rejected' && fullReviewApplication.status !== 'not_selected' && fullReviewApplication.status !== 'interview_scheduled'
+            }">
+                {{ fullReviewApplication.status | titlecase }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Submission Links -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6" *ngIf="fullReviewApplication.submissionLink || fullReviewApplication.project?.repoUrl || fullReviewApplication.project?.liveUrl">
+        <p class="text-[12px] font-bold tracking-[0.14em] text-slate-400 uppercase mb-4">Submission Links</p>
+        <div class="flex flex-wrap gap-3">
+            <a *ngIf="fullReviewApplication.submissionLink" [href]="fullReviewApplication.submissionLink" target="_blank"
+                class="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-semibold no-underline hover:bg-slate-100 hover:border-slate-300 transition-all hover:shadow-sm">
+                <i class="bi bi-link-45deg text-lg"></i>
+                <span>View Work</span>
+                <i class="bi bi-box-arrow-up-right text-[10px] text-slate-400"></i>
+            </a>
+            <a *ngIf="fullReviewApplication.project?.repoUrl" [href]="fullReviewApplication.project.repoUrl" target="_blank"
+                class="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-semibold no-underline hover:bg-slate-100 hover:border-slate-300 transition-all hover:shadow-sm">
+                <i class="bi bi-github text-lg"></i>
+                <span>Repository</span>
+                <i class="bi bi-box-arrow-up-right text-[10px] text-slate-400"></i>
+            </a>
+            <a *ngIf="fullReviewApplication.project?.liveUrl" [href]="fullReviewApplication.project.liveUrl" target="_blank"
+                class="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-[13px] font-semibold no-underline hover:bg-indigo-100 hover:border-indigo-300 transition-all hover:shadow-sm">
+                <i class="bi bi-window text-lg"></i>
+                <span>Live Demo</span>
+                <i class="bi bi-box-arrow-up-right text-[10px] text-indigo-400"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Evaluation Notes -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
+        <p class="text-[12px] font-bold tracking-[0.14em] text-slate-400 uppercase mb-3">Evaluation Notes</p>
+        <p class="text-sm leading-7 text-slate-600 whitespace-pre-wrap">
+            {{ fullReviewApplication.evaluation?.notes || fullReviewApplication.evaluationNotesInput || 'No evaluation notes added yet.' }}
+        </p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <p class="text-[12px] font-bold tracking-[0.14em] text-slate-400 uppercase mb-4">Actions</p>
+        <div class="flex flex-wrap gap-3">
+            <button
+                *ngIf="fullReviewApplication.status !== 'selected' && fullReviewApplication.status !== 'winner'"
+                class="inline-flex items-center gap-2 h-11 px-5 rounded-xl border-none cursor-pointer text-[13px] font-bold transition-all bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm hover:shadow-md"
+                (click)="quickAction(fullReviewApplication, 'selected')">
+                <i class="bi bi-trophy-fill"></i>
+                <span>Select</span>
+            </button>
+            <button
+                *ngIf="fullReviewApplication.status !== 'rejected'"
+                class="inline-flex items-center gap-2 h-11 px-5 rounded-xl border-none cursor-pointer text-[13px] font-bold transition-all bg-rose-500 text-white hover:bg-rose-600 shadow-sm hover:shadow-md"
+                (click)="quickAction(fullReviewApplication, 'rejected')">
+                <i class="bi bi-x-circle-fill"></i>
+                <span>Reject</span>
+            </button>
+            <button
+                *ngIf="fullReviewApplication.status === 'selected' || fullReviewApplication.status === 'winner'"
+                class="inline-flex items-center gap-2 h-11 px-5 rounded-xl border-none cursor-pointer text-[13px] font-bold transition-all bg-cyan-500 text-white hover:bg-cyan-600 shadow-sm hover:shadow-md"
+                (click)="navigateToPipeline()">
+                <i class="bi bi-calendar-plus-fill"></i>
+                <span>Schedule Interview</span>
+            </button>
+            <button
+                class="inline-flex items-center gap-2 h-11 px-5 rounded-xl border-none cursor-pointer text-[13px] font-bold transition-all bg-violet-500 text-white hover:bg-violet-600 shadow-sm hover:shadow-md"
+                (click)="openEvaluationModal(fullReviewApplication)">
+                <i class="bi bi-sliders2"></i>
+                <span>Give Score</span>
+            </button>
+
+        </div>
+    </div>
+
 </div>
 
 <div *ngIf="evaluationModalApplication"

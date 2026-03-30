@@ -126,28 +126,38 @@ router.post('/verify-payment', async (req, res) => {
             return res.status(400).json({ error: 'Payment verification failed — invalid signature' });
         }
 
-        // 2. Fetch payment details from Razorpay for method info
+        // 2. Fetch payment method + company data in parallel
         let paymentMethod = 'Razorpay';
-        try {
-            const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
-            paymentMethod = paymentDetails.method || 'Razorpay'; // upi, card, netbanking, wallet
-        } catch (fetchErr) {
-            console.warn('Could not fetch payment method from Razorpay:', fetchErr.message);
+        const [paymentDetails, companyDoc, existingSub] = await Promise.all([
+            razorpay.payments.fetch(razorpay_payment_id).catch(() => null),
+            db.collection('companies').doc(companyId).get(),
+            db.collection('subscriptions')
+                .where('companyId', '==', companyId)
+                .limit(1)
+                .get(),
+        ]);
+
+        if (paymentDetails?.method) {
+            paymentMethod = paymentDetails.method;
         }
 
-        // 3. Update company plan
-        const companyRef = db.collection('companies').doc(companyId);
-        const companyDoc = await companyRef.get();
         const companyData = companyDoc.exists ? companyDoc.data() : {};
 
-        await companyRef.update({
+        // 3. BATCHED WRITE — All mutations in a single atomic operation
+        const batch = db.batch();
+        const now = new Date().toISOString();
+
+        // Update company plan
+        const companyRef = db.collection('companies').doc(companyId);
+        batch.update(companyRef, {
             plan: planName,
             subscriptionId: `sub_rzp_${razorpay_payment_id}`,
-            updatedAt: new Date().toISOString(),
+            updatedAt: now,
         });
 
-        // 4. Create Payment record
-        const paymentData = {
+        // Create Payment record
+        const paymentRef = db.collection('payments').doc();
+        batch.set(paymentRef, {
             companyId,
             companyName: companyData.name || companyData.companyName || 'Company',
             amount: amount || 0,
@@ -158,40 +168,40 @@ router.post('/verify-payment', async (req, res) => {
             razorpayPaymentId: razorpay_payment_id,
             transactionId: razorpay_payment_id,
             description: `Plan Upgrade to ${planName}`,
-            createdAt: new Date().toISOString(),
-        };
-        await db.collection('payments').add(paymentData);
+            createdAt: now,
+        });
 
-        // 5. Create/Update Subscription record
+        // Create/Update Subscription
         const subData = {
             companyId,
             plan: planName,
             status: 'ACTIVE',
             razorpayOrderId: razorpay_order_id,
             razorpayPaymentId: razorpay_payment_id,
-            validFrom: new Date().toISOString(),
+            validFrom: now,
             validTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-            updatedAt: new Date().toISOString(),
+            updatedAt: now,
         };
 
-        const existingSub = await db.collection('subscriptions')
-            .where('companyId', '==', companyId)
-            .limit(1)
-            .get();
-
         if (existingSub.empty) {
-            await db.collection('subscriptions').add(subData);
+            const subRef = db.collection('subscriptions').doc();
+            batch.set(subRef, subData);
         } else {
-            await db.collection('subscriptions').doc(existingSub.docs[0].id).update(subData);
+            const subRef = db.collection('subscriptions').doc(existingSub.docs[0].id);
+            batch.update(subRef, subData);
         }
 
-        // 6. Admin Activity Log
-        await db.collection('activityLogs').add({
+        // Activity Log
+        const logRef = db.collection('activityLogs').doc();
+        batch.set(logRef, {
             action: 'PLAN_UPGRADE',
             severity: 'SUCCESS',
             description: `${companyData.name || 'A company'} upgraded to ${planName} plan via Razorpay. Payment ID: ${razorpay_payment_id}. Revenue: ₹${amount}`,
-            createdAt: new Date().toISOString(),
+            createdAt: now,
         });
+
+        // Commit all writes atomically
+        await batch.commit();
 
         res.status(200).json({
             message: 'Payment verified and plan upgraded successfully!',

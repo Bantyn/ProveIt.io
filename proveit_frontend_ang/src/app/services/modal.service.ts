@@ -11,6 +11,7 @@ export interface ModalConfig {
   mode?: 'alert' | 'confirm' | 'schedule';
   initialDate?: Date | null;
   initialTime?: string;
+  initialMeetingLink?: string;
 }
 
 @Injectable({
@@ -64,7 +65,10 @@ export class ModalService {
   scheduleInterview(
     title: string = 'Schedule Interview',
     message: string = 'Choose an interview date and time for the selected candidate.',
-  ): Promise<{ date: string; time: string } | null> {
+    initialDate?: Date | null,
+    initialTime?: string,
+    initialMeetingLink?: string,
+  ): Promise<{ date: string; time: string; meetingLink: string } | null> {
     return new Promise((resolve) => {
       this.zone.run(() => {
         this.modalStateSource.next({
@@ -76,6 +80,9 @@ export class ModalService {
             showCancel: true,
             type: 'info',
             mode: 'schedule',
+            initialDate: initialDate ?? null,
+            initialTime: initialTime ?? '',
+            initialMeetingLink: initialMeetingLink ?? '',
           },
           resolve,
         });

@@ -59,6 +59,16 @@
                         placeholder="Pick interview time">
                     </app-time-picker>
                 </div>
+
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                    <label for="meeting-link" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Meeting Link</label>
+                    <div class="relative">
+                        <i class="bi bi-link-45deg absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="url" id="meeting-link" [(ngModel)]="meetingLink"
+                            class="w-full py-3 pl-10 pr-4 rounded-xl text-[13px] bg-white border border-slate-200 focus:border-[var(--dd-blue)] outline-none transition-all font-medium placeholder:text-slate-400"
+                            placeholder="Google Meet, Zoom, Teams link..." />
+                    </div>
+                </div>
             </div>
 
             <!-- Actions -->
@@ -69,7 +79,7 @@
                 </button>
 
                 <button *ngIf="state.config.mode === 'schedule'; else defaultConfirm" (click)="onSchedule()"
-                    [disabled]="!selectedDate || !selectedTime"
+                    [disabled]="!selectedDate || !selectedTime || !meetingLink"
                     class="flex-1 py-3.5 px-4 rounded-xl font-bold transition-all active:scale-95 text-[15px] cursor-pointer outline-none bg-gradient-to-tr from-[var(--dd-blue-dark)] to-[var(--dd-blue)] text-white border-transparent hover:opacity-90 shadow-md shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
                     {{ state.config.confirmText || 'Schedule' }}
                 </button>

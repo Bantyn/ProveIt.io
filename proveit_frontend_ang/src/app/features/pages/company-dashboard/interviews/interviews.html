@@ -1,168 +1,283 @@
-<div class="flex flex-wrap items-center justify-between gap-3 mb-8">
-    <div>
-        <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
-            Interview Management</h1>
-        <p class="text-[13px] text-black mt-1 font-medium">Schedule, update or finalise interview decisions</p>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- COMPETITION CARDS VIEW (default — no competition selected)            -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div *ngIf="!selectedCompetition && !loading">
+
+    <!-- Header -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+                Interview Management</h1>
+            <p class="text-[13px] text-black mt-1 font-medium">Select a competition to view and manage interviews</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="flex flex-wrap gap-2.5">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">
+                <i class="bi bi-trophy text-(--dd-blue) text-sm"></i>
+                <span class="text-[12px] font-bold text-slate-500">Competitions</span>
+                <strong class="text-[14px] font-semibold text-slate-900">{{ competitions.length }}</strong>
+            </div>
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm">
+                <i class="bi bi-camera-video text-(--dd-blue) text-sm"></i>
+                <span class="text-[12px] font-bold text-slate-500">Total Interviews</span>
+                <strong class="text-[14px] font-semibold text-slate-900">{{ interviews.length }}</strong>
+            </div>
+        </div>
     </div>
-    <div class="flex gap-3">
-        <button
-            class="px-5 py-2.5 rounded-full font-semibold text-[13px] bg-(--dd-blue) text-white border-none cursor-pointer hover:bg-(--dd-blue-dark) transition-colors shadow-lg shadow-(--dd-blue-light)/40"
-            (click)="schedule()">
-            <i class="bi bi-calendar-plus mr-2"></i> Schedule Interview
-        </button>
+
+    <!-- Competition Search -->
+    <div class="bg-white rounded-3xl p-4 mb-6 border border-slate-100 shadow-sm">
+        <div class="relative max-w-md">
+            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="text" [(ngModel)]="competitionSearchTerm"
+                class="w-full py-3 pl-11 pr-5 rounded-2xl text-[13px] bg-slate-50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-slate-400"
+                placeholder="Search competitions..." />
+        </div>
+    </div>
+
+    <!-- Competition Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div *ngFor="let c of filteredCompetitions" (click)="selectCompetition(c)"
+            class="group relative bg-white rounded-[28px] border border-slate-200 p-6 shadow-sm cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-(--dd-blue-light) overflow-hidden">
+
+            <!-- Accent glow -->
+            <div class="absolute -top-8 -right-8 w-28 h-28 rounded-full bg-(--dd-blue)/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+            <!-- Title Row -->
+            <div class="flex items-start justify-between gap-3 mb-4">
+                <div class="min-w-0 flex-1">
+                    <h3 class="text-[16px] font-bold text-slate-900 leading-6 group-hover:text-(--dd-blue) transition-colors">
+                        {{ c.title || c.name || 'Untitled Competition' }}
+                    </h3>
+                    <p class="text-[12px] text-slate-500 font-medium mt-1.5">
+                        {{ c.postedAt | date:'MMM d, yyyy' }}
+                    </p>
+                </div>
+                <span class="shrink-0 px-3 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase"
+                    [ngClass]="{
+                        'bg-emerald-50 text-emerald-600 border border-emerald-200': getCompetitionStatus(c) === 'active',
+                        'bg-slate-100 text-slate-500 border border-slate-200': getCompetitionStatus(c) === 'closed',
+                        'bg-amber-50 text-amber-600 border border-amber-200': getCompetitionStatus(c) === 'draft'
+                    }">
+                    {{ getCompetitionStatus(c) | titlecase }}
+                </span>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-3 text-center">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Interviews</p>
+                    <p class="text-[20px] font-bold text-slate-900 mt-1">{{ c.interviewCount }}</p>
+                </div>
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-3 text-center">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">End Date</p>
+                    <p class="text-[12px] font-bold text-slate-700 mt-2">{{ c.endDate ? (c.endDate | date:'MMM d') : '—' }}</p>
+                </div>
+            </div>
+
+            <!-- CTA hint -->
+            <div class="mt-4 flex items-center gap-2 text-[12px] font-semibold text-(--dd-blue) opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span>View Interviews</span>
+                <i class="bi bi-arrow-right transition-transform group-hover:translate-x-1"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredCompetitions.length === 0" class="bg-white rounded-[28px] border border-slate-100 shadow-sm p-16 text-center mt-4">
+        <div class="flex flex-col items-center opacity-50">
+            <i class="bi bi-trophy text-5xl text-slate-300 mb-4"></i>
+            <p class="text-sm font-bold text-slate-500">No competitions found</p>
+            <p class="text-xs text-slate-400 mt-1">Create a competition and schedule interviews to get started</p>
+        </div>
     </div>
 </div>
 
-<!-- Datatable Filters & Search -->
-<div class="bg-white dark:bg-neutral-900 rounded-4xl p-4 mb-8 border border-neutral-100 dark:border-neutral-800 shadow-sm">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-        <!-- Status Filters -->
-        <div class="flex items-center gap-2 p-1 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl border border-neutral-200/50 dark:border-neutral-700">
-            <button *ngFor="let f of filters"
-                class="text-[14px] font-semibold px-5 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
-                [ngClass]="filter === f ? 'bg-white dark:bg-neutral-900 text-(--dd-blue) shadow-sm' : 'bg-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'"
-                (click)="filter = f">
-                {{ f | titlecase }}
+<!-- Loading State -->
+<div *ngIf="loading" class="min-h-[420px] flex items-center justify-center bg-white border border-slate-100 rounded-[28px] shadow-sm">
+    <div class="flex flex-col items-center justify-center">
+        <app-morph-loading size="md"></app-morph-loading>
+        <p class="text-sm font-bold text-black animate-pulse mt-4">Loading interviews...</p>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- DRILL-DOWN VIEW (competition selected)                                 -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div *ngIf="!loading && selectedCompetition">
+
+    <!-- Header with Back button -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <div class="flex items-center gap-4">
+            <button (click)="backToCompetitions()"
+                class="flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-(--dd-blue) hover:border-(--dd-blue-light) transition-all cursor-pointer shadow-sm">
+                <i class="bi bi-arrow-left text-lg"></i>
             </button>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="relative min-w-[320px] flex-1 md:flex-none">
-            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
-            <input type="text" [(ngModel)]="searchTerm"
-                class="w-full py-3.5 pl-11 pr-5 rounded-2xl text-[13px] bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-neutral-400 dark:text-white"
-                placeholder="Search by candidate or interview type..." />
+            <div>
+                <h1 class="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
+                    {{ selectedCompetition.title || selectedCompetition.name }}</h1>
+                <p class="text-[13px] text-black mt-1 font-medium">Schedule, update or finalise interview decisions</p>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Table Card -->
-<div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-x-auto relative min-h-[400px]">
-    <!-- Glow effect -->
-    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+    <!-- Datatable Filters & Search -->
+    <div class="bg-white rounded-4xl p-4 mb-8 border border-neutral-100 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <!-- Status Filters -->
+            <div class="flex items-center gap-2 p-1 bg-neutral-100 rounded-2xl border border-neutral-200/50">
+                <button *ngFor="let f of filters"
+                    class="text-[14px] font-semibold px-5 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
+                    [ngClass]="filter === f ? 'bg-white text-(--dd-blue) shadow-sm' : 'bg-transparent text-neutral-400 hover:text-neutral-600'"
+                    (click)="filter = f">
+                    {{ f | titlecase }}
+                </button>
+            </div>
 
-    <table class="w-full border-collapse text-[13px] text-left whitespace-nowrap relative z-10">
-        <thead>
-            <tr>
-                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('candidateName')">
-                    <div class="flex items-center gap-2">
-                        <span>Candidate</span>
-                        <i class="bi"
-                            [ngClass]="sortKey === 'candidateName' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
-                    </div>
-                </th>
-                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('type')">
-                    <div class="flex items-center gap-2">
-                        <span>Type</span>
-                        <i class="bi"
-                            [ngClass]="sortKey === 'type' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
-                    </div>
-                </th>
-                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('date')">
-                    <div class="flex items-center gap-2">
-                        <span>Date & Time</span>
-                        <i class="bi"
-                            [ngClass]="sortKey === 'date' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
-                    </div>
-                </th>
-                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('status')">
-                    <div class="flex items-center gap-2">
-                        <span>Status</span>
-                        <i class="bi"
-                            [ngClass]="sortKey === 'status' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
-                    </div>
-                </th>
-                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Decision</th>
-                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold text-right">Actions</th>
-            </tr>
-        </thead>
-        <tbody *ngIf="!loading && filtered.length > 0">
-            <tr *ngFor="let i of filtered"
-                class="group hover:bg-slate-50/50 transition-colors">
-                <td class="py-4 border-b border-slate-50 pr-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-[18px] group-hover:bg-(--dd-blue-light)/20 group-hover:text-(--dd-blue) transition-colors font-bold">
-                            {{ i.candidateName[0] }}
+            <!-- Search Bar -->
+            <div class="relative min-w-[320px] flex-1 md:flex-none">
+                <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
+                <input type="text" [(ngModel)]="searchTerm"
+                    class="w-full py-3.5 pl-11 pr-5 rounded-2xl text-[13px] bg-neutral-100 border border-transparent focus:border-(--dd-blue) outline-none transition-all font-semibold placeholder:text-neutral-400"
+                    placeholder="Search by candidate or interview type..." />
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-x-auto relative min-h-[400px]">
+        <!-- Glow effect -->
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+
+        <table class="w-full border-collapse text-[13px] text-left whitespace-nowrap relative z-10">
+            <thead>
+                <tr>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('candidateName')">
+                        <div class="flex items-center gap-2">
+                            <span>Candidate</span>
+                            <i class="bi"
+                                [ngClass]="sortKey === 'candidateName' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
                         </div>
-                        <span class="font-semibold text-slate-900">{{ i.candidateName }}</span>
-                    </div>
-                </td>
-                <td class="py-4 border-b border-slate-50 pr-4">
-                    <span class="text-[12px] font-medium text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
-                        {{ i.type }}
-                    </span>
-                </td>
-                <td class="py-4 border-b border-slate-50 pr-4">
-                    <div class="flex flex-col gap-0.5">
-                        <div class="flex items-center gap-1.5 text-slate-700 font-medium">
-                            <i class="bi bi-calendar3 text-(--dd-blue) text-[11px]"></i>
-                            <span>{{ i.date }}</span>
+                    </th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('type')">
+                        <div class="flex items-center gap-2">
+                            <span>Type</span>
+                            <i class="bi"
+                                [ngClass]="sortKey === 'type' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
                         </div>
-                        <div class="flex items-center gap-1.5 text-slate-400 text-[11px]">
-                            <i class="bi bi-clock"></i>
-                            <span>{{ i.time }}</span>
+                    </th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('date')">
+                        <div class="flex items-center gap-2">
+                            <span>Date & Time</span>
+                            <i class="bi"
+                                [ngClass]="sortKey === 'date' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
                         </div>
-                    </div>
-                </td>
-                <td class="py-4 border-b border-slate-50 pr-4">
-                    <span class="text-[10px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap"
-                        [ngClass]="{
-                            'bg-blue-50 text-blue-600 border border-blue-100': i.status === 'scheduled',
-                            'bg-emerald-50 text-emerald-600 border border-emerald-100': i.status === 'completed'
-                        }">{{ i.status | titlecase }}</span>
-                </td>
-                <td class="py-4 border-b border-slate-50 pr-4">
-                    <span *ngIf="i.decision"
-                        class="text-[10px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap border"
-                        [ngClass]="i.decision === 'hired' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
-                        <i class="bi mr-1.5" [ngClass]="i.decision === 'hired' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
-                        {{ i.decision | titlecase }}
-                    </span>
-                    <span *ngIf="!i.decision" class="text-slate-300">-</span>
-                </td>
-                <td class="py-4 border-b border-slate-50 text-right">
-                    <div class="flex gap-2 justify-end" *ngIf="i.status === 'scheduled'">
-                        <button
-                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
-                            title="Hire" (click)="decide(i,'hired')">
-                            <i class="bi bi-person-check-fill"></i>
-                            <span>Hire</span>
-                        </button>
-                        <button
-                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-rose-50 text-rose-600 hover:bg-rose-100"
-                            title="Reject" (click)="decide(i,'rejected')">
-                            <i class="bi bi-person-x-fill"></i>
-                            <span>Reject</span>
-                        </button>
-                    </div>
-                    <div *ngIf="i.status === 'completed'" class="flex justify-end">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-1 rounded border border-slate-100">
-                            Closed
+                    </th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('status')">
+                        <div class="flex items-center gap-2">
+                            <span>Status</span>
+                            <i class="bi"
+                                [ngClass]="sortKey === 'status' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
+                        </div>
+                    </th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Meeting Link</th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4">Decision</th>
+                    <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody *ngIf="filtered.length > 0">
+                <tr *ngFor="let i of filtered"
+                    class="group hover:bg-slate-50/50 transition-colors">
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center text-[18px] group-hover:bg-(--dd-blue-light)/20 group-hover:text-(--dd-blue) transition-colors font-bold">
+                                {{ (i.candidateName || 'C')[0] }}
+                            </div>
+                            <span class="font-semibold text-slate-900">{{ i.candidateName || 'Unknown' }}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <span class="text-[12px] font-medium text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+                            {{ i.type }}
                         </span>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-        <tbody *ngIf="!loading && filtered.length === 0">
-            <tr>
-                <td colspan="6" class="py-20 text-center">
-                    <div class="flex flex-col items-center justify-center opacity-40 text-slate-400">
-                        <i class="bi bi-calendar-x text-5xl mb-3"></i>
-                        <p class="text-sm font-bold">No matching interviews found</p>
-                        <p class="text-xs mt-1">Try adjusting your filters or search terms</p>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-        <tbody *ngIf="loading">
-            <tr>
-                <td colspan="6" class="py-20 text-center">
-                    <div class="flex flex-col items-center justify-center">
-                        <app-morph-loading size="md"></app-morph-loading>
-                        <p class="text-sm font-bold text-black animate-pulse mt-4">Syncing with server...</p>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                    </td>
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <div class="flex flex-col gap-0.5">
+                            <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                <i class="bi bi-calendar3 text-(--dd-blue) text-[11px]"></i>
+                                <span>{{ i.date || i.interviewDate || i.scheduledDate || '-' }}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-slate-400 text-[11px]">
+                                <i class="bi bi-clock"></i>
+                                <span>{{ i.time || i.interviewTime || i.scheduledTime || '-' }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <span class="text-[10px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap"
+                            [ngClass]="{
+                                'bg-blue-50 text-blue-600 border border-blue-100': i.status === 'scheduled',
+                                'bg-emerald-50 text-emerald-600 border border-emerald-100': i.status === 'completed'
+                            }">{{ i.status | titlecase }}</span>
+                    </td>
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <a *ngIf="i.meetingLink" [href]="i.meetingLink" target="_blank" rel="noopener"
+                            class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-(--dd-blue) hover:underline no-underline">
+                            <i class="bi bi-link-45deg"></i>
+                            <span>Join</span>
+                        </a>
+                        <span *ngIf="!i.meetingLink" class="text-slate-300 text-[12px]">—</span>
+                    </td>
+                    <td class="py-4 border-b border-slate-50 pr-4">
+                        <span *ngIf="i.decision"
+                            class="text-[10px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap border"
+                            [ngClass]="i.decision === 'hired' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
+                            <i class="bi mr-1.5" [ngClass]="i.decision === 'hired' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                            {{ i.decision | titlecase }}
+                        </span>
+                        <span *ngIf="!i.decision" class="text-slate-300">-</span>
+                    </td>
+                    <td class="py-4 border-b border-slate-50 text-right">
+                        <div class="flex gap-2 justify-end" *ngIf="i.status === 'scheduled'">
+                            <button
+                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-blue-50 text-blue-600 hover:bg-blue-100"
+                                title="Update Interview" (click)="updateInterview(i)">
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Update</span>
+                            </button>
+                            <button
+                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                                title="Hire" (click)="decide(i,'hired')">
+                                <i class="bi bi-person-check-fill"></i>
+                                <span>Hire</span>
+                            </button>
+                            <button
+                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-rose-50 text-rose-600 hover:bg-rose-100"
+                                title="Reject" (click)="decide(i,'rejected')">
+                                <i class="bi bi-person-x-fill"></i>
+                                <span>Reject</span>
+                            </button>
+                        </div>
+                        <div *ngIf="i.status === 'completed'" class="flex justify-end">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                                Closed
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody *ngIf="filtered.length === 0">
+                <tr>
+                    <td colspan="7" class="py-20 text-center">
+                        <div class="flex flex-col items-center justify-center opacity-40 text-slate-400">
+                            <i class="bi bi-calendar-x text-5xl mb-3"></i>
+                            <p class="text-sm font-bold">No interviews found for this competition</p>
+                            <p class="text-xs mt-1">Schedule an interview from the Applications page</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

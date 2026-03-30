@@ -1,9 +1,19 @@
 const { db } = require('../config/firebase');
 
+// ── Plan cache (60s TTL) — avoids repeated Firestore reads for the same company ──
+const planCache = new Map();
+const PLAN_CACHE_TTL_MS = 60000;
+
 /**
- * Common utility to get company plan details
+ * Common utility to get company plan details (with caching)
  */
 async function getCompanyPlan(companyId) {
+    // Check cache first
+    const cached = planCache.get(companyId);
+    if (cached && Date.now() - cached.fetchedAt < PLAN_CACHE_TTL_MS) {
+        return cached.features;
+    }
+
     const companyDoc = await db.collection('companies').doc(companyId).get();
     if (!companyDoc.exists) return null;
     
@@ -16,6 +26,7 @@ async function getCompanyPlan(companyId) {
         .limit(1)
         .get();
         
+    let features;
     if (planSnapshot.empty) {
         // Fallback to hardcoded defaults if plans collection not initialized
         const fallbacks = {
@@ -35,10 +46,14 @@ async function getCompanyPlan(companyId) {
                 interviews: { enabled: true }
             }
         };
-        return fallbacks[planName] || fallbacks['STARTER'];
+        features = fallbacks[planName] || fallbacks['STARTER'];
+    } else {
+        features = planSnapshot.docs[0].data().features;
     }
-    
-    return planSnapshot.docs[0].data().features;
+
+    // Cache the result
+    planCache.set(companyId, { features, fetchedAt: Date.now() });
+    return features;
 }
 
 /**

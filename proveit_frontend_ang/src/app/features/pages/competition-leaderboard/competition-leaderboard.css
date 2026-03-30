@@ -1,0 +1,48 @@
+.podium-container {
+  perspective: 800px;
+}
+
+.podium-bar {
+  animation: podiumRise 0.8s ease-out forwards;
+  transform-origin: bottom;
+  opacity: 0;
+}
+
+.podium-bar:nth-child(1) { animation-delay: 0.3s; }
+.podium-bar:nth-child(2) { animation-delay: 0.1s; }
+.podium-bar:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes podiumRise {
+  0% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  60% {
+    opacity: 1;
+    transform: scaleY(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.avatar-ring {
+  animation: avatarPop 0.5s ease-out forwards;
+  opacity: 0;
+  animation-delay: 0.8s;
+}
+
+@keyframes avatarPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

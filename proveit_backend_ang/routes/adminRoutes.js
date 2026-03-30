@@ -229,14 +229,37 @@ router.get('/system-settings', async (req, res) => {
     }
 });
 
+// Allowed system settings keys (whitelist)
+const ALLOWED_SETTINGS_KEYS = new Set([
+    'maintenanceMode', 'registrationOpen', 'aiAssistantEnabled',
+    'plagiarismCheckEnabled', 'maxFileUploadMB', 'defaultPlan',
+    'supportEmail', 'platformVersion',
+]);
+
 // Update system settings
 router.put('/system-settings', async (req, res) => {
     try {
+        if (!req.body || typeof req.body !== 'object' || Object.keys(req.body).length === 0) {
+            return res.status(400).json({ error: 'Request body cannot be empty.' });
+        }
+
+        // Filter to only allowed keys
+        const filtered = {};
+        for (const key of Object.keys(req.body)) {
+            if (ALLOWED_SETTINGS_KEYS.has(key)) {
+                filtered[key] = req.body[key];
+            }
+        }
+
+        if (Object.keys(filtered).length === 0) {
+            return res.status(400).json({ error: 'No valid settings fields provided.', allowedFields: [...ALLOWED_SETTINGS_KEYS] });
+        }
+
         const settingsRef = db.collection('systemSettings').doc(SYSTEM_SETTINGS_DOC_ID);
         const currentSettings = await ensureSystemSettings();
         const updates = {
             ...currentSettings,
-            ...req.body,
+            ...filtered,
             updatedAt: new Date().toISOString(),
         };
 
@@ -409,6 +432,10 @@ router.post('/roles', async (req, res) => {
 // Update role
 router.put('/roles/:id', async (req, res) => {
     try {
+        if (!req.body.name || typeof req.body.name !== 'string' || !req.body.name.trim()) {
+            return res.status(400).json({ error: 'Role name is required and must be a non-empty string.' });
+        }
+
         const roleRef = db.collection('roles').doc(req.params.id);
         const current = await roleRef.get();
 
@@ -417,7 +444,7 @@ router.put('/roles/:id', async (req, res) => {
         }
 
         const updates = {
-            name: req.body.name,
+            name: req.body.name.trim(),
             description: req.body.description || '',
             permissions: Array.isArray(req.body.permissions) ? req.body.permissions : [],
             updatedAt: new Date().toISOString(),
@@ -506,45 +533,57 @@ router.get('/plans', async (req, res) => {
             const defaultPlans = [
                 {
                     name: 'STARTER',
-                    price: 0,
+                    priceMonthly: 0,
+                    priceYearly: 0,
+                    isActive: true,
+                    description: 'For new companies starting their skill-based hiring journey.',
                     features: {
-                        competitions: {
-                            maxCompetitionsPerMonth: 2,
-                            maxApplicationsPerCompetition: 50,
-                            maxShortlistedPerCompetition: 5
-                        },
-                        messaging: { enabled: true }
+                        competitions: { maxCompetitionsPerMonth: 2, maxActiveCompetitions: 1, maxApplicationsPerCompetition: 50, maxShortlistedPerCompetition: 5 },
+                        interviews: { enabled: false, maxRoundsPerApplication: 1 },
+                        analytics: { advancedAnalytics: false, leaderboardAccess: false },
+                        branding: { brandingCustomization: false },
+                        ai: { chatbotSupport: false },
+                        pipeline: { enabled: false },
+                        messaging: { enabled: true, unlockStage: 'NONE', maxActiveChats: 5, allowFileSharing: false, maxAttachmentSizeMB: 0 },
+                        support: { prioritySupport: false },
                     },
-                    description: "For new companies starting their skill-based hiring journey.",
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
                 },
                 {
                     name: 'GROWTH',
-                    price: 499,
+                    priceMonthly: 499,
+                    priceYearly: 4990,
+                    isActive: true,
+                    description: 'For scaling businesses actively hiring top talent.',
                     features: {
-                        competitions: {
-                            maxCompetitionsPerMonth: 10,
-                            maxApplicationsPerCompetition: 200,
-                            maxShortlistedPerCompetition: 25
-                        },
-                        messaging: { enabled: true }
+                        competitions: { maxCompetitionsPerMonth: 10, maxActiveCompetitions: 5, maxApplicationsPerCompetition: 200, maxShortlistedPerCompetition: 25 },
+                        interviews: { enabled: true, maxRoundsPerApplication: 2 },
+                        analytics: { advancedAnalytics: true, leaderboardAccess: true },
+                        branding: { brandingCustomization: false },
+                        ai: { chatbotSupport: true },
+                        pipeline: { enabled: true },
+                        messaging: { enabled: true, unlockStage: 'SUBMITTED', maxActiveChats: 25, allowFileSharing: true, maxAttachmentSizeMB: 10 },
+                        support: { prioritySupport: false },
                     },
-                    description: "For scaling businesses actively hiring top talent.",
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
                 },
                 {
                     name: 'ELITE',
-                    price: 1299,
+                    priceMonthly: 1299,
+                    priceYearly: 12990,
+                    isActive: true,
+                    description: 'Unlimited potential for enterprise hiring.',
                     features: {
-                        competitions: {
-                            maxCompetitionsPerMonth: 999999,
-                            maxApplicationsPerCompetition: 999999,
-                            maxShortlistedPerCompetition: 999999
-                        },
-                        messaging: { enabled: true }
+                        competitions: { maxCompetitionsPerMonth: 999999, maxActiveCompetitions: 999999, maxApplicationsPerCompetition: 999999, maxShortlistedPerCompetition: 999999 },
+                        interviews: { enabled: true, maxRoundsPerApplication: 5 },
+                        analytics: { advancedAnalytics: true, leaderboardAccess: true },
+                        branding: { brandingCustomization: true },
+                        ai: { chatbotSupport: true },
+                        pipeline: { enabled: true },
+                        messaging: { enabled: true, unlockStage: 'NONE', maxActiveChats: 999999, allowFileSharing: true, maxAttachmentSizeMB: 50 },
+                        support: { prioritySupport: true },
                     },
-                    description: "Unlimited potential for enterprise hiring.",
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
                 }
             ];
             
@@ -574,8 +613,20 @@ router.get('/plans', async (req, res) => {
 // Update Plan
 router.put('/plans/:id', async (req, res) => {
     try {
+        if (!req.body || typeof req.body !== 'object' || Object.keys(req.body).length === 0) {
+            return res.status(400).json({ error: 'Request body cannot be empty.' });
+        }
+        if (req.body.name !== undefined && (typeof req.body.name !== 'string' || !req.body.name.trim())) {
+            return res.status(400).json({ error: 'Plan name must be a non-empty string.' });
+        }
+
         const planRef = db.collection('plans').doc(req.params.id);
-        const updates = req.body;
+        const existing = await planRef.get();
+        if (!existing.exists) {
+            return res.status(404).json({ error: 'Plan not found' });
+        }
+
+        const updates = { ...req.body };
         updates.updatedAt = new Date().toISOString();
         await planRef.update(updates);
         res.status(200).json({ id: req.params.id, ...updates, message: 'Plan updated successfully' });

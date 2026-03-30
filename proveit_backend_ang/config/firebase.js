@@ -37,6 +37,7 @@ const db = admin.firestore();
 // Firestore performance settings
 db.settings({
     ignoreUndefinedProperties: true,
+    preferRest: true, // Use REST instead of gRPC — eliminates cold-start overhead
 });
 
 module.exports = { admin, db };

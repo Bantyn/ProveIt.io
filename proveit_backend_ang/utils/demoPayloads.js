@@ -90,6 +90,7 @@ function normalizeApplicationPayload(input = {}) {
     jobId: input.jobId,
     competitionType: cleanString(input.competitionType).toUpperCase() || 'SKILL',
     candidateName: cleanString(input.candidateName || input.applicantName) || 'Candidate',
+    profileImage: cleanString(input.profileImage),
     status: cleanString(input.status) || 'applied',
     feedback,
     projectSummary: cleanString(input.projectSummary) || feedback,

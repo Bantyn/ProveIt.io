@@ -82,6 +82,12 @@
                                 class="px-8 py-3 rounded-full border border-gray-300 dark:border-(--dd-border) text-gray-700 dark:text-violet-200 font-bold hover:bg-gray-50 dark:hover:bg-(--dd-surface-secondary) transition-all">
                                 Back
                             </button>
+
+                            <a [routerLink]="['/user/compition', competitionId, 'leaderboard']"
+                                class="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-linear-to-r from-amber-500 to-yellow-500 text-white font-bold text-sm hover:from-amber-600 hover:to-yellow-600 transition-all shadow-lg shadow-amber-500/20 no-underline">
+                                <i class="bi bi-trophy-fill"></i>
+                                View Leaderboard
+                            </a>
                         </div>
 
                         <!-- Profile Prompt -->

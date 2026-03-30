@@ -5,7 +5,7 @@ import { NgFor, NgClass, NgIf, TitleCasePipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../services/auth.service';
 import { MorphLoading } from '../../../../features/components/ui/morph-loading/morph-loading';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom, forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -18,6 +18,7 @@ import { take } from 'rxjs/operators';
 })
 export class CompanyApplications implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   constructor(
     public api: ApiService,
     private auth: AuthService,
@@ -25,13 +26,16 @@ export class CompanyApplications implements OnInit {
     private modalService: ModalService,
   ) {}
   applications: any[] = [];
+  competitions: any[] = [];
+  selectedCompetition: any = null;
   filter = 'all';
   selected: any = null;
-  statusFilters = ['all', 'submitted', 'under_evaluation', 'winner', 'interview_scheduled', 'not_selected', 'rejected'];
+  statusFilters = ['all', 'pending', 'submitted', 'under_evaluation', 'selected', 'winner', 'interview_scheduled', 'not_selected', 'rejected'];
   userId = '';
   companyId = '';
   loading = false;
   searchTerm = '';
+  competitionSearchTerm = '';
   sortKey = 'submittedAt';
   sortDirection: 'asc' | 'desc' = 'desc';
 
@@ -41,6 +45,9 @@ export class CompanyApplications implements OnInit {
   showUpgradeModal = false;
   savingEvaluationIds = new Set<string>();
   evaluationModalApplication: any = null;
+  fullReviewApplication: any = null;
+  pendingStatusAfterScore: string | null = null;
+  showLeaderboard = false;
 
   ngOnInit() {
     this.auth.user$.pipe(take(1)).subscribe((user: any) => {
@@ -86,6 +93,30 @@ export class CompanyApplications implements OnInit {
                   this.applications = data.applications.map((app: any) =>
                     this.decorateApplication(app, compMap, projectMap),
                   );
+
+                  // Enrich applications with profile images
+                  this.applications.forEach((app: any) => {
+                    if (!app.profileImage && app.userId) {
+                      this.api.getUser(app.userId).subscribe({
+                        next: (user: any) => {
+                          app.profileImage = user?.profileImage || user?.profile?.profileImage || user?.candidateProfile?.profileImage || '';
+                          this.cdr.detectChanges();
+                        },
+                        error: () => {} // Silently skip — initials fallback
+                      });
+                    }
+                  });
+
+                  // Build competition cards with counts
+                  this.competitions = (data.competitions || []).map((c: any) => {
+                    const appCount = this.applications.filter((a: any) => a.competitionId === c.id).length;
+                    return { ...c, applicationCount: appCount };
+                  }).sort((a: any, b: any) => {
+                    const dateA = a.postedAt ? new Date(a.postedAt).getTime() : 0;
+                    const dateB = b.postedAt ? new Date(b.postedAt).getTime() : 0;
+                    return dateB - dateA;
+                  });
+
                   this.loading = false;
                   this.cdr.detectChanges();
                 },
@@ -129,10 +160,47 @@ export class CompanyApplications implements OnInit {
     }
   }
 
+  // ── Competition card helpers ──
+  selectCompetition(competition: any) {
+    this.selectedCompetition = competition;
+    this.filter = 'all';
+    this.searchTerm = '';
+  }
+
+  backToCompetitions() {
+    this.selectedCompetition = null;
+    this.showLeaderboard = false;
+    this.filter = 'all';
+    this.searchTerm = '';
+  }
+
+  get filteredCompetitions() {
+    if (!this.competitionSearchTerm) return this.competitions;
+    const s = this.competitionSearchTerm.toLowerCase();
+    return this.competitions.filter((c: any) =>
+      (c.title || c.name || '').toLowerCase().includes(s)
+    );
+  }
+
+  getCompetitionStatus(c: any): string {
+    if (c.status) return c.status;
+    if (c.endDate) {
+      return new Date(c.endDate) < new Date() ? 'closed' : 'active';
+    }
+    return 'active';
+  }
+
   get filtered() {
     let list = [...this.applications];
 
-    if (this.filter !== 'all') {
+    // Scope by selected competition
+    if (this.selectedCompetition) {
+      list = list.filter((a) => a.competitionId === this.selectedCompetition.id);
+    }
+
+    if (this.filter === 'pending') {
+      list = list.filter((a) => !this.hasScore(a.score));
+    } else if (this.filter !== 'all') {
       list = list.filter((a) => a.status === this.filter);
     }
 
@@ -140,9 +208,9 @@ export class CompanyApplications implements OnInit {
       const s = this.searchTerm.toLowerCase();
       list = list.filter(
         (a) =>
-          a.candidateName?.toLowerCase().includes(s) ||
-          a.competitionTitle?.toLowerCase().includes(s) ||
-          a.competitionId?.toLowerCase().includes(s),
+          (a.candidateName || '').toLowerCase().includes(s) ||
+          (a.competitionTitle || '').toLowerCase().includes(s) ||
+          (a.competitionId || '').toLowerCase().includes(s),
       );
     }
 
@@ -218,6 +286,30 @@ export class CompanyApplications implements OnInit {
       a.evaluationNotesInput = notes;
       await this.recalculateCompetitionRanks(a.competitionId);
       if (this.evaluationModalApplication?.id === a.id) {
+        // Apply pending status if set (e.g. select/reject after scoring)
+        if (this.pendingStatusAfterScore) {
+          const pendingStatus = this.pendingStatusAfterScore;
+          this.pendingStatusAfterScore = null;
+          try {
+            await firstValueFrom(this.api.updateApplication(a.id, { status: pendingStatus }));
+            a.status = pendingStatus;
+            // Update the applications array in-place
+            const idx = this.applications.findIndex((app: any) => app.id === a.id);
+            if (idx !== -1) {
+              this.applications[idx].status = pendingStatus;
+            }
+            if (this.fullReviewApplication?.id === a.id) {
+              this.fullReviewApplication = { ...this.fullReviewApplication, status: pendingStatus, score: a.score, rank: a.rank };
+            }
+          } catch (statusErr) {
+            console.error('Failed to apply pending status', statusErr);
+          }
+        } else {
+          // No pending status, just update the review page with new score
+          if (this.fullReviewApplication?.id === a.id) {
+            this.fullReviewApplication = { ...this.fullReviewApplication, score: a.score, rank: a.rank };
+          }
+        }
         this.closeEvaluationModal();
       }
     } catch (err: any) {
@@ -240,7 +332,61 @@ export class CompanyApplications implements OnInit {
 
   closeEvaluationModal() {
     this.evaluationModalApplication = null;
+    this.pendingStatusAfterScore = null;
     this.cdr.detectChanges();
+  }
+
+  openFullReview(application: any) {
+    this.fullReviewApplication = application;
+    this.cdr.detectChanges();
+  }
+
+  closeFullReview() {
+    this.fullReviewApplication = null;
+    this.cdr.detectChanges();
+  }
+
+  quickAction(application: any, newStatus: string) {
+    // If selecting or rejecting and no score assigned, open evaluation first
+    if ((newStatus === 'selected' || newStatus === 'rejected') && !this.hasScore(application.score)) {
+      this.pendingStatusAfterScore = newStatus;
+      this.openEvaluationModal(application);
+      return;
+    }
+
+    this.api.updateApplication(application.id, { status: newStatus }).subscribe({
+      next: () => {
+        application.status = newStatus;
+        // Update the applications array in-place
+        const idx = this.applications.findIndex((a: any) => a.id === application.id);
+        if (idx !== -1) {
+          this.applications[idx].status = newStatus;
+        }
+        // Also update fullReviewApplication if it's the same
+        if (this.fullReviewApplication?.id === application.id) {
+          this.fullReviewApplication = { ...this.fullReviewApplication, status: newStatus };
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to update status', err);
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  navigateToPipeline() {
+    const competitionId = this.fullReviewApplication?.competitionId;
+    this.router.navigate(['/company/dashboard/pipeline'], {
+      queryParams: competitionId ? { competition: competitionId } : {},
+    });
+  }
+
+  navigateToPipelineFor(application: any) {
+    const competitionId = application?.competitionId;
+    this.router.navigate(['/company/dashboard/pipeline'], {
+      queryParams: competitionId ? { competition: competitionId } : {},
+    });
   }
 
   async scheduleInterview(a: any) {
@@ -268,6 +414,8 @@ export class CompanyApplications implements OnInit {
       companyId: this.companyId,
       candidateId: a.userId,
       candidateName: a.candidateName,
+      competitionId: a.competitionId || '',
+      competitionTitle: a.competitionTitle || '',
       type: 'Final Interview',
       date: result.date,
       time: result.time,
@@ -309,6 +457,105 @@ export class CompanyApplications implements OnInit {
 
   hasScore(score: any): boolean {
     return typeof score === 'number' && Number.isFinite(score);
+  }
+
+  get leaderboardData(): any[] {
+    if (!this.selectedCompetition) return [];
+    return this.applications
+      .filter((a: any) => a.competitionId === this.selectedCompetition.id && this.hasScore(a.score))
+      .sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0))
+      .map((a: any, idx: number) => ({ ...a, leaderboardRank: idx + 1 }));
+  }
+
+  openLeaderboardFor(competition: any) {
+    this.selectCompetition(competition);
+    this.showLeaderboard = true;
+  }
+
+  async completeReviewPeriod() {
+    if (!this.selectedCompetition) return;
+
+    const competitionApps = this.applications.filter(
+      (a: any) => a.competitionId === this.selectedCompetition.id
+    );
+
+    if (competitionApps.length === 0) {
+      await this.modalService.alert('No applications found for this competition.', 'No Data', 'error');
+      return;
+    }
+
+    // Check for unscored applications
+    const unscored = competitionApps.filter((a: any) => !this.hasScore(a.score));
+    // Check for unreviewed (not selected/rejected/winner/not_selected)
+    const unreviewedStatuses = ['submitted', 'under_review', 'under_evaluation', 'applied'];
+    const unreviewed = competitionApps.filter((a: any) => unreviewedStatuses.includes(a.status));
+
+    // Combine issues
+    const issues = [...new Set([...unscored, ...unreviewed])];
+
+    if (issues.length > 0) {
+      const names = issues.map((a: any) => `• ${a.candidateName || 'Unknown'} (Score: ${this.hasScore(a.score) ? a.score : 'Not given'}, Status: ${a.status})`).join('\n');
+
+      const confirmed = await this.modalService.confirm(
+        `The following ${issues.length} application(s) are not fully reviewed:\n\n${names}\n\nDo you want to ignore them and complete the review?`,
+        'Incomplete Reviews',
+      );
+
+      if (!confirmed) return;
+    }
+
+    // Find the highest scored application
+    const scoredApps = competitionApps.filter((a: any) => this.hasScore(a.score));
+
+    if (scoredApps.length === 0) {
+      await this.modalService.alert('No applications have been scored yet. Please score at least one application before completing the review.', 'No Scores', 'error');
+      return;
+    }
+
+    scoredApps.sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0));
+    const winner = scoredApps[0];
+
+    const updates: Promise<any>[] = [];
+
+    for (const app of competitionApps) {
+      let newStatus: string;
+      if (app.id === winner.id) {
+        newStatus = 'selected';
+      } else if (app.status === 'selected' || app.status === 'interview_scheduled') {
+        // Don't demote already-progressed applications
+        continue;
+      } else {
+        newStatus = 'not_selected';
+      }
+
+      if (app.status !== newStatus) {
+        updates.push(
+          firstValueFrom(this.api.updateApplication(app.id, { status: newStatus })).then(() => {
+            app.status = newStatus;
+            const idx = this.applications.findIndex((a: any) => a.id === app.id);
+            if (idx !== -1) this.applications[idx].status = newStatus;
+          })
+        );
+      }
+    }
+
+    try {
+      await Promise.all(updates);
+      this.cdr.detectChanges();
+      await this.modalService.alert(
+        `Review complete! ${winner.candidateName || 'Top scorer'} declared as winner with a score of ${winner.score}/100.`,
+        'Winner Declared',
+        'success',
+      );
+    } catch (err) {
+      console.error('Failed to complete review', err);
+      await this.modalService.alert('Something went wrong while completing the review.', 'Error', 'error');
+    }
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'C';
+    return name.split(' ').filter(Boolean).slice(0, 2).map(p => p.charAt(0).toUpperCase()).join('') || 'C';
   }
 
   private decorateApplication(app: any, compMap: Map<any, any>, projectMap: Map<any, any>) {

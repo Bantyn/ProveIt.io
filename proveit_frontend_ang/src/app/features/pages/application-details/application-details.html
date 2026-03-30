@@ -4,6 +4,15 @@
 <div class="min-h-screen flex flex-col bg-(--dd-cream)">
     <div class="grow">
         <section class="mt-30 min-h-screen pb-20">
+
+            <!-- Back Navigation -->
+            <div *ngIf="!isLoading && application" class="max-w-[80%] mx-auto px-4 md:px-8 mb-6">
+                <button (click)="goBack()"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-(--dd-blue) hover:border-(--dd-blue-light) transition-all cursor-pointer shadow-sm text-sm font-semibold">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Back to Applications</span>
+                </button>
+            </div>
             <!-- Loading State -->
             <div *ngIf="isLoading" class="premium-loader mt-20 flex flex-col items-center">
                 <app-morph-loading size="lg"></app-morph-loading>
@@ -154,9 +163,9 @@
                                         </button>
                                     </ng-container>
 
-                                    <button (click)="closeWindow()"
+                                    <button (click)="goBack()"
                                         class="px-6 py-2 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all text-sm shadow-sm whitespace-nowrap flex items-center gap-2 cursor-pointer">
-                                        <i class="bi bi-x-circle"></i> Close
+                                        <i class="bi bi-arrow-left"></i> Back
                                     </button>
                                 </div>
                             </div>

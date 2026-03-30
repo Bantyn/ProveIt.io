@@ -76,8 +76,8 @@
 
         <!-- Guest CTAs -->
         <ng-container *ngIf="!isLoggedIn">
-          <a routerLink="/auth"
-            class="text-[13px] font-medium transition-colors duration-150 px-2 py-1"
+          <a (click)="goToLogin()"
+            class="text-[13px] font-medium transition-colors duration-150 px-2 py-1 cursor-pointer"
             [ngClass]="transparent
               ? 'text-white/80 hover:text-white'
               : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'">
@@ -96,7 +96,8 @@
             [ngClass]="transparent
               ? 'border border-white/25 bg-white/15 text-white hover:bg-white/25'
               : 'border border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-neutral-700'">
-            <div class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[10px] font-bold text-white uppercase">
+            <img *ngIf="userProfileImage" [src]="userProfileImage" class="h-5 w-5 shrink-0 rounded-full object-cover" alt="">
+            <div *ngIf="!userProfileImage" class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[10px] font-bold text-white uppercase">
               {{ (userName || role || 'U').charAt(0) }}
             </div>
             <span class="max-w-[80px] truncate">{{ userName || (role | titlecase) }}</span>
@@ -109,7 +110,8 @@
             <!-- Header -->
             <div class="border-b border-slate-100 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-800/50 px-4 py-3">
               <div class="flex items-center gap-3">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[13px] font-bold text-white uppercase">
+                <img *ngIf="userProfileImage" [src]="userProfileImage" class="h-8 w-8 shrink-0 rounded-full object-cover" alt="">
+                <div *ngIf="!userProfileImage" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[13px] font-bold text-white uppercase">
                   {{ (userName || role || 'U').charAt(0) }}
                 </div>
                 <div class="min-w-0">
@@ -181,8 +183,8 @@
 
       <!-- Mobile Auth -->
       <div *ngIf="!isLoggedIn" class="mt-4 grid grid-cols-2 gap-2">
-        <a routerLink="/auth" (click)="closeMobileMenu()"
-          class="rounded-2xl border border-slate-200 dark:border-neutral-700 px-4 py-2.5 text-center text-[13px] font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-50 dark:hover:bg-neutral-800">
+        <a (click)="goToLogin()"
+          class="rounded-2xl border border-slate-200 dark:border-neutral-700 px-4 py-2.5 text-center text-[13px] font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-50 dark:hover:bg-neutral-800 cursor-pointer">
           Sign in
         </a>
         <a routerLink="/auth" (click)="closeMobileMenu()"
@@ -194,7 +196,8 @@
       <!-- Mobile logged-in profile -->
       <div *ngIf="isLoggedIn" class="mt-4 rounded-2xl border border-slate-100 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 overflow-hidden">
         <div class="flex items-center gap-3 border-b border-slate-100 dark:border-neutral-800 px-4 py-3">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-sm font-bold text-white uppercase">
+          <img *ngIf="userProfileImage" [src]="userProfileImage" class="h-9 w-9 shrink-0 rounded-full object-cover" alt="">
+          <div *ngIf="!userProfileImage" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-sm font-bold text-white uppercase">
             {{ (userName || role || 'U').charAt(0) }}
           </div>
           <div>

@@ -4,11 +4,12 @@ import { ModalService, ModalConfig } from '../../../services/modal.service';
 import { Subscription } from 'rxjs';
 import { DatePicker } from '../ui/date-picker/date-picker';
 import { TimePicker } from '../ui/time-picker/time-picker';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-custom-modal',
   standalone: true,
-  imports: [CommonModule, DatePicker, TimePicker],
+  imports: [CommonModule, DatePicker, TimePicker, FormsModule],
   templateUrl: './custom-modal.html',
   styleUrl: './custom-modal.css',
 })
@@ -16,6 +17,7 @@ export class CustomModal implements OnInit, OnDestroy {
   state: { config: ModalConfig; resolve: (val: any) => void } | null = null;
   selectedDate: Date | null = null;
   selectedTime: string | null = null;
+  meetingLink: string = '';
   private sub!: Subscription;
 
   constructor(private modalService: ModalService) {}
@@ -25,6 +27,7 @@ export class CustomModal implements OnInit, OnDestroy {
       this.state = state;
       this.selectedDate = state?.config?.initialDate ?? null;
       this.selectedTime = state?.config?.initialTime ?? null;
+      this.meetingLink = state?.config?.initialMeetingLink ?? '';
     });
   }
 
@@ -56,7 +59,7 @@ export class CustomModal implements OnInit, OnDestroy {
     const day = `${this.selectedDate.getDate()}`.padStart(2, '0');
     const date = `${year}-${month}-${day}`;
     this.modalService.close(
-      { date, time: this.selectedTime },
+      { date, time: this.selectedTime, meetingLink: this.meetingLink.trim() },
       this.state.resolve,
     );
   }

@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../services/auth.service';
 import { ApiService } from '../../../../services/api.service';
 import { MorphLoading } from '../../../../features/components/ui/morph-loading/morph-loading';
-import { forkJoin } from 'rxjs';
+import { ModalService } from '../../../../services/modal.service';
+import { firstValueFrom, forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 interface PipelineColumn {
   id: string;
@@ -18,7 +20,7 @@ interface PipelineColumn {
 @Component({
   selector: 'app-hiring-pipeline',
   standalone: true,
-  imports: [CommonModule, MorphLoading, RouterLink],
+  imports: [CommonModule, MorphLoading, RouterLink, FormsModule],
   templateUrl: './hiring-pipeline.html',
   styleUrl: './hiring-pipeline.css',
 })
@@ -26,56 +28,48 @@ export class HiringPipeline implements OnInit {
   private auth = inject(AuthService);
   private api = inject(ApiService);
   private cdr = inject(ChangeDetectorRef);
+  private modalService = inject(ModalService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   loading = false;
   draggedApplicationId: string | null = null;
   updatingApplicationId: string | null = null;
   selectedApplication: any | null = null;
   applications: any[] = [];
+  competitions: any[] = [];
+  selectedCompetition: any = null;
+  competitionSearchTerm = '';
   companyProfile: any = null;
   currentPlanDetails: any = null;
   featureLocked = false;
 
   readonly columns: PipelineColumn[] = [
     {
-      id: 'submitted',
-      title: 'New Submissions',
-      subtitle: 'Fresh entries waiting to be reviewed',
-      accentClass: 'border-blue-200 bg-blue-50/70',
-      headerClass: 'text-blue-700',
-    },
-    {
-      id: 'under_evaluation',
-      title: 'Under Evaluation',
-      subtitle: 'Projects currently being assessed',
-      accentClass: 'border-amber-200 bg-amber-50/70',
-      headerClass: 'text-amber-700',
-    },
-    {
-      id: 'winner',
-      title: 'Winner',
-      subtitle: 'Top candidates ready for next step',
+      id: 'selected',
+      title: 'Selected',
+      subtitle: 'Top candidates selected from applications',
       accentClass: 'border-emerald-200 bg-emerald-50/70',
       headerClass: 'text-emerald-700',
     },
     {
       id: 'interview_scheduled',
-      title: 'Interviews',
-      subtitle: 'Candidates already moved to interview',
+      title: 'Interview Scheduled',
+      subtitle: 'Candidates moved to interview stage',
       accentClass: 'border-cyan-200 bg-cyan-50/70',
       headerClass: 'text-cyan-700',
     },
     {
-      id: 'not_selected',
-      title: 'Not Selected',
-      subtitle: 'Candidates not moving forward',
-      accentClass: 'border-slate-200 bg-slate-50/90',
-      headerClass: 'text-slate-700',
+      id: 'hired',
+      title: 'Hired',
+      subtitle: 'Candidates who passed the interview',
+      accentClass: 'border-violet-200 bg-violet-50/70',
+      headerClass: 'text-violet-700',
     },
     {
       id: 'rejected',
       title: 'Rejected',
-      subtitle: 'Candidates directly rejected in review',
+      subtitle: 'Candidates not moving forward',
       accentClass: 'border-rose-200 bg-rose-50/80',
       headerClass: 'text-rose-700',
     },
@@ -111,27 +105,19 @@ export class HiringPipeline implements OnInit {
           forkJoin({
             applications: this.api.getCompanyApplications(company.id),
             competitions: this.api.getCompanyCompetitions(company.id),
-            users: this.api.getUsers(),
           }).subscribe({
-            next: ({ applications, competitions, users }) => {
+            next: ({ applications, competitions }) => {
               const competitionMap = new Map(
                 (competitions || []).map((competition: any) => [
                   competition.id,
                   competition.title || competition.name || 'Competition',
                 ]),
               );
-              const userMap = new Map((users || []).map((candidate: any) => [candidate.id || candidate.uid, candidate]));
 
               this.applications = (applications || [])
                 .map((application: any) => {
-                  const candidate = userMap.get(application.userId) || {};
-                  const combinedName = [candidate.firstName, candidate.lastName].filter(Boolean).join(' ').trim();
-                  const resolvedName = this.getPreferredCandidateName(application, candidate, combinedName);
-                  const candidateEmail =
-                    candidate.email ||
-                    application.candidateEmail ||
-                    (this.looksLikeEmail(application.candidateName) ? application.candidateName : '') ||
-                    '';
+                  const resolvedName = application.candidateName || 'Candidate';
+                  const candidateEmail = application.candidateEmail || '';
 
                   return {
                     ...application,
@@ -144,8 +130,40 @@ export class HiringPipeline implements OnInit {
                   };
                 });
 
+              // Enrich with profile images from user profiles
+              this.applications.forEach((app: any) => {
+                if (!app.profileImage && app.userId) {
+                  this.api.getUser(app.userId).subscribe({
+                    next: (user: any) => {
+                      app.profileImage = user?.profileImage || user?.profile?.profileImage || user?.candidateProfile?.profileImage || '';
+                      this.cdr.detectChanges();
+                    },
+                    error: () => {} // Silently skip — initials fallback
+                  });
+                }
+              });
+
+              // Build competition cards with counts
+              this.competitions = (competitions || []).map((c: any) => {
+                const appCount = this.applications.filter((a: any) => a.competitionId === c.id).length;
+                return { ...c, applicationCount: appCount };
+              }).sort((a: any, b: any) => {
+                const dateA = a.postedAt ? new Date(a.postedAt).getTime() : 0;
+                const dateB = b.postedAt ? new Date(b.postedAt).getTime() : 0;
+                return dateB - dateA;
+              });
+
               this.loading = false;
               this.cdr.detectChanges();
+
+              // Auto-select competition from query param
+              const competitionParam = this.route.snapshot.queryParamMap.get('competition');
+              if (competitionParam) {
+                const match = this.competitions.find((c: any) => c.id === competitionParam);
+                if (match) {
+                  this.selectCompetition(match);
+                }
+              }
             },
             error: (error) => {
               console.error('Failed to load hiring pipeline data', error);
@@ -163,9 +181,45 @@ export class HiringPipeline implements OnInit {
     });
   }
 
+  // ── Competition card helpers ──
+  selectCompetition(competition: any) {
+    this.selectedCompetition = competition;
+  }
+
+  backToCompetitions() {
+    this.selectedCompetition = null;
+  }
+
+  navigateToInterviews() {
+    const competitionId = this.selectedCompetition?.id;
+    this.router.navigate(['/company/dashboard/interviews'], {
+      queryParams: competitionId ? { competition: competitionId } : {},
+    });
+  }
+
+  get filteredCompetitions() {
+    if (!this.competitionSearchTerm) return this.competitions;
+    const s = this.competitionSearchTerm.toLowerCase();
+    return this.competitions.filter((c: any) =>
+      (c.title || c.name || '').toLowerCase().includes(s)
+    );
+  }
+
+  getCompetitionStatus(c: any): string {
+    if (c.status) return c.status;
+    if (c.endDate) {
+      return new Date(c.endDate) < new Date() ? 'closed' : 'active';
+    }
+    return 'active';
+  }
+
   getApplicationsForColumn(status: string) {
     return this.applications
-      .filter((application) => !application.isArchived && application.status === status)
+      .filter((application) => {
+        const matchesStatus = !application.isArchived && application.status === status;
+        if (!this.selectedCompetition) return matchesStatus;
+        return matchesStatus && application.competitionId === this.selectedCompetition.id;
+      })
       .sort((a, b) => {
         const rankA = a.rank ?? Number.MAX_SAFE_INTEGER;
         const rankB = b.rank ?? Number.MAX_SAFE_INTEGER;
@@ -179,7 +233,11 @@ export class HiringPipeline implements OnInit {
 
   get archivedApplications() {
     return this.applications
-      .filter((application) => application.isArchived)
+      .filter((application) => {
+        if (!application.isArchived) return false;
+        if (!this.selectedCompetition) return true;
+        return application.competitionId === this.selectedCompetition.id;
+      })
       .sort((a, b) => {
         const archivedA = a.archivedAt ? new Date(a.archivedAt).getTime() : 0;
         const archivedB = b.archivedAt ? new Date(b.archivedAt).getTime() : 0;
@@ -207,6 +265,13 @@ export class HiringPipeline implements OnInit {
     const application = this.applications.find((item) => item.id === this.draggedApplicationId);
     if (!application || application.status === nextStatus) {
       this.draggedApplicationId = null;
+      return;
+    }
+
+    // If dropping into interview_scheduled, open the scheduling modal
+    if (nextStatus === 'interview_scheduled') {
+      this.draggedApplicationId = null;
+      this.scheduleInterview(application);
       return;
     }
 
@@ -290,6 +355,83 @@ export class HiringPipeline implements OnInit {
 
   closeDetailsModal() {
     this.selectedApplication = null;
+  }
+
+  async scheduleInterview(application: any) {
+    if (!this.companyProfile?.id) {
+      await this.modalService.alert('Company information is missing.', 'Unable to Schedule', 'error');
+      return;
+    }
+
+    // Resolve candidateId from multiple possible fields
+    const candidateId = application.userId || application.candidateId || application.uid || '';
+    if (!candidateId) {
+      await this.modalService.alert('Candidate information is missing for this application.', 'Unable to Schedule', 'error');
+      return;
+    }
+
+    const result = await this.modalService.scheduleInterview(
+      'Schedule Interview',
+      `Set the interview date and time for ${application.candidateName || 'this candidate'}.`,
+    );
+
+    if (!result) return;
+
+    const interviewPayload = {
+      applicationId: application.id,
+      companyId: this.companyProfile.id,
+      candidateId,
+      candidateName: application.candidateName || 'Candidate',
+      competitionId: application.competitionId || '',
+      competitionTitle: application.competitionTitle || '',
+      type: 'Final Interview',
+      date: result.date,
+      time: result.time,
+      meetingLink: result.meetingLink || '',
+      status: 'scheduled',
+      decision: null,
+    };
+
+    try {
+      const interview = await firstValueFrom(this.api.createInterview(interviewPayload));
+      await firstValueFrom(
+        this.api.updateApplication(application.id, {
+          status: 'interview_scheduled',
+          interviewId: interview.id,
+          interviewDate: result.date,
+          interviewTime: result.time,
+        }),
+      );
+
+      application.status = 'interview_scheduled';
+      application.interviewId = interview.id;
+      application.interviewDate = result.date;
+      application.interviewTime = result.time;
+      this.cdr.detectChanges();
+      await this.modalService.alert('Interview scheduled successfully.', 'Success', 'success');
+    } catch (err: any) {
+      console.error('Failed to schedule interview', err);
+
+      // Handle duplicate interview (409) — interview already exists, just move the card
+      if (err?.status === 409) {
+        const existingId = err?.error?.existingInterviewId;
+        await firstValueFrom(
+          this.api.updateApplication(application.id, {
+            status: 'interview_scheduled',
+            ...(existingId ? { interviewId: existingId } : {}),
+            interviewDate: result.date,
+            interviewTime: result.time,
+          }),
+        );
+        application.status = 'interview_scheduled';
+        this.cdr.detectChanges();
+        await this.modalService.alert('Interview was already scheduled. Candidate moved to Interview stage.', 'Info', 'success');
+        return;
+      }
+
+      const errorMsg = err?.error?.error || 'Interview could not be scheduled. Please try again.';
+      await this.modalService.alert(errorMsg, 'Error', 'error');
+    }
   }
 
   getCandidateInitials(name: string): string {

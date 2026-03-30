@@ -481,69 +481,87 @@ router.post('/verify-plan-change-otp', async (req, res) => {
             return res.status(400).json({ error: 'OTP has expired' });
         }
 
-        // OTP Valid - Update the Company Plan securely
-        const companyRef = db.collection('companies').doc(companyId);
-        const companyDoc = await companyRef.get();
-        const companyData = companyDoc.data();
+        // OTP Valid - Fetch company data and existing subscription in parallel
+        const [companyDoc, existingSub] = await Promise.all([
+            db.collection('companies').doc(companyId).get(),
+            db.collection('subscriptions')
+                .where('companyId', '==', companyId)
+                .limit(1)
+                .get(),
+        ]);
 
-        await companyRef.update({
-            'plan': newPlan,
-            'subscriptionId': `sub_${Math.random().toString(36).substr(2, 9)}`, // Dummy logic enforcing subscription renewal securely
-            'updatedAt': new Date().toISOString()
-        });
+        const companyData = companyDoc.exists ? companyDoc.data() : {};
 
         // Determine price based on current platform pricing
         let amount = 0;
         if (newPlan.toLowerCase() === 'growth') amount = 499;
         if (newPlan.toLowerCase() === 'elite' || newPlan.toLowerCase() === 'enterprise') amount = 1299;
 
-        // Create Payment Transaction
+        const now = new Date().toISOString();
+
+        // BATCHED WRITE — All mutations in one atomic operation
+        const batch = db.batch();
+
+        // Update company plan
+        const companyRef = db.collection('companies').doc(companyId);
+        batch.update(companyRef, {
+            plan: newPlan,
+            subscriptionId: `sub_${Math.random().toString(36).substr(2, 9)}`,
+            updatedAt: now,
+        });
+
+        // Create Payment record (if paid plan)
         if (amount > 0) {
-            const paymentData = {
+            const paymentRef = db.collection('payments').doc();
+            batch.set(paymentRef, {
                 companyId,
                 companyName: companyData.name || 'Company',
-                amount: amount,
+                amount,
                 plan: newPlan,
                 status: 'SUCCESS',
                 method: 'INTERNAL_UPGRADE',
-                createdAt: new Date().toISOString(),
-                transactionId: `txn_${Math.random().toString(36).substr(2, 12).toUpperCase()}`
-            };
-            await db.collection('payments').add(paymentData);
+                createdAt: now,
+                transactionId: `txn_${Math.random().toString(36).substr(2, 12).toUpperCase()}`,
+            });
 
-            // Create/Update Subscription record
+            // Create/Update Subscription
             const subData = {
                 companyId,
                 plan: newPlan,
                 status: 'ACTIVE',
-                validFrom: new Date().toISOString(),
-                validTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
-                updatedAt: new Date().toISOString()
+                validFrom: now,
+                validTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                updatedAt: now,
             };
-            
-            // Check if sub exists
-            const existingSub = await db.collection('subscriptions')
-                .where('companyId', '==', companyId)
-                .limit(1)
-                .get();
 
             if (existingSub.empty) {
-                await db.collection('subscriptions').add(subData);
+                const subRef = db.collection('subscriptions').doc();
+                batch.set(subRef, subData);
             } else {
-                await db.collection('subscriptions').doc(existingSub.docs[0].id).update(subData);
+                const subRef = db.collection('subscriptions').doc(existingSub.docs[0].id);
+                batch.update(subRef, subData);
             }
 
-            // Add Admin Activity Log
-            await db.collection('activityLogs').add({
+            // Activity Log
+            const logRef = db.collection('activityLogs').doc();
+            batch.set(logRef, {
                 action: 'PLAN_UPGRADE',
                 severity: 'SUCCESS',
                 description: `${companyData.name || 'A company'} upgraded to ${newPlan} plan. Revenue: ₹${amount}`,
-                createdAt: new Date().toISOString()
+                createdAt: now,
             });
         }
 
         // Cleanup OTP
-        await otpDocRef.delete();
+        batch.delete(otpDocRef);
+
+        // Commit all writes atomically
+        await batch.commit();
+
+        // Invalidate caches
+        dashboardCache.delete(companyId);
+        responseCache.delete(`companies:id:${companyId}`);
+        responseCache.delete('companies:list');
 
         res.status(200).json({ message: 'Plan successfully updated!', newPlan });
     } catch (error) {
