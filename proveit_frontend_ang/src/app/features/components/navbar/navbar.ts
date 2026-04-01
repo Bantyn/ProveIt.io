@@ -13,7 +13,13 @@ import {
   Renderer2,
   NgZone,
 } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterLinkWithHref, Router, NavigationEnd } from '@angular/router';
+import {
+  RouterLink,
+  RouterLinkActive,
+  RouterLinkWithHref,
+  Router,
+  NavigationEnd,
+} from '@angular/router';
 import { NgClass, NgForOf, NgIf, TitleCasePipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { ApiService } from '../../../services/api.service';
@@ -26,7 +32,15 @@ type UserRole = 'candidate' | 'company' | 'admin' | null;
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkWithHref, RouterLinkActive, NgClass, NgForOf, NgIf, TitleCasePipe],
+  imports: [
+    RouterLink,
+    RouterLinkWithHref,
+    RouterLinkActive,
+    NgClass,
+    NgForOf,
+    NgIf,
+    TitleCasePipe,
+  ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
@@ -54,7 +68,8 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('navPillContainer', { static: false }) navPillContainer!: ElementRef<HTMLDivElement>;
   @ViewChildren(RouterLinkActive) routerLinkActives!: QueryList<RouterLinkActive>;
 
-  adv = "We're hiring! Build the future with ProveIt.io — work on meaningful products, solve real problems, and grow with a passionate team.";
+  adv =
+    "We're hiring! Build the future with ProveIt.io — work on meaningful products, solve real problems, and grow with a passionate team.";
 
   private routerSub?: Subscription;
   private raf?: number;
@@ -73,8 +88,11 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.checkAuth();
-    this.updateMenus();
+    // Reactively update auth status whenever it changes
+    this.authService.isLoggedIn$.subscribe(() => {
+      this.checkAuth();
+      this.updateMenus();
+    });
   }
 
   ngAfterViewInit() {
@@ -84,7 +102,7 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
     // After each navigation: animate pill to new active
     this.zone.runOutsideAngular(() => {
       this.routerSub = this.router.events
-        .pipe(filter(e => e instanceof NavigationEnd))
+        .pipe(filter((e) => e instanceof NavigationEnd))
         .subscribe(() => {
           // Small rAF delay so Angular renders the new routerLinkActive state
           this.schedulePillUpdate();
@@ -167,7 +185,11 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /** Apply pill geometry to a target element */
-  private applyPillToElement(pill: HTMLElement, container: HTMLElement, target: HTMLElement | null) {
+  private applyPillToElement(
+    pill: HTMLElement,
+    container: HTMLElement,
+    target: HTMLElement | null,
+  ) {
     if (!target) {
       this.renderer.setStyle(pill, 'opacity', '0');
       return;
@@ -196,7 +218,8 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
         this.apiService.getUser(user.uid).subscribe((data: any) => {
           if (data) {
             this.userName = data.fullName || data.name || user.displayName;
-            this.userProfileImage = data.profileImage || data.logoUrl || data.imageUrl || user.photoURL || '';
+            this.userProfileImage =
+              data.profileImage || data.logoUrl || data.imageUrl || user.photoURL || '';
           }
         });
       }
@@ -237,6 +260,7 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
       const defaultGuestMenus = [
         { label: 'Home', route: '/home' },
         { label: 'Competitions', route: '/user/compition' },
+        { label: 'Company', route: '/user/company' },
         { label: 'Pricing', route: '/pricing' },
         { label: 'About', route: '/about' },
         { label: 'Contact', route: '/contact' },
@@ -245,19 +269,22 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
       if (!this.menus || this.menus.length === 0) {
         this.menus = defaultGuestMenus;
       } else {
-        if (!this.menus.some(m => m.label === 'Pricing')) this.menus.push({ label: 'Pricing', route: '/pricing' });
-        if (!this.menus.some(m => m.label === 'Contact')) this.menus.push({ label: 'Contact', route: '/contact' });
-        if (!this.menus.some(m => m.label === 'Support')) this.menus.push({ label: 'Support', route: '/support' });
+        if (!this.menus.some((m) => m.label === 'Pricing'))
+          this.menus.push({ label: 'Pricing', route: '/pricing' });
+        if (!this.menus.some((m) => m.label === 'Contact'))
+          this.menus.push({ label: 'Contact', route: '/contact' });
+        if (!this.menus.some((m) => m.label === 'Support'))
+          this.menus.push({ label: 'Support', route: '/support' });
       }
     }
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   private hasCookie(name: string) {
-    return document.cookie.split('; ').some(r => r.startsWith(name + '='));
+    return document.cookie.split('; ').some((r) => r.startsWith(name + '='));
   }
   private getCookie(name: string): string | null {
-    const c = document.cookie.split('; ').find(r => r.startsWith(name + '='));
+    const c = document.cookie.split('; ').find((r) => r.startsWith(name + '='));
     return c ? c.split('=')[1] : null;
   }
 
@@ -267,10 +294,14 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
 
   getDashboardRoute(): string {
     switch (this.role) {
-      case 'candidate': return '/user/applications';
-      case 'company': return '/company/dashboard';
-      case 'admin': return '/admin/overview';
-      default: return '/auth';
+      case 'candidate':
+        return '/user/applications';
+      case 'company':
+        return '/company/dashboard';
+      case 'admin':
+        return '/admin/overview';
+      default:
+        return '/auth';
     }
   }
 
@@ -281,13 +312,20 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/auth']);
   }
 
-  logout() { this.authService.logOut(); this.mobileMenuOpen = false; }
-  toggleDropdown() { this.showProfileDropdown = !this.showProfileDropdown; }
+  logout() {
+    this.authService.logOut();
+    this.mobileMenuOpen = false;
+  }
+  toggleDropdown() {
+    this.showProfileDropdown = !this.showProfileDropdown;
+  }
   toggleMobileMenu() {
     this.mobileMenuOpen = !this.mobileMenuOpen;
     if (this.mobileMenuOpen) this.showProfileDropdown = false;
   }
-  closeMobileMenu() { this.mobileMenuOpen = false; }
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
+  }
 
   demoLogin(role: UserRole) {
     const maxAge = 60 * 60 * 8;

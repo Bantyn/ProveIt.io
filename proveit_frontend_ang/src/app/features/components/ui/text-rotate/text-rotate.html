@@ -1,0 +1,13 @@
+<span class="tr-main" [class]="mainClassName">
+  <span class="sr-only">{{ texts[currentIndex] || '' }}</span>
+  <span class="tr-word" [attr.aria-hidden]="true" [style.--tr-count]="parts.length">
+    <span
+      *ngFor="let part of parts; let i = index; trackBy: trackByIndex"
+      class="tr-char"
+      [class]="elementClassName"
+      [style.--tr-index]="i"
+    >
+      {{ part }}
+    </span>
+  </span>
+</span>

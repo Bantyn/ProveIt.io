@@ -86,6 +86,14 @@ export class CompetitionDetails implements OnInit {
   }
 
   async applyToEvent() {
+    if (!this.canParticipateYet) {
+      await this.modalService.alert(
+        this.participationBlockedMessage,
+        'Competition Not Open Yet',
+      );
+      return;
+    }
+
     if (!this.user) {
       await this.modalService.alert('Please login to apply.', 'Login Required');
       this.router.navigate(['/auth']);
@@ -162,5 +170,29 @@ export class CompetitionDetails implements OnInit {
         this.router.navigate([`/user/compition/${this.competitionId}/submit`]);
       },
     });
+  }
+
+  get canParticipateYet(): boolean {
+    if (!this.competition) return false;
+
+    const rawStartDate = this.competition.startDate || this.competition.projectInfo?.startDate;
+    if (!rawStartDate) return true;
+
+    const startDate = new Date(rawStartDate);
+    startDate.setHours(0, 0, 0, 0);
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    return now >= startDate;
+  }
+
+  get participationBlockedMessage(): string {
+    if (!this.competition) return 'This competition is not open for participation yet.';
+
+    const rawStartDate = this.competition.startDate || this.competition.projectInfo?.startDate;
+    if (!rawStartDate) return 'This competition is not open for participation yet.';
+
+    return `This competition will open on ${new Date(rawStartDate).toLocaleDateString()}. You can participate after it starts.`;
   }
 }

@@ -15,15 +15,19 @@
   <div class="shader-content">
     <div *ngIf="title" class="shader-text">
       <div
-        class="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md mb-6 border border-white/10">
+        class="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 mb-6 border border-white/10">
         <span class="text-white/90 text-xs font-medium tracking-wide">✨ ProveIt.io</span>
       </div>
 
-      <h1 class="text-4xl md:text-7xl leading-tight tracking-tight text-white mb-5 font-bold">
+      <h1 class="text-4xl md:text-7xl leading-tight tracking-tight mb-5 font-bold"
+        [class.text-white]="!darkText"
+        [class.text-slate-900]="darkText">
         {{ title }}
       </h1>
 
-      <p *ngIf="subtitle" class="text-sm md:text-lg font-light text-white/70 mb-8 leading-relaxed max-w-2xl">
+      <p *ngIf="subtitle" class="text-sm md:text-lg font-light mb-8 leading-relaxed max-w-2xl"
+        [class.text-white/70]="!darkText"
+        [class.text-slate-600]="darkText">
         {{ subtitle }}
       </p>
     </div>

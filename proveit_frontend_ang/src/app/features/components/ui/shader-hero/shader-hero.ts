@@ -27,6 +27,7 @@ export class ShaderHeroComponent implements AfterViewInit, OnDestroy {
   @Input() title = '';
   @Input() subtitle = '';
   @Input() minHeight = '650px';
+  @Input() darkText: boolean = false;
   @Input() lightColors: string[] = [
     '#e8e0ff',
     '#7a6cf0',
@@ -50,6 +51,7 @@ export class ShaderHeroComponent implements AfterViewInit, OnDestroy {
   private shaderMount: ShaderMount | null = null;
   private observer: IntersectionObserver | null = null;
   private themeObserver: MutationObserver | null = null;
+  useStaticFallback = false;
   private zone = NgZone;
 
   private get isDark(): boolean {
@@ -89,6 +91,12 @@ export class ShaderHeroComponent implements AfterViewInit, OnDestroy {
     this.shaderMount?.dispose();
     this.shaderMount = null;
 
+    this.useStaticFallback = this.shouldUseStaticFallback();
+    if (this.useStaticFallback) {
+      this.applyFallbackBackground(container);
+      return;
+    }
+
     const colorVecs = this.activeColors.map((c) => getShaderColorFromString(c));
     while (colorVecs.length < 10) {
       colorVecs.push([0, 0, 0, 0]);
@@ -118,17 +126,14 @@ export class ShaderHeroComponent implements AfterViewInit, OnDestroy {
         meshGradientFragmentShader,
         uniforms,
         { antialias: false, powerPreference: 'low-power' },
-        this.speed,
+        Math.min(this.speed, 0.08),
         undefined,
         1,            // minPixelRatio (1x = no retina upscale)
-        1280 * 720    // maxPixelCount (720p cap for huge perf gain)
+        960 * 540     // lower GPU budget keeps scroll and hover much smoother
       );
     } catch (e) {
       console.warn('WebGL shader init failed, using CSS fallback', e);
-      container.style.background =
-        this.isDark
-          ? 'linear-gradient(135deg, #000000, #8b5cf6, #1e1b4b, #4c1d95)'
-          : 'linear-gradient(135deg, #f6f4ff, #c7b8ff, #e8e0ff, #9a8cff)';
+      this.applyFallbackBackground(container);
     }
   }
 
@@ -141,7 +146,7 @@ export class ShaderHeroComponent implements AfterViewInit, OnDestroy {
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            this.shaderMount?.setSpeed(this.speed);
+            this.shaderMount?.setSpeed(Math.min(this.speed, 0.08));
           } else {
             this.shaderMount?.setSpeed(0); // pauses animation loop
           }
@@ -162,5 +167,27 @@ export class ShaderHeroComponent implements AfterViewInit, OnDestroy {
       attributes: true,
       attributeFilter: ['class'],
     });
+  }
+
+  private shouldUseStaticFallback(): boolean {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return true;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = 'connection' in navigator && (navigator as Navigator & {
+      connection?: { saveData?: boolean };
+    }).connection?.saveData;
+    const lowMemoryDevice =
+      'deviceMemory' in navigator &&
+      ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 4;
+    const lowCpuDevice = navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4;
+    const smallViewport = window.innerWidth < 1024;
+
+    return prefersReducedMotion || !!saveData || !!lowMemoryDevice || lowCpuDevice || smallViewport;
+  }
+
+  private applyFallbackBackground(container: HTMLDivElement) {
+    container.style.background = this.isDark
+      ? 'radial-gradient(circle at 20% 20%, rgba(170,159,255,0.28), transparent 32%), linear-gradient(135deg, #141126 0%, #1d1936 42%, #2a2350 100%)'
+      : 'radial-gradient(circle at 20% 20%, rgba(154,140,255,0.22), transparent 30%), linear-gradient(135deg, #f6f4ff 0%, #ebe7ff 45%, #ddd6ff 100%)';
   }
 }

@@ -1,20 +1,42 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
-import { NgForOf, NgIf, NgClass, DatePipe, CommonModule } from '@angular/common';
+import { NgIf, NgClass, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Navbar } from '../../components/navbar/navbar';
 import { Footer } from '../../components/footer/footer';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { FluidDropdown, DropdownOption } from '../../components/ui/fluid-dropdown/fluid-dropdown';
 import { FaqAccordion, FaqItem } from '../../components/faq-accordion/faq-accordion';
 import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
+import { TextRotateComponent } from '../../components/ui/text-rotate/text-rotate';
+import { forkJoin } from 'rxjs';
 
 interface Filters {
   search: string;
+  projectType: string;
+  difficulty: string;
+  skill: string;
+  view: 'all' | 'recently_viewed';
+}
+
+interface CompetitionCard {
+  id: string;
+  title: string;
+  company: string;
+  companyLogo: string;
+  bannerImage: string;
   location: string;
   projectType: string;
-  experience: string;
-  view: 'all' | 'recently_viewed';
+  requiredSkills: string[];
+  startDate: string | null;
+  deadline: string | null;
+  difficulty: string;
+  maxCandidates: number | null;
+}
+
+interface CompanyLookup {
+  id: string;
+  name: string;
+  logoUrl: string;
 }
 
 const RECENTLY_VIEWED_KEY = 'recently_viewed_competitions';
@@ -26,12 +48,12 @@ const MAX_RECENTLY_VIEWED = 10;
   imports: [
     CommonModule,
     FormsModule,
-    Navbar,
     Footer,
     RouterLink,
     FluidDropdown,
     FaqAccordion,
     ShaderHeroComponent,
+    TextRotateComponent,
   ],
   templateUrl: './compition.html',
   styleUrl: './compition.css',
@@ -41,15 +63,6 @@ export class Compition implements OnInit, OnDestroy {
   private api = inject(ApiService);
 
   /* ================= FILTER DATA ================= */
-  locationOptions: DropdownOption[] = [
-    { value: 'Remote', label: 'Remote', icon: 'bi bi-globe' },
-    { value: 'Bangalore', label: 'Bangalore', icon: 'bi bi-geo-alt-fill' },
-    { value: 'Mumbai', label: 'Mumbai', icon: 'bi bi-geo-alt-fill' },
-    { value: 'Delhi', label: 'Delhi', icon: 'bi bi-geo-alt-fill' },
-    { value: 'Pune', label: 'Pune', icon: 'bi bi-geo-alt-fill' },
-    { value: 'Hybrid', label: 'Hybrid', icon: 'bi bi-building' },
-  ];
-
   projectTypeOptions: DropdownOption[] = [
     { value: 'Web Development', label: 'Web Development', icon: 'bi bi-browser-chrome' },
     { value: 'Backend Development', label: 'Backend Development', icon: 'bi bi-server' },
@@ -63,14 +76,21 @@ export class Compition implements OnInit, OnDestroy {
     { value: 'Product Management', label: 'Product Mgmt', icon: 'bi bi-kanban-fill' },
   ];
 
-  experienceOptions: DropdownOption[] = [
-    { value: 'Fresher', label: 'Fresher', icon: 'bi bi-mortarboard-fill' },
-    { value: 'Junior', label: 'Junior', icon: 'bi bi-person-fill' },
-    { value: 'Mid', label: 'Mid Level', icon: 'bi bi-person-badge-fill' },
-    { value: 'Senior', label: 'Senior', icon: 'bi bi-award-fill' },
+  difficultyOptions: DropdownOption[] = [
+    { value: 'EASY', label: 'Easy', icon: 'bi bi-star' },
+    { value: 'MEDIUM', label: 'Medium', icon: 'bi bi-star-half' },
+    { value: 'HARD', label: 'Hard', icon: 'bi bi-stars' },
   ];
 
-  skills: string[] = ['React', 'Angular', 'Node.js', 'Python', 'Java', 'UI/UX', 'Figma'];
+  skillOptions: DropdownOption[] = [
+    { value: 'Angular', label: 'Angular', icon: 'bi bi-code-slash' },
+    { value: 'React', label: 'React', icon: 'bi bi-code-slash' },
+    { value: 'Node.js', label: 'Node.js', icon: 'bi bi-hdd-network' },
+    { value: 'Python', label: 'Python', icon: 'bi bi-terminal' },
+    { value: 'Java', label: 'Java', icon: 'bi bi-cup-hot' },
+    { value: 'UI/UX', label: 'UI/UX', icon: 'bi bi-palette' },
+    { value: 'Figma', label: 'Figma', icon: 'bi bi-vector-pen' },
+  ];
 
   howItWorksItems: FaqItem[] = [
     {
@@ -90,31 +110,16 @@ export class Compition implements OnInit, OnDestroy {
     }
   ];
 
-  // keep legacy arrays for any remaining usages
-  locations: string[] = ['Remote', 'Bangalore', 'Mumbai', 'Delhi', 'Pune', 'Hybrid'];
-  projectTypes: string[] = [
-    'Web Development',
-    'Backend Development',
-    'Full Stack',
-    'UI/UX Design',
-    'Artificial Intelligence',
-    'Mobile Development',
-    'DevOps / Cloud',
-    'Cyber Security',
-    'Data Analysis',
-    'Product Management',
-  ];
-
   filters: Filters = {
     search: '',
-    location: '',
     projectType: '',
-    experience: '',
+    difficulty: '',
+    skill: '',
     view: 'all',
   };
 
   /* ================= COMPETITIONS ================= */
-  competitions: any[] = [];
+  competitions: CompetitionCard[] = [];
   isLoading: boolean = true;
   recentlyViewedIds: string[] = [];
 
@@ -130,9 +135,15 @@ export class Compition implements OnInit, OnDestroy {
       this.recentlyViewedIds = [];
     }
 
-    this.subscription = this.api.getCompetitions().subscribe({
-      next: (data) => {
-        this.competitions = data;
+    this.subscription = forkJoin({
+      competitions: this.api.getCompetitions(),
+      companies: this.api.getCompanies(),
+    }).subscribe({
+      next: ({ competitions, companies }) => {
+        const companyLookup = this.buildCompanyLookup(companies || []);
+        this.competitions = (competitions || []).map((competition) =>
+          this.toCompetitionCard(competition, companyLookup),
+        );
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -151,16 +162,12 @@ export class Compition implements OnInit, OnDestroy {
   }
 
   /* ================= DATE CLASSIFICATION ================= */
-  getStatus(competition: any): 'upcoming' | 'active' | 'completed' {
+  getStatus(competition: CompetitionCard): 'upcoming' | 'active' | 'completed' {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
-    const startDate = competition.startDate
-      ? new Date(competition.startDate)
-      : (competition.projectInfo?.startDate ? new Date(competition.projectInfo.startDate) : null);
-    const endDate = competition.endDate
-      ? new Date(competition.endDate)
-      : (competition.projectInfo?.deadline ? new Date(competition.projectInfo.deadline) : null);
+    const startDate = competition.startDate ? new Date(competition.startDate) : null;
+    const endDate = competition.deadline ? new Date(competition.deadline) : null;
 
     if (endDate) endDate.setHours(23, 59, 59, 999);
     if (startDate) startDate.setHours(0, 0, 0, 0);
@@ -185,13 +192,19 @@ export class Compition implements OnInit, OnDestroy {
     return this.competitions.filter(
       (c) =>
         (!this.filters.search ||
-          (c.title && c.title.toLowerCase().includes(this.filters.search.toLowerCase())) ||
-          (c.name && c.name.toLowerCase().includes(this.filters.search.toLowerCase())) ||
-          (c.company && c.company.toLowerCase().includes(this.filters.search.toLowerCase()))) &&
-        (!this.filters.location || c.location === this.filters.location) &&
+          c.title.toLowerCase().includes(this.filters.search.toLowerCase()) ||
+          c.company.toLowerCase().includes(this.filters.search.toLowerCase()) ||
+          c.requiredSkills.some((skill) =>
+            skill.toLowerCase().includes(this.filters.search.toLowerCase()),
+          )) &&
         (!this.filters.projectType || c.projectType === this.filters.projectType) &&
-        (!this.filters.experience || c.experienceLevel === this.filters.experience),
+        (!this.filters.difficulty || c.difficulty === this.filters.difficulty) &&
+        (!this.filters.skill || c.requiredSkills.includes(this.filters.skill)),
     );
+  }
+
+  canOpenCompetition(competition: CompetitionCard): boolean {
+    return this.getStatus(competition) !== 'upcoming';
   }
 
   /* ================= CATEGORIZED GETTERS ================= */
@@ -223,10 +236,69 @@ export class Compition implements OnInit, OnDestroy {
   clearFilters() {
     this.filters = {
       search: '',
-      location: '',
       projectType: '',
-      experience: '',
+      difficulty: '',
+      skill: '',
       view: 'all',
     };
+  }
+
+  private toCompetitionCard(
+    competition: any,
+    companyLookup: Map<string, CompanyLookup>,
+  ): CompetitionCard {
+    const companyName = competition.company || competition.companyName || 'Partner';
+    const companyDetails =
+      companyLookup.get(competition.companyId || '') ||
+      companyLookup.get(companyName.toLowerCase()) ||
+      null;
+
+    return {
+      id: competition.id || competition._id || '',
+      title: competition.title || competition.name || 'Untitled Competition',
+      company: companyDetails?.name || companyName,
+      companyLogo:
+        competition.companyLogo ||
+        competition.logoUrl ||
+        competition.company?.logoUrl ||
+        companyDetails?.logoUrl ||
+        'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=100&h=100&fit=crop',
+      bannerImage:
+        competition.img_url ||
+        competition.imageUrl ||
+        'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=60',
+      location: competition.location || competition.projectInfo?.location || '',
+      projectType:
+        competition.projectType || competition.competitionType || competition.category || '',
+      requiredSkills: competition.requiredSkills || competition.skillsRequired || [],
+      startDate: competition.startDate || competition.projectInfo?.startDate || null,
+      deadline: competition.endDate || competition.deadline || competition.projectInfo?.deadline || null,
+      difficulty: competition.projectInfo?.difficulty || '',
+      maxCandidates: competition.projectInfo?.maxCandidates || null,
+    };
+  }
+
+  private buildCompanyLookup(companies: any[]): Map<string, CompanyLookup> {
+    const lookup = new Map<string, CompanyLookup>();
+
+    for (const company of companies) {
+      const normalized: CompanyLookup = {
+        id: company.id || company._id || '',
+        name: company.companyName || company.name || 'Partner',
+        logoUrl:
+          company.logoUrl ||
+          company.imageUrl ||
+          company.profileImage ||
+          'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=100&h=100&fit=crop',
+      };
+
+      if (normalized.id) {
+        lookup.set(normalized.id, normalized);
+      }
+
+      lookup.set(normalized.name.toLowerCase(), normalized);
+    }
+
+    return lookup;
   }
 }

@@ -2,18 +2,15 @@
 <app-shader-hero
     title="About ProveIt"
     subtitle="We're building the future of skill-first hiring — where what you can do matters more than what's on your resume."
-    minHeight="130vh">
-    <header class="absolute top-0 left-0 w-full z-30 backdrop-blur-md">
-        <app-navbar [transparent]="true"
-            [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
-    </header>
+    minHeight="80vh">
+    
 </app-shader-hero>
 
 <!-- ================= MAIN CONTENT ================= -->
-<div class="bg-(--dd-cream)">
+<div class="bg-(--dd-cream) md:max-w-[95%] mx-auto">
 
     <!-- ─── INTRO SECTION ─── -->
-    <section class="max-w-6xl mx-auto px-4 md:px-6 py-20">
+    <section class=" px-4 md:px-6 py-20">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <!-- Left: Content -->
             <div>
@@ -61,13 +58,13 @@
             <!-- Right: Visual Card -->
             <div class="relative">
                 <div
-                    class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) shadow-xl dark:shadow-(--dd-blue-dark)/20 relative overflow-hidden">
+                    class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) shadow-lg dark:shadow-(--dd-blue-dark)/10 relative overflow-hidden">
                     <!-- Decorative gradient blob -->
                     <div
-                        class="absolute -top-10 -right-10 w-40 h-40 bg-linear-to-br from-(--dd-blue-dark)/20 to-(--dd-blue)/20 rounded-full blur-3xl pointer-events-none">
+                        class="absolute -top-8 -right-8 w-32 h-32 bg-linear-to-br from-(--dd-blue-dark)/18 to-(--dd-blue)/18 rounded-full blur-2xl pointer-events-none">
                     </div>
                     <div
-                        class="absolute -bottom-10 -left-10 w-36 h-36 bg-linear-to-br from-(--dd-orange)/15 to-(--dd-yellow)/15 rounded-full blur-3xl pointer-events-none">
+                        class="absolute -bottom-8 -left-8 w-28 h-28 bg-linear-to-br from-(--dd-orange)/12 to-(--dd-yellow)/12 rounded-full blur-2xl pointer-events-none">
                     </div>
 
                     <div class="relative z-10 space-y-6">
@@ -124,7 +121,7 @@
     </section>
 
     <!-- ─── WHY PROVEIT - BENTO GRID ─── -->
-    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+    <section class=" px-4 md:px-6 pb-20">
         <div class="text-center mb-14">
             <span
                 class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 text-(--dd-blue-dark) dark:text-(--dd-blue-light) text-xs font-bold uppercase tracking-wider mb-4">
@@ -142,13 +139,13 @@
 
             <!-- Large Card -->
             <div
-                class="md:col-span-2 lg:col-span-2 bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300 relative overflow-hidden group">
+                class="md:col-span-2 lg:col-span-2 bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
                 <div
-                    class="absolute -top-20 -right-20 w-60 h-60 bg-(--dd-blue-ultra-light)/50 dark:bg-(--dd-blue-dark)/5 rounded-full blur-3xl group-hover:bg-(--dd-blue-light)/50 dark:group-hover:bg-(--dd-blue-dark)/10 transition-colors duration-500">
+                    class="absolute -top-16 -right-16 w-44 h-44 bg-(--dd-blue-ultra-light)/45 dark:bg-(--dd-blue-dark)/5 rounded-full blur-2xl group-hover:bg-(--dd-blue-light)/45 dark:group-hover:bg-(--dd-blue-dark)/10 transition-colors duration-500">
                 </div>
                 <div class="relative z-10">
                     <div
-                        class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
                         <i class="bi bi-lightning-charge-fill text-2xl text-(--dd-blue-dark)"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Industry-Driven Challenges</h3>
@@ -161,9 +158,9 @@
 
             <!-- Regular Card -->
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300 group">
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-lg transition-all duration-300 group">
                 <div
-                    class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
                     <i class="bi bi-person-badge-fill text-2xl text-(--dd-blue)"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Skill-First Hiring</h3>
@@ -175,9 +172,9 @@
 
             <!-- Regular Card -->
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300 group">
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-8 border border-gray-100 dark:border-(--dd-border) hover:shadow-lg transition-all duration-300 group">
                 <div
-                    class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    class="w-14 h-14 rounded-2xl bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
                     <i class="bi bi-people-fill text-2xl text-(--dd-orange)"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Built for Both Sides</h3>
@@ -204,11 +201,11 @@
             <div
                 class="bg-linear-to-br from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-orange) rounded-3xl p-8 text-white relative overflow-hidden group">
                 <div
-                    class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none">
+                        class="absolute -bottom-8 -right-8 w-28 h-28 bg-white/5 rounded-full blur-xl pointer-events-none">
                 </div>
                 <div class="relative z-10">
                     <div
-                        class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        class="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
                         <i class="bi bi-gear-wide-connected text-2xl text-white"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">Modern & Scalable</h3>
@@ -223,12 +220,12 @@
     </section>
 
     <!-- ─── MISSION & STORY ─── -->
-    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+    <section class=" px-4 md:px-6 pb-20">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <!-- Mission Card -->
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-10 border border-gray-100 dark:border-(--dd-border) relative overflow-hidden group hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300">
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-10 border border-gray-100 dark:border-(--dd-border) relative overflow-hidden group hover:shadow-lg transition-all duration-300">
                 <div
                     class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue) rounded-t-3xl">
                 </div>
@@ -252,7 +249,7 @@
 
             <!-- Story Card -->
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-10 border border-gray-100 dark:border-(--dd-border) relative overflow-hidden group hover:shadow-xl dark:hover:shadow-(--dd-blue-dark)/10 transition-all duration-300">
+                class="bg-white dark:bg-(--dd-surface) rounded-3xl p-10 border border-gray-100 dark:border-(--dd-border) relative overflow-hidden group hover:shadow-lg transition-all duration-300">
                 <div
                     class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-(--dd-orange) to-(--dd-yellow) rounded-t-3xl">
                 </div>
@@ -274,7 +271,7 @@
     </section>
 
     <!-- ─── HOW PROVEIT HELPS YOU GROW ─── -->
-    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-24">
+    <section class=" px-4 md:px-6 pb-24">
         <div class="text-center mb-14">
             <span
                 class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 text-(--dd-blue-dark) dark:text-(--dd-blue-light) text-xs font-bold uppercase tracking-wider mb-4">
@@ -289,9 +286,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 group">
                 <div
-                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                     <i class="bi bi-patch-check-fill text-lg text-(--dd-blue-dark)"></i>
                 </div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-2">Hire with Confidence</h3>
@@ -301,9 +298,9 @@
             </div>
 
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 group">
                 <div
-                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                     <i class="bi bi-speedometer2 text-lg text-(--dd-blue)"></i>
                 </div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-2">Faster, Smarter Hiring</h3>
@@ -313,9 +310,9 @@
             </div>
 
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 group">
                 <div
-                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-orange)/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                     <i class="bi bi-heart-fill text-lg text-(--dd-orange)"></i>
                 </div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-2">Fair & Bias-Free</h3>
@@ -325,9 +322,9 @@
             </div>
 
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 group">
                 <div
-                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-yellow)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-yellow)/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                     <i class="bi bi-hand-thumbs-up-fill text-lg text-(--dd-yellow-dark)"></i>
                 </div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-2">Better Experience</h3>
@@ -337,9 +334,9 @@
             </div>
 
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 group">
                 <div
-                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue-dark)/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                     <i class="bi bi-bar-chart-fill text-lg text-(--dd-blue-dark)"></i>
                 </div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-2">Scalable for Teams</h3>
@@ -349,9 +346,9 @@
             </div>
 
             <div
-                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                class="bg-white dark:bg-(--dd-surface) rounded-2xl p-7 border border-gray-100 dark:border-(--dd-border) hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 group">
                 <div
-                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    class="w-11 h-11 rounded-lg bg-(--dd-blue-ultra-light) dark:bg-(--dd-blue)/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                     <i class="bi bi-cpu-fill text-lg text-(--dd-blue)"></i>
                 </div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-2">Future of Work</h3>
@@ -364,14 +361,14 @@
     </section>
 
     <!-- ─── CTA BANNER ─── -->
-    <section class="max-w-6xl mx-auto px-4 md:px-6 pb-20">
+    <section class=" px-4 md:px-6 pb-20">
         <div
             class="bg-linear-to-r from-(--dd-blue-dark) via-(--dd-blue) to-(--dd-orange) rounded-3xl p-10 md:p-14 text-center text-white relative overflow-hidden">
             <div
-                class="absolute -top-20 -left-20 w-60 h-60 bg-white/5 rounded-full blur-3xl pointer-events-none">
+                class="absolute -top-14 -left-14 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none">
             </div>
             <div
-                class="absolute -bottom-20 -right-20 w-60 h-60 bg-white/5 rounded-full blur-3xl pointer-events-none">
+                class="absolute -bottom-14 -right-14 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none">
             </div>
             <div class="relative z-10">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to prove what you can do?</h2>
@@ -381,11 +378,11 @@
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a routerLink="/user/compition"
-                        class="px-8 py-3.5 rounded-xl bg-white text-(--dd-blue-dark) font-bold text-sm hover:bg-white/90 transition-all shadow-lg">
+                        class="px-8 py-3.5 rounded-xl bg-white text-(--dd-blue-dark) font-bold text-sm hover:bg-white/90 transition-all shadow-md">
                         Browse Challenges
                     </a>
                     <a routerLink="/contact"
-                        class="px-8 py-3.5 rounded-xl bg-white/10 backdrop-blur-sm text-white font-bold text-sm border border-white/20 hover:bg-white/20 transition-all">
+                        class="px-8 py-3.5 rounded-xl bg-white/10 text-white font-bold text-sm border border-white/20 hover:bg-white/20 transition-all">
                         Get in Touch
                     </a>
                 </div>

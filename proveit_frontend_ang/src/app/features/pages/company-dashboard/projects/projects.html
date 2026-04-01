@@ -58,13 +58,13 @@
                             [ngClass]="sortKey === 'submissionLink' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
                     </div>
                 </th>
-                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('aiScore')">
+                <!-- <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('aiScore')">
                     <div class="flex items-center gap-2">
                         <span>AI Score</span>
                         <i class="bi"
                             [ngClass]="sortKey === 'aiScore' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
                     </div>
-                </th>
+                </th> -->
                 <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('applicationScore')">
                     <div class="flex items-center gap-2">
                         <span>Manual Score</span>
@@ -79,13 +79,13 @@
                             [ngClass]="sortKey === 'applicationRank' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
                     </div>
                 </th>
-                <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('plagiarism')">
+                <!-- <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('plagiarism')">
                     <div class="flex items-center gap-2">
                         <span>Plagiarism</span>
                         <i class="bi"
                             [ngClass]="sortKey === 'plagiarism' ? (sortDirection === 'asc' ? 'bi-arrow-up text-(--dd-blue)' : 'bi-arrow-down text-(--dd-blue)') : 'bi-arrow-down-up text-slate-300 opacity-0 group-hover:opacity-100'"></i>
                     </div>
-                </th>
+                </th> -->
                 <th class="text-slate-500 text-[13px] pb-4 border-b border-slate-100 font-semibold pr-4 cursor-pointer group" (click)="toggleSort('submittedAt')">
                     <div class="flex items-center gap-2">
                         <span>Submitted At</span>
@@ -124,12 +124,12 @@
                         Open Link
                     </a>
                 </td>
-                <td class="py-4 border-b border-slate-50 pr-4">
+                <!-- <td class="py-4 border-b border-slate-50 pr-4">
                     <span class="text-[12px] font-semibold px-2.5 py-1 rounded-lg border"
                         [ngClass]="p.aiScore >= 90 ? 'bg-green-50 text-green-600 border-green-100' : p.aiScore >= 80 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
                         {{ p.aiScore }}
                     </span>
-                </td>
+                </td> -->
                 <td class="py-4 border-b border-slate-50 pr-4">
                     <span class="text-[12px] font-semibold px-2.5 py-1 rounded-lg border"
                         [ngClass]="!hasApplicationScore(p.applicationScore) ? 'bg-slate-100 text-slate-500 border-slate-200' : p.applicationScore >= 90 ? 'bg-green-50 text-green-600 border-green-100' : p.applicationScore >= 80 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
@@ -139,12 +139,12 @@
                 <td class="py-4 border-b border-slate-50 pr-4 text-slate-600 font-semibold">
                     {{ hasApplicationScore(p.applicationRank) ? ('#' + p.applicationRank) : '—' }}
                 </td>
-                <td class="py-4 border-b border-slate-50 pr-4">
+                <!-- <td class="py-4 border-b border-slate-50 pr-4">
                     <span class="text-[12px] font-semibold px-2.5 py-1 rounded-lg border"
                         [ngClass]="parsePlagiarism(p.plagiarism) > 5 ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-green-50 text-green-600 border-green-100'">
                         {{ p.plagiarism }}
                     </span>
-                </td>
+                </td> -->
                 <td class="py-4 border-b border-slate-50 text-[11px] text-slate-400 font-medium pr-4">{{ p.submittedAt | date:'medium' }}</td>
                 <td class="py-4 border-b border-slate-50 pr-4">
                     <span

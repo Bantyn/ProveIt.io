@@ -1,14 +1,10 @@
 <app-shader-hero
     title="Simple, Transparent Pricing"
     subtitle="Choose the plan that's right for your business. No hidden fees, no surprises."
-    minHeight="130vh">
-    <header class="absolute top-0 left-0 w-full z-30 backdrop-blur-md">
-        <app-navbar [transparent]="true"
-            [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
-    </header>
+    minHeight="70vh">
 </app-shader-hero>
 
-<main class="relative min-h-screen w-full overflow-hidden bg-(--dd-cream) flex flex-col items-center pt-16 pb-20 px-4">
+<main class="relative min-h-screen w-full bg-(--dd-cream) flex flex-col items-center pb-20 px-4">
 
     <!-- Loading skeleton -->
     <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full">
@@ -20,7 +16,7 @@
     <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl w-full relative z-10 items-stretch">
 
         <div *ngFor="let plan of plans"
-            class="flex flex-col group bg-white/70 dark:bg-(--dd-surface)/90 backdrop-blur-xl border border-slate-200 dark:border-(--dd-border) p-1.5 rounded-3xl shadow-xl dark:shadow-violet-900/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            class="flex flex-col group bg-white/92 dark:bg-(--dd-surface)/95 border border-slate-200 dark:border-(--dd-border) p-1.5 rounded-3xl shadow-lg dark:shadow-(--dd-blue-dark)/10 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:shadow-xl"
             [ngClass]="{'border-(--dd-orange)/50 ring-1 ring-(--dd-orange)/20 scale-105 z-10': plan.popular}">
 
             <!-- Card Header -->
@@ -31,7 +27,7 @@
                 </div>
 
                 <div class="relative z-10 mb-8 flex items-center justify-between">
-                    <div class="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-violet-200">
+                    <div class="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-(--dd-blue-light)">
                         <i class="bi bi-people-fill text-(--dd-orange)"></i>
                         <span>{{ plan.name }}</span>
                     </div>
@@ -42,14 +38,14 @@
 
                 <div class="relative z-10 mb-6 flex items-end gap-1">
                     <span class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{{ plan.price }}</span>
-                    <span class="text-slate-500 dark:text-violet-300/60 pb-1 text-sm">{{ plan.period }}</span>
-                    <span *ngIf="plan.priceYearly" class="text-slate-400 dark:text-violet-400/50 ml-auto text-sm font-medium">
+                    <span class="text-slate-500 dark:text-(--dd-blue-light)/60 pb-1 text-sm">{{ plan.period }}</span>
+                    <span *ngIf="plan.priceYearly" class="text-slate-400 dark:text-(--dd-blue-light)/45 ml-auto text-sm font-medium">
                         {{ plan.priceYearly }}/yr
                     </span>
                 </div>
 
                 <button
-                    class="relative z-10 w-full py-4 rounded-xl font-bold text-white transition-all transform active:scale-95 shadow-lg"
+                    class="relative z-10 w-full py-4 rounded-xl font-bold text-white transition-all transform active:scale-95 shadow-md"
                     [ngClass]="plan.popular ? 
                         'bg-linear-to-r from-(--dd-orange) to-(--dd-blue-dark) shadow-(--dd-orange)/30' : 
                         'bg-slate-900 shadow-slate-900/10'">
@@ -58,18 +54,18 @@
             </div>
 
             <!-- Card Body -->
-            <div class="space-y-5 p-6 grow blur-[2px] group-hover:blur-[0px] transition-all duration-500">
-                <p class="text-slate-600 dark:text-violet-200 text-sm leading-relaxed">{{ plan.description }}</p>
+            <div class="space-y-5 p-6 grow">
+                <p class="text-slate-600 dark:text-(--dd-blue-light) text-sm leading-relaxed">{{ plan.description }}</p>
 
                 <ul class="space-y-3">
-                    <li *ngFor="let feature of plan.features" class="flex items-start gap-3 text-sm text-slate-600 dark:text-violet-200">
+                    <li *ngFor="let feature of plan.features" class="flex items-start gap-3 text-sm text-slate-600 dark:text-(--dd-blue-light)">
                         <i class="bi bi-check-circle-fill text-green-500 dark:text-emerald-400 mt-0.5 shrink-0"></i>
                         <span>{{ feature }}</span>
                     </li>
                 </ul>
 
                 <!-- Empty state -->
-                <p *ngIf="!plan.features?.length" class="text-sm text-slate-400 dark:text-violet-300/50 italic">
+                <p *ngIf="!plan.features?.length" class="text-sm text-slate-400 dark:text-(--dd-blue-light)/50 italic">
                     Contact us for custom features.
                 </p>
             </div>
@@ -78,7 +74,7 @@
     </div>
 
     <!-- Bottom CTA -->
-    <p *ngIf="!loading" class="relative z-10 text-slate-400 dark:text-violet-300/50 text-sm mt-12">
+    <p *ngIf="!loading" class="relative z-10 text-slate-400 dark:text-(--dd-blue-light)/50 text-sm mt-12">
         All plans include a 14-day free trial. No credit card required.
     </p>
 
@@ -86,7 +82,7 @@
     <div class="max-w-7xl mx-auto px-6 py-12 w-full mt-24 mb-10">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white border-b-2 border-orange-400 inline-block pb-2">Frequently Asked Questions</h2>
-            <p class="text-gray-500 dark:text-violet-300/60 mt-2">Got questions about our plans? We have answers.</p>
+            <p class="text-gray-500 dark:text-(--dd-blue-light)/60 mt-2">Got questions about our plans? We have answers.</p>
         </div>
         <app-faq-accordion [items]="howItWorksItems"></app-faq-accordion>
     </div>

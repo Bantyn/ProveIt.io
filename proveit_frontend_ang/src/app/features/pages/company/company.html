@@ -1,17 +1,12 @@
 <div class="min-h-screen flex flex-col bg-(--dd-cream)">
     <div class="grow">
         <!-- ================= SHADER HERO ================= -->
-        <app-shader-hero
-            title="Discover Top Hiring Companies"
-            subtitle="Explore top organizations, their unique cultures, and exciting new opportunities available today."
-            minHeight="130vh">
-            <header class="absolute top-0 left-0 w-full z-30 backdrop-blur-md">
-                <app-navbar [transparent]="true"
-                    [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
-            </header>
+        <app-shader-hero title="We're Hiring Exceptional Talent"
+            subtitle="Showcase your skills through real-world challenges and get hired by top companies building the future."
+            [darkText]="true" minHeight="100vh">
         </app-shader-hero>
 
-        <section class="mt-8">
+        <section class="-mt-30">
             <!-- Filter Options -->
             <div
                 class="bg-white/30 dark:bg-(--dd-surface-secondary) backdrop-blur-sm sticky top-25 z-50 w-[80%] mx-auto rounded-xl p-5 shadow-md dark:shadow-violet-900/20 border border-gray-200/50 dark:border-(--dd-border) mb-6">
@@ -24,15 +19,6 @@
                     <!-- Industry Filter -->
                     <app-fluid-dropdown [options]="industryOptions" placeholder="All Industries"
                         [(ngModel)]="filters.industry">
-                    </app-fluid-dropdown>
-
-                    <!-- Location Filter -->
-                    <app-fluid-dropdown [options]="locationOptions" placeholder="All Locations"
-                        [(ngModel)]="filters.location">
-                    </app-fluid-dropdown>
-
-                    <!-- Company Size -->
-                    <app-fluid-dropdown [options]="sizeOptions" placeholder="Company Size" [(ngModel)]="filters.size">
                     </app-fluid-dropdown>
 
                     <!-- Clear Button -->
@@ -50,39 +36,37 @@
             </div>
 
             <div *ngIf="!isLoading"
-                class="title text-3xl font-semibold md:text-3xl text-center md:text-start flex flex-col gap-10">
+                class="title text-3xl font-semibold md:text-3xl text-center md:text-start flex flex-col gap-10 ">
                 <h1 class="text-gray-400 md:pl-40">
-                    <span
-                        class="bg-linear-to-r from-(--dd-blue-dark) to-(--dd-orange) bg-clip-text text-transparent">
+                    <span class="bg-linear-to-r from-(--dd-blue-dark) to-(--dd-orange) bg-clip-text text-transparent">
                         Top
                     </span>
                     Companies
                 </h1>
 
-                <div class="w-full flex flex-row bg-transparent md:pl-40 mx-auto overflow-x-scroll cardContainer pb-10">
+                <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:px-40 mx-auto pb-10">
 
                     <div *ngIf="filteredCompanies.length === 0" class="text-gray-500 text-lg mx-auto p-10 font-normal">
                         No companies found matching your criteria.
                     </div>
 
                     <div *ngFor="let company of filteredCompanies"
-                        class="reveal-card mb-15 mt-1 mx-2 w-full max-w-sm shrink-0 border border-gray-100 dark:border-(--dd-border)">
+                        class="reveal-card w-full border border-gray-100 dark:border-(--dd-border) ">
 
                         <!-- BASE (Visible by default) -->
                         <div class="reveal-card-base">
                             <div class="flex items-start gap-4 mb-4">
                                 <div
                                     class="w-20 h-20 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center p-2 overflow-hidden shrink-0">
-                                    <img [src]="company.logoUrl || 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=200&fit=crop'"
-                                        alt="{{ company.companyName || company.name }} logo"
+                                    <img [src]="company.logoUrl" alt="{{ company.name }} logo"
                                         class="w-full h-full object-contain rounded-xl" />
                                 </div>
                                 <div class="grow">
                                     <h3 class="text-xl font-bold text-gray-900 leading-tight">
-                                        {{ company.companyName || company.name || 'Unknown Company' }}
+                                        {{ company.name }}
                                     </h3>
                                     <p class="text-sm text-gray-500 mt-1 line-clamp-2">
-                                        {{ company.description || 'Verified organization on ProveIt.io.' }}
+                                        {{ company.description }}
                                     </p>
                                 </div>
                             </div>
@@ -106,12 +90,11 @@
                             <div class="space-y-3 text-sm text-gray-600">
                                 <div class="flex items-center gap-2">
                                     <i class="bi bi-geo-alt-fill text-(--dd-orange)"></i>
-                                    <span class="font-medium text-gray-800">{{ company.location || 'Multiple Locations'
-                                        }}</span>
+                                    <span class="font-medium text-gray-800">{{ company.location }}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <i class="bi bi-people-fill text-(--dd-orange)"></i>
-                                    <span class="font-medium text-gray-800">{{ company.size || 'Growing Team' }}</span>
+                                    <span class="font-medium text-gray-800">{{ company.size }}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <i class="bi bi-tag-fill text-(--dd-orange)"></i>
@@ -129,16 +112,15 @@
                             <div class="flex items-start gap-4 mb-4">
                                 <div
                                     class="w-20 h-20 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center p-2 overflow-hidden shrink-0">
-                                    <img [src]="company.logoUrl || 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=200&fit=crop'"
-                                        alt="{{ company.companyName || company.name }} logo"
+                                    <img [src]="company.logoUrl" alt="{{ company.name }} logo"
                                         class="w-full h-full object-contain rounded-xl" />
                                 </div>
                                 <div class="grow">
                                     <h3 class="text-xl font-bold text-white leading-tight">
-                                        {{ company.companyName || company.name || 'Unknown Company' }}
+                                        {{ company.name }}
                                     </h3>
                                     <p class="text-sm text-white/80 opacity-30 mt-1 line-clamp-2">
-                                        {{ company.description || 'Verified organization on ProveIt.io.' }}
+                                        {{ company.description }}
                                     </p>
                                 </div>
                             </div>
@@ -162,12 +144,11 @@
                             <div class="space-y-3 text-sm text-white/90">
                                 <div class="flex items-center gap-2">
                                     <i class="bi bi-geo-alt-fill text-white"></i>
-                                    <span class="font-medium text-white">{{ company.location || 'Multiple Locations'
-                                        }}</span>
+                                    <span class="font-medium text-white">{{ company.location }}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <i class="bi bi-people-fill text-white"></i>
-                                    <span class="font-medium text-white">{{ company.size || 'Growing Team' }}</span>
+                                    <span class="font-medium text-white">{{ company.size }}</span>
                                 </div>
                                 <div class="flex items-center gap-2" *ngIf="company.industry">
                                     <i class="bi bi-tag-fill text-white"></i>
@@ -186,8 +167,11 @@
             <!-- How It Works Accordion -->
             <div class="max-w-7xl mx-auto px-6 py-12 mb-20 md:mt-20">
                 <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white border-b-2 border-orange-400 inline-block pb-2">How It Works</h2>
-                    <p class="text-gray-500 dark:text-violet-300/60 mt-2">Everything you need to know about hiring on ProveIt.</p>
+                    <h2
+                        class="text-3xl font-bold text-gray-900 dark:text-white border-b-2 border-orange-400 inline-block pb-2">
+                        How It Works</h2>
+                    <p class="text-gray-500 dark:text-violet-300/60 mt-2">Everything you need to know about hiring on
+                        ProveIt.</p>
                 </div>
                 <app-faq-accordion [items]="howItWorksItems"></app-faq-accordion>
             </div>

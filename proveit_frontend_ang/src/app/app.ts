@@ -3,6 +3,7 @@ import { isPlatformBrowser, NgIf } from '@angular/common';
 import { RouterOutlet, Router } from '@angular/router';
 import { AiWidget } from './features/components/ai-widget/ai-widget';
 import { CustomModal } from './features/components/custom-modal/custom-modal';
+import { Navbar } from './features/components/navbar/navbar';
 import { ScrollService } from './services/scroll.service';
 import { SystemSettingsService } from './services/system-settings.service';
 import { filter } from 'rxjs/operators';
@@ -14,7 +15,7 @@ import Lenis from 'lenis';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, AiWidget, CustomModal, NgIf],
+  imports: [RouterOutlet, AiWidget, CustomModal, NgIf, Navbar],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -72,6 +73,11 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   showGlobalUi(): boolean {
     return !this.router.url.startsWith('/maintenance');
+  }
+
+  showNavbar(): boolean {
+    const hiddenRoutes = ['/maintenance', '/auth', '/admin', '/company'];
+    return !hiddenRoutes.some(r => this.router.url.startsWith(r));
   }
 
   private handleMaintenanceRoute(url: string): void {

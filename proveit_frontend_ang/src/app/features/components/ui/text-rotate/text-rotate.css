@@ -1,0 +1,32 @@
+.tr-main {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tr-word {
+  display: inline-flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.tr-char {
+  display: inline-block;
+  transform: translateY(120%);
+  opacity: 0;
+  animation: tr-rise 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--tr-index) * 45ms);
+  will-change: transform, opacity;
+}
+
+@keyframes tr-rise {
+  from {
+    transform: translateY(120%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

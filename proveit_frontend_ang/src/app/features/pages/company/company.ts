@@ -2,11 +2,12 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { NgForOf, NgIf, NgClass, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Navbar } from '../../components/navbar/navbar';
 import { Footer } from '../../components/footer/footer';
 import { ApiService } from '../../../services/api.service';
 import { FluidDropdown, DropdownOption } from '../../components/ui/fluid-dropdown/fluid-dropdown';
 import { FaqAccordion, FaqItem } from '../../components/faq-accordion/faq-accordion';
+import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
+import { TextRotateComponent } from '../../components/ui/text-rotate/text-rotate';
 
 interface Filters {
   search: string;
@@ -14,7 +15,18 @@ interface Filters {
   location: string;
   size: string;
 }
-import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
+
+interface CompanyCard {
+  id: string;
+  name: string;
+  description: string;
+  logoUrl: string;
+  location: string;
+  size: string;
+  industry: string;
+  averageRating: number;
+  reviewCount: number;
+}
 
 @Component({
   selector: 'app-company',
@@ -25,12 +37,12 @@ import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero
     NgClass,
     DecimalPipe,
     FormsModule,
-    Navbar,
     Footer,
     RouterLink,
     FluidDropdown,
     FaqAccordion,
     ShaderHeroComponent,
+    TextRotateComponent,
   ],
   templateUrl: './company.html',
   styleUrl: './company.css',
@@ -63,31 +75,11 @@ export class Company implements OnInit, OnDestroy {
   ];
 
   sizeOptions: DropdownOption[] = [
-    { value: '1-10 Employees', label: '1–10 Employees', icon: 'bi bi-people-fill' },
-    { value: '11-50 Employees', label: '11–50 Employees', icon: 'bi bi-people-fill' },
-    { value: '51-200 Employees', label: '51–200 Employees', icon: 'bi bi-people-fill' },
-    { value: '201-500 Employees', label: '201–500 Employees', icon: 'bi bi-people-fill' },
+    { value: '1-10 Employees', label: '1-10 Employees', icon: 'bi bi-people-fill' },
+    { value: '11-50 Employees', label: '11-50 Employees', icon: 'bi bi-people-fill' },
+    { value: '51-200 Employees', label: '51-200 Employees', icon: 'bi bi-people-fill' },
+    { value: '201-500 Employees', label: '201-500 Employees', icon: 'bi bi-people-fill' },
     { value: '500+ Employees', label: '500+ Employees', icon: 'bi bi-people-fill' },
-  ];
-
-  // keep for any legacy usages
-  industries: string[] = [
-    'Technology',
-    'Finance',
-    'Healthcare',
-    'Education',
-    'E-commerce',
-    'Manufacturing',
-    'Consulting',
-    'Media & Entertainment',
-  ];
-  locations: string[] = ['Remote', 'Bangalore', 'Mumbai', 'Delhi', 'Pune', 'Hyderabad', 'Chennai'];
-  sizes: string[] = [
-    '1-10 Employees',
-    '11-50 Employees',
-    '51-200 Employees',
-    '201-500 Employees',
-    '500+ Employees',
   ];
 
   filters: Filters = {
@@ -100,24 +92,27 @@ export class Company implements OnInit, OnDestroy {
   howItWorksItems: FaqItem[] = [
     {
       question: 'How do companies hire on ProveIt?',
-      answer: 'Create a company profile, post a skill-based competition, and invite candidates. You can then review their submissions and hire the best fits.',
-      meta: 'Hiring'
+      answer:
+        'Create a company profile, post a skill-based competition, and invite candidates. You can then review their submissions and hire the best fits.',
+      meta: 'Hiring',
     },
     {
       question: 'What kind of challenges can we post?',
-      answer: 'You can post technical coding challenges, design briefs, marketing case studies, or any project-based assessment relevant to your open roles.',
-      meta: 'Challenges'
+      answer:
+        'You can post technical coding challenges, design briefs, marketing case studies, or any project-based assessment relevant to your open roles.',
+      meta: 'Challenges',
     },
     {
       question: 'How do we evaluate candidates?',
-      answer: 'Our platform provides a structured dashboard to review submissions, code repositories, and live demos, allowing you to score and shortlist candidates efficiently.',
-      meta: 'Evaluation'
-    }
+      answer:
+        'Our platform provides a structured dashboard to review submissions, code repositories, and live demos, allowing you to score and shortlist candidates efficiently.',
+      meta: 'Evaluation',
+    },
   ];
 
   /* ================= COMPANIES ================= */
-  companies: any[] = [];
-  isLoading: boolean = true;
+  companies: CompanyCard[] = [];
+  isLoading = true;
 
   private subscription: any;
 
@@ -130,7 +125,7 @@ export class Company implements OnInit, OnDestroy {
     this.isLoading = true;
     this.subscription = this.api.getCompanies().subscribe({
       next: (data) => {
-        this.companies = data;
+        this.companies = (data || []).map((company) => this.toCompanyCard(company));
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -150,16 +145,16 @@ export class Company implements OnInit, OnDestroy {
 
   /* ================= FILTERED LIST ================= */
   get filteredCompanies() {
-    return this.companies.filter((c) => {
-      const cName = (c.companyName || c.name || '').toLowerCase();
-      const cDesc = (c.description || '').toLowerCase();
-      const searchTerms = this.filters.search.toLowerCase();
+    return this.companies.filter((company) => {
+      const searchTerm = this.filters.search.toLowerCase();
 
       return (
-        (!this.filters.search || cName.includes(searchTerms) || cDesc.includes(searchTerms)) &&
-        (!this.filters.industry || (c.industry && c.industry.includes(this.filters.industry))) &&
-        (!this.filters.location || (c.location && c.location.includes(this.filters.location))) &&
-        (!this.filters.size || c.size === this.filters.size)
+        (!this.filters.search ||
+          company.name.toLowerCase().includes(searchTerm) ||
+          company.description.toLowerCase().includes(searchTerm)) &&
+        (!this.filters.industry || company.industry.includes(this.filters.industry)) &&
+        (!this.filters.location || company.location.includes(this.filters.location)) &&
+        (!this.filters.size || company.size === this.filters.size)
       );
     });
   }
@@ -171,6 +166,24 @@ export class Company implements OnInit, OnDestroy {
       industry: '',
       location: '',
       size: '',
+    };
+  }
+
+  private toCompanyCard(company: any): CompanyCard {
+    return {
+      id: company.id || company._id || '',
+      name: company.companyName || company.name || 'Unknown Company',
+      description: company.description || 'Verified organization on ProveIt.io.',
+      logoUrl:
+        company.logoUrl ||
+        company.imageUrl ||
+        company.profileImage ||
+        'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=200&fit=crop',
+      location: company.location || 'Multiple Locations',
+      size: company.size || 'Growing Team',
+      industry: company.industry || 'General',
+      averageRating: Number(company.averageRating || 0),
+      reviewCount: Number(company.reviewCount || 0),
     };
   }
 }

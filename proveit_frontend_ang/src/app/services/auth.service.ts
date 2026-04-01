@@ -9,7 +9,7 @@ import {
   authState,
 } from '@angular/fire/auth';
 import { ApiService } from './api.service';
-import { firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { NgZone } from '@angular/core';
 
@@ -43,7 +43,20 @@ export class AuthService {
   email = '';
   password = '';
 
-  constructor() {}
+  constructor() {
+    // Initial check
+    this.sessionSubject.next(this.hasCookie('auth_token'));
+    
+    // Sync with Firebase auth state changes
+    authState(this.auth).subscribe((user) => {
+      this.zone.run(() => {
+        const hasToken = this.hasCookie('auth_token');
+        if (this.sessionSubject.value !== hasToken) {
+          this.sessionSubject.next(hasToken);
+        }
+      });
+    });
+  }
 
   async registerUser(email: string, pass: string, name: string, role: string) {
     try {
@@ -183,14 +196,26 @@ export class AuthService {
     }
   }
 
+  private sessionSubject = new BehaviorSubject<boolean>(false);
+  isLoggedIn$ = this.sessionSubject.asObservable();
+
+  private hasCookie(name: string) {
+    if (typeof document === 'undefined') return false;
+    return document.cookie.split('; ').some(r => r.trim().startsWith(name + '='));
+  }
+
+
   async logOut() {
     try {
+      console.log('Logging out...');
       await signOut(this.auth);
-      this.clearSession();
-      this.router.navigate(['/']);
     } catch (err) {
-      console.error(err);
-      throw err;
+      console.error('Firebase signOut error', err);
+    } finally {
+      this.clearSession();
+      console.log('Session cleared. Redirecting...');
+      // Using window.location.href ensures all app state is wiped and we start fresh
+      window.location.href = '/';
     }
   }
 
@@ -198,10 +223,17 @@ export class AuthService {
     const maxAge = 60 * 60 * 24; // 24 hours
     document.cookie = `auth_token=${uid}; Max-Age=${maxAge}; path=/`;
     document.cookie = `user_role=${role}; Max-Age=${maxAge}; path=/`;
+    this.sessionSubject.next(true);
   }
 
   private clearSession() {
-    document.cookie = 'auth_token=; Max-Age=0; path=/';
-    document.cookie = 'user_role=; Max-Age=0; path=/';
+    // Clear cookies with all possible variants to be safe
+    document.cookie = 'auth_token=; Max-Age=0; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = 'user_role=; Max-Age=0; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    
+    // Also clear localStorage just in case
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+    this.sessionSubject.next(false);
   }
 }

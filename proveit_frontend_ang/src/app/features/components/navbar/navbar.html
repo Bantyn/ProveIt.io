@@ -1,7 +1,7 @@
 <!-- ─── NAVBAR WRAPPER ─────────────────────────────────────────────────────── -->
 <div
   class="w-full select-none"
-  [ngClass]="transparent ? 'relative' : 'fixed top-0 z-50 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 shadow-sm'">
+  [ngClass]="transparent ? 'relative' : 'fixed top-0 z-50 bg-white/60 dark:bg-neutral-950/80 backdrop-blur-sm border-b border-black/5 dark:border-white/5 shadow-sm'">
   <nav class="mx-auto w-full px-4 sm:px-6 md:px-12 xl:px-40">
     <div class="flex min-h-[60px] items-center justify-between gap-4 py-2 md:py-0">
 
@@ -60,7 +60,7 @@
         <!-- Theme Toggle -->
         <button
           type="button"
-          (click)="theme.toggle()"
+          (click)="theme.toggleWithTransition('horizontal')"
           class="group relative flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 focus:outline-none"
           [ngClass]="transparent
             ? 'text-white/80 hover:bg-white/15 hover:text-white'
@@ -68,9 +68,8 @@
           [attr.aria-label]="'Switch theme'">
           <i class="bi text-[14px] transition-transform duration-300 group-hover:rotate-[20deg]"
             [ngClass]="{
-              'bi-sun-fill text-amber-500': theme.mode() === 'light',
-              'bi-moon-stars-fill text-indigo-400': theme.mode() === 'dark',
-              'bi-circle-half': theme.mode() === 'system'
+              'bi-sun-fill text-amber-500': !theme.isDark(),
+              'bi-moon-stars-fill text-indigo-400': theme.isDark()
             }"></i>
         </button>
 
@@ -162,15 +161,14 @@
       class="border-t border-gray-100 dark:border-neutral-800 py-4 md:hidden overflow-hidden">
       <div class="flex flex-col gap-1">
         <!-- Theme toggle -->
-        <button type="button" (click)="theme.toggle()"
+        <button type="button" (click)="theme.toggleWithTransition('vertical')"
           class="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-[13px] font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-neutral-800">
           <i class="bi w-5 text-center text-base"
             [ngClass]="{
-              'bi-sun-fill text-amber-500': theme.mode() === 'light',
-              'bi-moon-stars-fill text-indigo-400': theme.mode() === 'dark',
-              'bi-circle-half text-slate-500': theme.mode() === 'system'
+              'bi-sun-fill text-amber-500': !theme.isDark(),
+              'bi-moon-stars-fill text-indigo-400': theme.isDark()
             }"></i>
-          Theme: {{ theme.mode() | titlecase }}
+          Theme: {{ theme.isDark() ? 'Dark' : 'Light' }}
         </button>
 
         <a *ngFor="let m of menus" [routerLink]="getRoute(m)" (click)="closeMobileMenu()"
