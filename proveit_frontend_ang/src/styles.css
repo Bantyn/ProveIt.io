@@ -130,7 +130,7 @@ html.dark {
     --dd-blue: #aa9fff;
     --dd-blue-light: #cfc9ff;
     --dd-blue-ultra-light: #1a1731;
-    --dd-cream: #1a1730;
+    --dd-cream: #1a17300a;
     --dd-yellow: #2a2350;
     --dd-yellow-dark: #4b4190;
     --dd-orange: #b5a8ff;
@@ -141,9 +141,9 @@ html.dark {
     --dd-white: #1a1730;
 
     /* Dark surface tokens — light pastel lavender (between white & purple) */
-    --dd-surface: #4a4280;
-    --dd-surface-secondary: #524a8a;
-    --dd-surface-input: #3d3670;
+    --dd-surface: #4a428004;
+    --dd-surface-secondary: #524a8a11;
+    --dd-surface-input: #3d367011;
     --dd-border: rgba(180, 165, 255, 0.25);
     --dd-border-hover: rgba(180, 165, 255, 0.45);
     --btn-blue: #7c6ef0;
