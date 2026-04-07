@@ -86,6 +86,14 @@ export class CompetitionDetails implements OnInit {
   }
 
   async applyToEvent() {
+    if (this.isClosed) {
+      await this.modalService.alert(
+        'This competition is closed and no longer accepting submissions.',
+        'Competition Closed',
+      );
+      return;
+    }
+
     if (!this.canParticipateYet) {
       await this.modalService.alert(
         this.participationBlockedMessage,
@@ -182,9 +190,32 @@ export class CompetitionDetails implements OnInit {
     startDate.setHours(0, 0, 0, 0);
 
     const now = new Date();
+    // No need to set hours for 'now' if we compare with getTime() or just direct comparison
+    // but consistent with current logic:
     now.setHours(0, 0, 0, 0);
 
     return now >= startDate;
+  }
+
+  get isClosed(): boolean {
+    if (!this.competition) return false;
+    
+    // 1. Explicit Status Check
+    const status = (this.competition.status || '').toUpperCase();
+    if (status === 'CLOSED' || status === 'COMPLETED' || status === 'INACTIVE') return true;
+
+    // 2. End Date / Deadline Check
+    const rawEndDate = this.competition.endDate || this.competition.projectInfo?.deadline;
+    if (rawEndDate) {
+      const endDate = new Date(rawEndDate);
+      // If deadline is just a date (00:00:00), assume end of day to be fair
+      if (endDate.getHours() === 0 && endDate.getMinutes() === 0) {
+        endDate.setHours(23, 59, 59, 999);
+      }
+      return new Date() > endDate;
+    }
+
+    return false;
   }
 
   get participationBlockedMessage(): string {

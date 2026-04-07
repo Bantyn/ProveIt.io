@@ -114,10 +114,51 @@ router.post('/', async (req, res) => {
     try {
         const payload = normalizeApplicationPayload(req.body);
         const { userId, competitionId, companyId } = payload;
-
+        
         if (!userId) {
             return res.status(400).json({ error: 'User ID is required' });
         }
+
+        // --- PREVENT JOINING CLOSED COMPETITIONS ---
+        if (competitionId) {
+            const compRef = db.collection('competitions').doc(competitionId);
+            const compDoc = await compRef.get();
+            if (!compDoc.exists) {
+                return res.status(404).json({ error: 'Competition not found' });
+            }
+
+            const compData = compDoc.data();
+            const status = (compData.status || '').toUpperCase();
+            
+            // 1. Check Explicit Status
+            if (status === 'CLOSED' || status === 'COMPLETED' || status === 'INACTIVE') {
+                 return res.status(403).json({ error: 'This competition is closed and no longer accepting submissions.' });
+            }
+
+            // 2. Check End Date / Deadline
+            const rawEndDate = compData.endDate || compData.deadline || compData.projectInfo?.deadline;
+            if (rawEndDate) {
+                const endDate = new Date(rawEndDate);
+                // If deadline is just a date, assume end of day
+                if (endDate.getHours() === 0 && endDate.getMinutes() === 0) {
+                    endDate.setHours(23, 59, 59, 999);
+                }
+                if (Date.now() > endDate.getTime()) {
+                    return res.status(403).json({ error: 'The deadline for this competition has passed.' });
+                }
+            }
+
+            // 3. Check Start Date
+            const rawStartDate = compData.startDate || compData.projectInfo?.startDate;
+            if (rawStartDate) {
+                const startDate = new Date(rawStartDate);
+                startDate.setHours(0, 0, 0, 0);
+                if (Date.now() < startDate.getTime()) {
+                    return res.status(403).json({ error: 'This competition has not started yet.' });
+                }
+            }
+        }
+        // -------------------------------------------
 
         // --- ENFORCE PLAN LIMITS ---
         if (competitionId && companyId) {

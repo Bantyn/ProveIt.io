@@ -181,7 +181,7 @@ router.get('/analytics', async (req, res) => {
 
         // Fetch real payments for revenue chart
         const paymentsSnap = await db.collection('payments')
-            .where('status', '==', 'SUCCESS')
+            .where('status', '==', 'success')
             .get();
 
         const dailyRevenue = new Array(7).fill(0);
