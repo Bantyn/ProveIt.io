@@ -1,8 +1,15 @@
 <div class="min-h-screen flex flex-col bg-(--dd-cream)">
     <div class="grow">
-        <!-- FULL-SCREEN SHADER HERO WITH NAVBAR -->
+        <header class="absolute top-0 left-0 w-full z-30">
+            <app-navbar [transparent]="true"
+                [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+        </header>
+
+        <!-- FULL-SCREEN SHADER HERO -->
         <app-shader-hero
-            title="We're Hiring Exceptional Talent"
+            badge="Live Competitions"
+            title1="Skill-Based"
+            title2="Hiring Arena"
             subtitle="Showcase your skills through real-world challenges and get hired by top companies building the future."
             minHeight="100vh">
         </app-shader-hero>

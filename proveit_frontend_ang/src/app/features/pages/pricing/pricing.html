@@ -1,8 +1,17 @@
-<app-shader-hero
-    title="Simple, Transparent Pricing"
-    subtitle="Choose the plan that's right for your business. No hidden fees, no surprises."
-    minHeight="70vh">
-</app-shader-hero>
+<div class="min-h-screen flex flex-col bg-(--dd-cream)">
+    <div class="grow">
+        <header class="absolute top-0 left-0 w-full z-30">
+            <app-navbar [transparent]="true"
+                [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+        </header>
+
+        <app-shader-hero
+            badge="Pricing Plans"
+            title1="Simple, Transparent"
+            title2="Pricing"
+            subtitle="Choose the plan that's right for your business. No hidden fees, no surprises."
+            minHeight="70vh">
+        </app-shader-hero>
 
 <main class="relative min-h-screen w-full bg-(--dd-cream) flex flex-col items-center pb-20 px-4">
 
@@ -89,4 +98,7 @@
 
 </main>
 
-<app-footer></app-footer>
+    </div>
+    <app-footer></app-footer>
+</div>
+

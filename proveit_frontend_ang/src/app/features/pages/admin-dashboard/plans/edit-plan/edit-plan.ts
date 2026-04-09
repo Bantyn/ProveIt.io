@@ -197,7 +197,7 @@ export class EditPlan implements OnInit {
       next: (res: any) => {
         this.loading = false;
         this.cdr.detectChanges();
-        this.router.navigate(['/admin/billing']);
+        this.router.navigate(['/admin/plans']);
         this.modal.alert('Plan updated successfully!', 'Success');
       },
       error: (err: any) => {
