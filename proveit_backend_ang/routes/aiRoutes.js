@@ -7,6 +7,7 @@ const { db } = require('../config/firebase');
 // n8n Webhook URL
 const N8N_WEBHOOK_URL = 'https://arjav1212.app.n8n.cloud/webhook-test/64afd809-5530-407f-901a-84ec4d83af59';
 // const N8N_WEBHOOK_URL = 'https://n8n-latest-vvzy.onrender.com/webhook/64afd809-5530-407f-901a-84ec4d83af59';
+// const N8N_WEBHOOK_URL = 'https://arjav1212.app.n8n.cloud/webhook/64afd809-5530-407f-901a-84ec4d83af59';
 
 router.post('/chat', async (req, res) => {
     try {
@@ -44,8 +45,40 @@ router.post('/chat', async (req, res) => {
             throw new Error(`n8n error: ${response.status} - ${errText}`);
         }
 
-        const data = await response.text();
-        res.status(200).send(data);
+        const rawData = await response.text();
+        let cleanMessage = rawData;
+
+        try {
+            // Helper function to recursively extract text from JSON
+            const extractMessage = (obj) => {
+                if (typeof obj === 'string') {
+                    try {
+                        const nested = JSON.parse(obj);
+                        return extractMessage(nested); // Try parsing again if it's a stringified JSON
+                    } catch (e) {
+                        return obj; // Plain string reached
+                    }
+                }
+                
+                if (typeof obj === 'object' && obj !== null) {
+                    const priorityKeys = ['reply', 'output', 'text', 'response', 'message', 'content'];
+                    for (const key of priorityKeys) {
+                        if (obj[key]) return extractMessage(obj[key]);
+                    }
+                    // Fallback: first string property
+                    const firstStr = Object.values(obj).find(v => typeof v === 'string');
+                    if (firstStr) return extractMessage(firstStr);
+                }
+                return JSON.stringify(obj);
+            };
+
+            const parsed = JSON.parse(rawData);
+            cleanMessage = extractMessage(parsed);
+        } catch (e) {
+            // Not JSON or parse failed, cleanMessage remains rawData
+        }
+
+        res.status(200).send(cleanMessage);
 
     } catch (error) {
         console.error('AI Proxy Error:', error);
