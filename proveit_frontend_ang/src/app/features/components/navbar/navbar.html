@@ -1,17 +1,15 @@
 <!-- ─── NAVBAR WRAPPER ─────────────────────────────────────────────────────── -->
-<div
-  class="w-full select-none"
+<div class="w-full select-none"
   [ngClass]="transparent ? 'relative' : 'fixed top-0 z-50 bg-white/60 dark:bg-neutral-950/80 backdrop-blur-sm border-b border-black/5 dark:border-white/5 shadow-sm'">
   <nav class="mx-auto w-full px-4 sm:px-6 md:px-12 xl:px-40">
     <div class="flex min-h-[60px] items-center justify-between gap-4 py-2 md:py-0">
 
       <!-- ── LOGO ── -->
-      <a routerLink="/" (click)="closeMobileMenu()"
-        class="group flex shrink-0 items-center gap-2.5 text-xl font-bold">
+      <a routerLink="/" (click)="closeMobileMenu()" class="group flex shrink-0 items-center gap-2.5 text-xl font-bold">
         <img class="block h-6 dark:hidden" src="assets/logo/favicon_light.ico" alt="ProveIt">
         <img class="hidden h-6 dark:block" src="assets/logo/favicon_dark.ico" alt="ProveIt">
         <span class="text-sm font-bold tracking-tight"
-          [ngClass]="transparent ? 'text-white' : 'text-gray-900 dark:text-white'">
+          [ngClass]="transparent ? (theme.isDark() ? 'text-white' : 'text-gray-900') : 'text-gray-900 dark:text-white'">
           ProveIt<span class="text-(--dd-orange)">.io</span>
         </span>
       </a>
@@ -19,36 +17,24 @@
       <!-- ── DESKTOP NAV ── -->
       <div class="hidden md:flex">
         <!-- Pill container -->
-        <div
-          class="relative flex items-center gap-0.5 rounded-full p-1"
-          [ngClass]="transparent
-            ? 'border border-white/20 bg-white/10 backdrop-blur-md'
-            : 'border border-black/6 dark:border-white/10 bg-black/3 dark:bg-white/5'"
-          #navPillContainer>
+        <div class="relative flex items-center gap-0.5 rounded-full p-1" [ngClass]="transparent
+            ? (theme.isDark() ? 'border border-white/20 bg-white/10 backdrop-blur-md' : 'border border-black/10 bg-black/5 backdrop-blur-md')
+            : 'border border-black/6 dark:border-white/10 bg-black/3 dark:bg-white/5'" #navPillContainer>
 
           <!-- Sliding background pill -->
-          <span
-            #slidingPill
-            class="nav-pill-slider absolute left-0 top-0 rounded-full"
-            [ngClass]="transparent
-              ? 'bg-white/25 shadow-inner shadow-white/10'
-              : 'bg-white dark:bg-neutral-700 shadow-sm shadow-black/10'"
-            style="opacity:0;width:0;height:0;"
-          ></span>
+          <span #slidingPill class="nav-pill-slider absolute left-0 top-0 rounded-full" [ngClass]="transparent
+              ? (theme.isDark() ? 'bg-white/25 shadow-inner shadow-white/10' : 'bg-black/10 shadow-inner shadow-black/5')
+              : 'bg-white dark:bg-neutral-700 shadow-sm shadow-black/10'" style="opacity:0;width:0;height:0;"></span>
 
-          <a
-            *ngFor="let m of menus; let i = index"
-            [routerLink]="getRoute(m)"
-            routerLinkActive
-            #rla="routerLinkActive"
-            [routerLinkActiveOptions]="{exact: false}"
-            (click)="onNavClick(i); closeMobileMenu()"
+          <a *ngFor="let m of menus; let i = index" [routerLink]="getRoute(m)" routerLinkActive #rla="routerLinkActive"
+            [routerLinkActiveOptions]="{exact: false}" (click)="onNavClick(i); closeMobileMenu()"
             [attr.data-nav-index]="i"
             class="nav-link relative z-10 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-150 cursor-pointer"
             [ngClass]="transparent
-              ? (rla.isActive ? 'text-white' : 'text-white/70 hover:text-white')
-              : (rla.isActive ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white')"
-          >
+              ? (rla.isActive 
+                  ? (theme.isDark() ? 'text-white' : 'text-gray-900') 
+                  : (theme.isDark() ? 'text-white/70 hover:text-white' : 'text-gray-500 hover:text-gray-900'))
+              : (rla.isActive ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white')">
             {{ m.label }}
           </a>
         </div>
@@ -58,16 +44,13 @@
       <div class="hidden items-center gap-2 md:flex">
 
         <!-- Theme Toggle -->
-        <button
-          type="button"
-          (click)="theme.toggleWithTransition('horizontal')"
+        <button type="button" (click)="theme.toggleWithTransition('horizontal')"
           class="group relative flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 focus:outline-none"
           [ngClass]="transparent
-            ? 'text-white/80 hover:bg-white/15 hover:text-white'
+            ? (theme.isDark() ? 'text-white/80 hover:bg-white/15 hover:text-white' : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900')
             : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-neutral-800 hover:text-slate-700 dark:hover:text-white'"
           [attr.aria-label]="'Switch theme'">
-          <i class="bi text-[14px] transition-transform duration-300 group-hover:rotate-[20deg]"
-            [ngClass]="{
+          <i class="bi text-[14px] transition-transform duration-300 group-hover:rotate-[20deg]" [ngClass]="{
               'bi-sun-fill text-amber-500': !theme.isDark(),
               'bi-moon-stars-fill text-indigo-400': theme.isDark()
             }"></i>
@@ -76,9 +59,8 @@
         <!-- Guest CTAs -->
         <ng-container *ngIf="!isLoggedIn">
           <a (click)="goToLogin()"
-            class="text-[13px] font-medium transition-colors duration-150 px-2 py-1 cursor-pointer"
-            [ngClass]="transparent
-              ? 'text-white/80 hover:text-white'
+            class="text-[13px] font-medium transition-colors duration-150 px-2 py-1 cursor-pointer" [ngClass]="transparent
+              ? (theme.isDark() ? 'text-white/80 hover:text-white' : 'text-slate-600 hover:text-slate-900')
               : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'">
             Sign in
           </a>
@@ -93,28 +75,37 @@
           <button (click)="toggleDropdown()"
             class="flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-medium transition-all duration-200 focus:outline-none"
             [ngClass]="transparent
-              ? 'border border-white/25 bg-white/15 text-white hover:bg-white/25'
+              ? (theme.isDark() 
+                  ? 'border border-white/25 bg-white/15 text-white hover:bg-white/25' 
+                  : 'border border-slate-200 bg-slate-100/50 text-slate-700 hover:bg-slate-200/50')
               : 'border border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-neutral-700'">
-            <img *ngIf="userProfileImage" [src]="userProfileImage" class="h-5 w-5 shrink-0 rounded-full object-cover" alt="">
-            <div *ngIf="!userProfileImage" class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[10px] font-bold text-white uppercase">
+            <img *ngIf="userProfileImage" [src]="userProfileImage" class="h-5 w-5 shrink-0 rounded-full object-cover"
+              alt="">
+            <div *ngIf="!userProfileImage"
+              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[10px] font-bold text-white uppercase">
               {{ (userName || role || 'U').charAt(0) }}
             </div>
             <span class="max-w-[80px] truncate">{{ userName || (role | titlecase) }}</span>
-            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" [class.rotate-180]="showProfileDropdown"></i>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200"
+              [class.rotate-180]="showProfileDropdown"></i>
           </button>
 
           <!-- Dropdown -->
           <div *ngIf="showProfileDropdown"
             class="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-slate-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl shadow-black/10 ring-1 ring-black/5">
             <!-- Header -->
-            <div class="border-b border-slate-100 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-800/50 px-4 py-3">
+            <div
+              class="border-b border-slate-100 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-800/50 px-4 py-3">
               <div class="flex items-center gap-3">
-                <img *ngIf="userProfileImage" [src]="userProfileImage" class="h-8 w-8 shrink-0 rounded-full object-cover" alt="">
-                <div *ngIf="!userProfileImage" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[13px] font-bold text-white uppercase">
+                <img *ngIf="userProfileImage" [src]="userProfileImage"
+                  class="h-8 w-8 shrink-0 rounded-full object-cover" alt="">
+                <div *ngIf="!userProfileImage"
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-[13px] font-bold text-white uppercase">
                   {{ (userName || role || 'U').charAt(0) }}
                 </div>
                 <div class="min-w-0">
-                  <p class="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-100">{{ userName || (role | titlecase) }}</p>
+                  <p class="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-100">{{ userName || (role
+                    | titlecase) }}</p>
                   <p class="text-[11px] text-slate-400 dark:text-slate-500 capitalize">{{ role }}</p>
                 </div>
               </div>
@@ -129,7 +120,8 @@
                 class="flex cursor-pointer items-center gap-3 px-4 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-(--dd-blue) transition-colors">
                 <i class="bi bi-person text-[14px] w-4 text-center"></i> My Profile
               </a>
-              <a *ngIf="role === 'company'" routerLink="/company/dashboard/settings" (click)="showProfileDropdown = false"
+              <a *ngIf="role === 'company'" routerLink="/company/dashboard/settings"
+                (click)="showProfileDropdown = false"
                 class="flex cursor-pointer items-center gap-3 px-4 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-(--dd-blue) transition-colors">
                 <i class="bi bi-building text-[14px] w-4 text-center"></i> Company Profile
               </a>
@@ -147,24 +139,23 @@
       <button type="button" (click)="toggleMobileMenu()"
         class="flex h-9 w-9 items-center justify-center rounded-full transition md:hidden focus:outline-none"
         [ngClass]="transparent
-          ? 'border border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20'
+          ? (theme.isDark() 
+              ? 'border border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20' 
+              : 'border border-slate-200 bg-white/50 text-slate-700 backdrop-blur-sm hover:bg-slate-50')
           : 'border border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-slate-700 dark:text-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-700'"
         [attr.aria-expanded]="mobileMenuOpen" aria-label="Toggle navigation">
-        <i class="bi text-lg transition-transform duration-200"
-          [class.rotate-90]="mobileMenuOpen"
+        <i class="bi text-lg transition-transform duration-200" [class.rotate-90]="mobileMenuOpen"
           [ngClass]="mobileMenuOpen ? 'bi-x-lg' : 'bi-list'"></i>
       </button>
     </div>
 
     <!-- ── MOBILE MENU ── -->
-    <div *ngIf="mobileMenuOpen"
-      class="border-t border-gray-100 dark:border-neutral-800 py-4 md:hidden overflow-hidden">
+    <div *ngIf="mobileMenuOpen" class="border-t border-gray-100 dark:border-neutral-800 py-4 md:hidden overflow-hidden">
       <div class="flex flex-col gap-1">
         <!-- Theme toggle -->
         <button type="button" (click)="theme.toggleWithTransition('vertical')"
           class="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-[13px] font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-neutral-800">
-          <i class="bi w-5 text-center text-base"
-            [ngClass]="{
+          <i class="bi w-5 text-center text-base" [ngClass]="{
               'bi-sun-fill text-amber-500': !theme.isDark(),
               'bi-moon-stars-fill text-indigo-400': theme.isDark()
             }"></i>
@@ -192,14 +183,18 @@
       </div>
 
       <!-- Mobile logged-in profile -->
-      <div *ngIf="isLoggedIn" class="mt-4 rounded-2xl border border-slate-100 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 overflow-hidden">
+      <div *ngIf="isLoggedIn"
+        class="mt-4 rounded-2xl border border-slate-100 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 overflow-hidden">
         <div class="flex items-center gap-3 border-b border-slate-100 dark:border-neutral-800 px-4 py-3">
-          <img *ngIf="userProfileImage" [src]="userProfileImage" class="h-9 w-9 shrink-0 rounded-full object-cover" alt="">
-          <div *ngIf="!userProfileImage" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-sm font-bold text-white uppercase">
+          <img *ngIf="userProfileImage" [src]="userProfileImage" class="h-9 w-9 shrink-0 rounded-full object-cover"
+            alt="">
+          <div *ngIf="!userProfileImage"
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-(--dd-blue) to-(--dd-orange) text-sm font-bold text-white uppercase">
             {{ (userName || role || 'U').charAt(0) }}
           </div>
           <div>
-            <p class="text-[13px] font-semibold text-slate-800 dark:text-slate-100">{{ userName || (role | titlecase) }}</p>
+            <p class="text-[13px] font-semibold text-slate-800 dark:text-slate-100">{{ userName || (role | titlecase) }}
+            </p>
             <p class="text-[11px] text-slate-400 capitalize">{{ role }}</p>
           </div>
         </div>
