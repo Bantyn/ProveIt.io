@@ -72,21 +72,33 @@
             <!-- Plan badge -->
             <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-(--dd-blue-dark)/8 mb-4">
                 <div class="w-2 h-2 rounded-full bg-(--dd-orange) animate-pulse"></div>
-                <span class="text-[11px] font-bold text-(--dd-blue-dark) uppercase tracking-widest">{{ selectedPlan?.name }} Plan</span>
+                <span class="text-[11px] font-bold text-(--dd-blue-dark) uppercase tracking-widest">{{ selectedPlan?.name }} Plan Upgrade</span>
             </div>
 
-            <h2 class="text-[22px] font-extrabold text-slate-900 leading-tight">Ready to Upgrade?</h2>
+            <h2 class="text-[22px] font-extrabold text-slate-900 leading-tight">Switch Plans?</h2>
+            
+            <div class="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 text-left">
+                <p class="text-[13px] text-slate-600 leading-relaxed mb-3">
+                    Your current plan is <strong class="text-slate-900">{{ (companyProfile?.plan || 'Starter') | titlecase }}</strong>. 
+                </p>
+                <div class="flex gap-3 items-start">
+                    <i class="bi bi-info-circle-fill text-(--dd-orange) mt-0.5"></i>
+                    <p class="text-[12px] text-slate-500 font-medium">
+                        As soon as you start the new plan, it will be activated <strong class="text-slate-900">immediately</strong> and your previous plan will be replaced.
+                    </p>
+                </div>
+            </div>
 
             <!-- Price highlight -->
-            <div class="mt-4 mb-4 inline-flex items-baseline gap-1 px-5 py-3 rounded-2xl bg-linear-to-r from-(--dd-blue-dark)/5 to-(--dd-orange)/5 border border-(--dd-blue-dark)/10">
-                <span class="text-3xl font-black text-(--dd-blue-dark)">₹{{ selectedPlan?.priceMonthly || selectedPlan?.price }}</span>
+            <div class="mt-5 mb-4 inline-flex items-baseline gap-1 px-5 py-3 rounded-2xl bg-linear-to-r from-(--dd-blue-dark)/5 to-(--dd-orange)/5 border border-(--dd-blue-dark)/10">
+                <span class="text-3xl font-black text-(--dd-blue-dark)">₹{{ (selectedPlan?.priceMonthly || selectedPlan?.price) | number }}</span>
                 <span class="text-sm text-slate-400 font-medium">/month</span>
             </div>
 
             <!-- Secure payment note -->
             <div class="flex items-center justify-center gap-2 mt-1 mb-5">
                 <i class="bi bi-shield-check text-emerald-500 text-sm"></i>
-                <span class="text-[12px] text-slate-400 font-medium">Secured by Razorpay • 256-bit encryption</span>
+                <span class="text-[12px] text-slate-400 font-medium tracking-tight">Secured by Razorpay • 256-bit encryption</span>
             </div>
         </div>
 

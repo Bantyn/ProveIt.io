@@ -75,6 +75,9 @@ import {
   Folder,
   Calendar,
   GitBranch,
+  Coins,
+  CircleDollarSign,
+  Activity,
 } from 'lucide-angular';
 import { importProvidersFrom } from '@angular/core';
 
@@ -120,6 +123,10 @@ export const appConfig: ApplicationConfig = {
         Folder,
         Calendar,
         GitBranch,
+        Coin: Coins,
+        Coins,
+        CircleDollarSign,
+        Activity,
       }),
     ),
     {

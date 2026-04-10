@@ -46,9 +46,9 @@ export class HiringPipeline implements OnInit {
 
   readonly columns: PipelineColumn[] = [
     {
-      id: 'selected',
-      title: 'Selected',
-      subtitle: 'Top candidates selected from applications',
+      id: 'shortlisted',
+      title: 'Shortlisted',
+      subtitle: 'Candidates moved to the next round',
       accentClass: 'border-emerald-200 bg-emerald-50/70',
       headerClass: 'text-emerald-700',
     },

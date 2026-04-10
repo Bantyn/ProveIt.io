@@ -27,6 +27,8 @@ interface CompanyCard {
   industry: string;
   averageRating: number;
   reviewCount: number;
+  isVerified: boolean;
+  isSuspended: boolean;
 }
 
 @Component({
@@ -148,6 +150,8 @@ export class Company implements OnInit, OnDestroy {
   get filteredCompanies() {
     return this.companies.filter((company) => {
       const searchTerm = this.filters.search.toLowerCase();
+      
+      if (company.isSuspended) return false;
 
       return (
         (!this.filters.search ||
@@ -171,10 +175,13 @@ export class Company implements OnInit, OnDestroy {
   }
 
   private toCompanyCard(company: any): CompanyCard {
+    const status = company.verificationStatus || company.status || 'pending';
     return {
       id: company.id || company._id || '',
       name: company.companyName || company.name || 'Unknown Company',
       description: company.description || 'Verified organization on ProveIt.io.',
+      isVerified: status === 'verified',
+      isSuspended: status === 'suspended',
       logoUrl:
         company.logoUrl ||
         company.imageUrl ||

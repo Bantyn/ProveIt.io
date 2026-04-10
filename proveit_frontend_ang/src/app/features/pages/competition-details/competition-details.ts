@@ -1,104 +1,86 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { ActivatedRoute, RouterLink, Router } from '@angular/router';
-import { Navbar } from '../../components/navbar/navbar';
-import { Footer } from '../../components/footer/footer';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
+import { Navbar } from '../../components/navbar/navbar';
+import { Footer } from '../../components/footer/footer';
 import { ModalService } from '../../../services/modal.service';
-import { firstValueFrom } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 import { SlideButtonComponent } from '../../components/ui/slide-button/slide-button';
 
 @Component({
   selector: 'app-competition-details',
   standalone: true,
-  imports: [CommonModule, Navbar, Footer, RouterLink, DatePipe, SlideButtonComponent],
+  imports: [CommonModule, Navbar, Footer, RouterLink, SlideButtonComponent],
   templateUrl: './competition-details.html',
-  styleUrls: ['./competition-details.css'],
+  styleUrl: './competition-details.css',
 })
 export class CompetitionDetails implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private api = inject(ApiService);
+  private auth = inject(AuthService);
+  private modalService = inject(ModalService);
+
   competitionId: string | null = null;
   competition: any = null;
   user: any = null;
   mongoUser: any = null;
-  showProfilePrompt: boolean = false;
-  isLoading: boolean = true;
-  hasAlreadyApplied: boolean = false;
+  isLoading = true;
+  showProfilePrompt = false;
+  hasAlreadyApplied = false;
 
-  constructor(
-    private route: ActivatedRoute,
-    private api: ApiService,
-    private auth: AuthService,
-    private router: Router,
-    private cdr: ChangeDetectorRef,
-    private modalService: ModalService,
-  ) {}
-
-  ngOnInit(): void {
-    this.competitionId = this.route.snapshot.paramMap.get('id');
-    if (this.competitionId) {
-      this.api.getCompetition(this.competitionId).subscribe({
-        next: (data) => {
-          this.competition = data;
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Could not load competition', err);
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-      });
-    } else {
-      this.isLoading = false;
-    }
+  ngOnInit() {
+    this.route.paramMap.subscribe((params) => {
+      this.competitionId = params.get('id');
+      if (this.competitionId) {
+        this.loadCompetition(this.competitionId);
+      }
+    });
 
     this.auth.user$.pipe(take(1)).subscribe((user) => {
       this.user = user;
       if (user) {
-        this.api.getUser(user.uid).subscribe({
-          next: (data) => {
-            this.mongoUser = data;
-            this.cdr.detectChanges();
-          },
-          error: (err) => {
-            console.error('Could not load mongo user', err);
-            this.cdr.detectChanges();
-          },
+        this.api.getUser(user.uid).subscribe((data) => {
+          this.mongoUser = data;
         });
 
-        // Check if user has already applied to this competition
-        if (this.competitionId) {
-          this.api.getUserApplications(user.uid).pipe(take(1)).subscribe({
-            next: (apps) => {
-              this.hasAlreadyApplied = apps.some((app) => app.competitionId === this.competitionId);
-              this.cdr.detectChanges();
-            },
-            error: () => {},
-          });
-        }
-      } else {
-        this.mongoUser = null;
-        this.cdr.detectChanges();
+        // Also check if user has already applied
+        this.api.getUserApplications(user.uid).pipe(take(1)).subscribe((apps) => {
+          this.hasAlreadyApplied = !!apps.find((app: any) => app.competitionId === this.competitionId);
+        });
       }
+    });
+  }
+
+  loadCompetition(id: string) {
+    this.api.getCompetition(id).subscribe({
+      next: (data) => {
+        this.competition = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load competition', err);
+        this.isLoading = false;
+      },
     });
   }
 
   async applyToEvent() {
     if (this.isClosed) {
-      await this.modalService.alert(
-        'This competition is closed and no longer accepting submissions.',
-        'Competition Closed',
-      );
+      await this.modalService.alert('This competition has already ended.', 'Closed');
+      return;
+    }
+
+    if (this.isCancelled) {
+      await this.modalService.alert('This competition has been cancelled.', 'Cancelled');
       return;
     }
 
     if (!this.canParticipateYet) {
-      await this.modalService.alert(
-        this.participationBlockedMessage,
-        'Competition Not Open Yet',
-      );
+      await this.modalService.alert(this.participationBlockedMessage, 'Not Yet Open');
       return;
     }
 
@@ -122,15 +104,16 @@ export class CompetitionDetails implements OnInit {
           return;
         }
 
-        // 2. Check for ANY active application across the platform
-        const activeApp = apps.find((app) => {
+        // 2. Check for active application from the SAME COMPANY
+        const activeAppFromSameCompany = apps.find((app) => {
           const status = (app.status || '').toUpperCase();
-          return status !== 'REJECTED' && status !== 'SELECTED';
+          const isSameCompany = app.companyId === this.competition?.companyId;
+          return isSameCompany && status !== 'REJECTED' && status !== 'SELECTED';
         });
 
-        if (activeApp) {
+        if (activeAppFromSameCompany) {
           await this.modalService.alert(
-            'You already have an active application. You cannot apply for a new one until your current application is rejected or completed.',
+            'You already have an active application with this company. You cannot apply for a new one until your current application is rejected or completed.',
             'Application Restriction',
           );
           this.router.navigate(['/user/applications']);
@@ -190,8 +173,6 @@ export class CompetitionDetails implements OnInit {
     startDate.setHours(0, 0, 0, 0);
 
     const now = new Date();
-    // No need to set hours for 'now' if we compare with getTime() or just direct comparison
-    // but consistent with current logic:
     now.setHours(0, 0, 0, 0);
 
     return now >= startDate;
@@ -200,15 +181,12 @@ export class CompetitionDetails implements OnInit {
   get isClosed(): boolean {
     if (!this.competition) return false;
     
-    // 1. Explicit Status Check
     const status = (this.competition.status || '').toUpperCase();
     if (status === 'CLOSED' || status === 'COMPLETED' || status === 'INACTIVE') return true;
 
-    // 2. End Date / Deadline Check
     const rawEndDate = this.competition.endDate || this.competition.projectInfo?.deadline;
     if (rawEndDate) {
       const endDate = new Date(rawEndDate);
-      // If deadline is just a date (00:00:00), assume end of day to be fair
       if (endDate.getHours() === 0 && endDate.getMinutes() === 0) {
         endDate.setHours(23, 59, 59, 999);
       }
@@ -216,6 +194,12 @@ export class CompetitionDetails implements OnInit {
     }
 
     return false;
+  }
+
+  get isCancelled(): boolean {
+    if (!this.competition) return false;
+    const status = (this.competition.status || '').toUpperCase();
+    return status === 'CANCELLED' || status === 'CANCEL';
   }
 
   get participationBlockedMessage(): string {

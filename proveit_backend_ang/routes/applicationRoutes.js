@@ -226,7 +226,37 @@ router.put('/:id', async (req, res) => {
         }
         // --------------------------------------------
 
+        const oldSnap = await appRef.get();
+        const oldData = oldSnap.exists ? oldSnap.data() : null;
+
         await appRef.update(updates);
+
+        // --- CREATE NOTIFICATION ON STATUS CHANGE ---
+        if (updates.status && oldData && updates.status !== oldData.status) {
+            const statusLabels = {
+                'REJECTED': 'Rejected ❌',
+                'SELECTED': 'Selected 🎉',
+                'SHORTLISTED': 'Shortlisted ✅',
+                'UNDER_EVALUATION': 'Under Evaluation 🔍',
+                'UNDER_REVELUTION': 'Under Evaluation 🔍',
+                'PENDING': 'Pending ⏳'
+            };
+
+            const label = statusLabels[updates.status.toUpperCase()] || updates.status;
+            
+            await db.collection('notifications').add({
+                userId: oldData.userId,
+                title: 'Application Update',
+                message: `Your application for "${oldData.competitionTitle || 'Competition'}" is now ${label}.`,
+                type: 'APPLICATION_STATUS',
+                status: updates.status,
+                competitionId: oldData.competitionId,
+                read: false,
+                createdAt: new Date().toISOString()
+            });
+        }
+        // --------------------------------------------
+
         res.status(200).json({ id: req.params.id, ...updates, message: 'Application updated successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });

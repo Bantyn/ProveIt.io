@@ -20,13 +20,16 @@ export class CompanyProjects implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   projects: any[] = [];
-  selected: any = null;
+  competitions: any[] = [];
+  selectedCompetition: any = null;
   filter = 'all';
   filters = ['all', 'reviewed', 'pending', 'flagged'];
   searchTerm = '';
+  competitionSearchTerm = '';
   sortKey = 'submittedAt';
   sortDirection: 'asc' | 'desc' = 'desc';
   loading = false;
+  selected: any = null;
 
   ngOnInit() {
     this.auth.user$.pipe(take(1)).subscribe((user) => {
@@ -37,8 +40,9 @@ export class CompanyProjects implements OnInit {
             forkJoin({
               projects: this.api.getCompanyProjects(company.id),
               applications: this.api.getCompanyApplications(company.id),
+              competitions: this.api.getCompanyCompetitions(company.id),
             }).subscribe({
-              next: ({ projects, applications }) => {
+              next: ({ projects, applications, competitions }) => {
                 const applicationMap = new Map(
                   (applications || []).map((application: any) => [application.id, application]),
                 );
@@ -47,6 +51,7 @@ export class CompanyProjects implements OnInit {
                   const linkedApplication = applicationMap.get(project.applicationId);
                   return {
                     ...project,
+                    competitionId: linkedApplication?.competitionId,
                     applicationScore: this.parseNumericValue(
                       linkedApplication?.score ?? linkedApplication?.evaluation?.manualScore,
                     ),
@@ -55,6 +60,18 @@ export class CompanyProjects implements OnInit {
                     evaluationNotes: linkedApplication?.evaluation?.notes || '',
                   };
                 });
+
+                // Build competition cards with project counts
+                this.competitions = (competitions || []).map((c: any) => {
+                  const projectCount = this.projects.filter((p: any) => p.competitionId === c.id).length;
+                  const applicationCount = (applications || []).filter((a: any) => a.competitionId === c.id).length;
+                  return { ...c, projectCount, applicationCount };
+                }).sort((a: any, b: any) => {
+                  const dateA = a.postedAt ? new Date(a.postedAt).getTime() : 0;
+                  const dateB = b.postedAt ? new Date(b.postedAt).getTime() : 0;
+                  return dateB - dateA;
+                });
+
                 this.loading = false;
                 this.cdr.detectChanges();
               },
@@ -73,6 +90,34 @@ export class CompanyProjects implements OnInit {
     });
   }
 
+  selectCompetition(competition: any) {
+    this.selectedCompetition = competition;
+    this.filter = 'all';
+    this.searchTerm = '';
+  }
+
+  backToCompetitions() {
+    this.selectedCompetition = null;
+    this.filter = 'all';
+    this.searchTerm = '';
+  }
+
+  get filteredCompetitions() {
+    if (!this.competitionSearchTerm) return this.competitions;
+    const s = this.competitionSearchTerm.toLowerCase();
+    return this.competitions.filter((c: any) =>
+      (c.title || c.name || '').toLowerCase().includes(s)
+    );
+  }
+
+  getCompetitionStatus(c: any): string {
+    if (c.status) return c.status;
+    if (c.endDate) {
+      return new Date(c.endDate) < new Date() ? 'closed' : 'active';
+    }
+    return 'active';
+  }
+
   toggleSort(key: string) {
     if (this.sortKey === key) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -84,6 +129,10 @@ export class CompanyProjects implements OnInit {
 
   get filtered() {
     let list = [...this.projects];
+
+    if (this.selectedCompetition) {
+      list = list.filter((p) => p.competitionId === this.selectedCompetition.id);
+    }
 
     if (this.filter !== 'all') {
       list = list.filter((p) => p.status === this.filter);

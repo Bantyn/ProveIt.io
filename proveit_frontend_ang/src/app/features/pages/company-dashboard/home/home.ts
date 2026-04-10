@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { ApiService } from '../../../../services/api.service';
 import { AuthService } from '../../../../services/auth.service';
-import { NgFor, NgClass, NgIf, DecimalPipe } from '@angular/common';
+import { NgFor, NgClass, NgIf } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { StatsCard } from '../../../../features/components/ui/stats-card/stats-card';
 import { AreaChart } from '../../../../features/components/ui/area-chart/area-chart';
@@ -11,7 +11,7 @@ import { take } from 'rxjs/operators';
 @Component({
   selector: 'app-company-home',
   standalone: true,
-  imports: [NgFor, NgIf, NgClass, RouterLink, DecimalPipe, StatsCard, AreaChart],
+  imports: [NgFor, NgIf, NgClass, RouterLink, StatsCard, AreaChart],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -31,7 +31,7 @@ export class CompanyHome implements OnInit {
   // Chart state
   chartLabels: string[] = [];
   applicationData: number[] = [];
-  competitionEngagement: number[] = [];
+  shortlistedData: number[] = [];
 
   planName = '';
   planPrice = 0;
@@ -63,26 +63,25 @@ export class CompanyHome implements OnInit {
                 if (data.analytics) {
                   this.chartLabels = data.analytics.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                   this.applicationData = data.analytics.applicationData || data.analytics.dailyApplications || [];
-                  this.competitionEngagement = data.analytics.engagementData || data.analytics.dailyEngagement || [];
+                  this.shortlistedData = data.analytics.shortlistedData || data.analytics.dailyShortlisted || [];
                   
-                  // If labels are still empty, force a default range
-                  if (this.chartLabels.length === 0) {
-                    this.chartLabels = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
+                  if (this.chartLabels.length <= 1) {
+                    this.chartLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                   }
                 } else {
-                  // Final fallback to make it look active
-                  this.chartLabels = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
-                  this.applicationData = [12, 18, 15, 22, 19, 25];
-                  this.competitionEngagement = [5, 8, 7, 12, 10, 15];
+                  // Final fallback to show zero state
+                  this.chartLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                  this.applicationData = [0, 0, 0, 0, 0, 0, 0];
+                  this.shortlistedData = [0, 0, 0, 0, 0, 0, 0];
                 }
 
                 if (data.recentComps) {
                   this.recentComps = data.recentComps.map((c: any) => ({
                     ...c,
                     applicants: c.applicants !== undefined ? c.applicants : 
-                                c.applicantCount !== undefined ? c.applicantCount : 
-                                c.applicantsCount !== undefined ? c.applicantsCount :
-                                c.applicationsCount !== undefined ? c.applicationsCount : 0,
+                                 c.applicantCount !== undefined ? c.applicantCount : 
+                                 c.applicantsCount !== undefined ? c.applicantsCount :
+                                 c.applicationsCount !== undefined ? c.applicationsCount : 0,
                     deadline: c.deadline || c.projectInfo?.deadline || null,
                   }));
                 }

@@ -1,18 +1,20 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../services/api.service';
+import { ThemeService } from '../../../../services/theme.service';
 import { SystemSettingsService } from '../../../../services/system-settings.service';
 
 @Component({
   selector: 'app-admin-settings',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink],
+  imports: [NgFor, NgIf, NgClass, FormsModule, RouterLink],
   templateUrl: './settings.html',
 })
 export class AdminSettings implements OnInit {
   private api = inject(ApiService);
+  public theme = inject(ThemeService);
   private systemSettings = inject(SystemSettingsService);
 
   settings: any = {};

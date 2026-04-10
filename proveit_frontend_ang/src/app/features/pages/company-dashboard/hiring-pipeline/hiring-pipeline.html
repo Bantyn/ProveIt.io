@@ -155,11 +155,11 @@
             <div class="flex flex-wrap gap-3">
                 <div class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200">
                     <span class="text-[12px] font-bold text-slate-500">Active in Pipeline</span>
-                    <strong class="text-[14px] font-semibold text-slate-900">{{ getApplicationsForColumn('selected').length + getApplicationsForColumn('interview_scheduled').length + getApplicationsForColumn('hired').length }}</strong>
+                    <strong class="text-[14px] font-semibold text-slate-900">{{ getApplicationsForColumn('shortlisted').length + getApplicationsForColumn('interview_scheduled').length + getApplicationsForColumn('hired').length }}</strong>
                 </div>
                 <div class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200">
-                    <span class="text-[12px] font-bold text-slate-500">Selected</span>
-                    <strong class="text-[14px] font-semibold text-slate-900">{{ getApplicationsForColumn('selected').length }}</strong>
+                    <span class="text-[12px] font-bold text-slate-500">Shortlisted</span>
+                    <strong class="text-[14px] font-semibold text-slate-900">{{ getApplicationsForColumn('shortlisted').length }}</strong>
                 </div>
             </div>
             <p class="text-[12px] font-semibold text-slate-500">Drag a candidate card and drop it into the next hiring stage.</p>
@@ -171,7 +171,7 @@
         class="min-h-[560px] bg-white border border-slate-200 rounded-[28px] p-4 shadow-sm transition-colors"
         [attr.data-stage]="column.id"
         [ngClass]="{
-            'border-emerald-200': column.id === 'selected',
+            'border-emerald-200': column.id === 'shortlisted',
             'border-cyan-200': column.id === 'interview_scheduled',
             'border-violet-200': column.id === 'hired',
             'border-rose-200': column.id === 'rejected'
@@ -185,7 +185,7 @@
                         [ngClass]="{
                             'text-blue-700': column.id === 'submitted',
                             'text-amber-700': column.id === 'under_evaluation',
-                            'text-emerald-700': column.id === 'selected',
+                            'text-emerald-700': column.id === 'shortlisted',
                             'text-cyan-700': column.id === 'interview_scheduled',
                             'text-rose-700': column.id === 'rejected'
                         }">{{ column.title }}</h2>
@@ -254,7 +254,7 @@
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
                         <button
-                            *ngIf="application.status === 'selected' || application.status === 'winner' || application.status === 'not_selected' || application.status === 'rejected'"
+                            *ngIf="application.status === 'selected' || application.status === 'winner' || application.status === 'shortlisted' || application.status === 'not_selected' || application.status === 'rejected'"
                             type="button"
                             class="inline-flex items-center gap-1.5 h-8 px-3 rounded-full border border-slate-200 bg-blue-500 text-white text-[11px] font-semibold cursor-pointer transition hover:bg-indigo-50 hover:text-slate-900 disabled:opacity-60 disabled:cursor-not-allowed"
                             [disabled]="updatingApplicationId === application.id"

@@ -32,7 +32,7 @@
 
                     <!-- Clear Button -->
                     <button (click)="clearFilters()"
-                        class="ml-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-[var(--dd-blue-dark)] via-[var(--dd-orange)] to-[var(--dd-yellow)] text-white text-sm font-bold shadow-md shadow-orange-500/20 hover:scale-105 active:scale-95 transition-all">
+                        class="ml-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-[var(--dd-blue-dark)] via-[var(--dd-orange)] to-[var(--dd-yellow)] text-white text-sm font-bold shadow-md hover:scale-105 active:scale-95 transition-all">
                         Clear Filters
                     </button>
                 </div>
@@ -71,8 +71,9 @@
                                         class="w-full h-full object-contain rounded-xl" />
                                 </div>
                                 <div class="grow">
-                                    <h3 class="text-xl font-bold text-gray-900 leading-tight">
+                                    <h3 class="text-xl font-bold text-gray-900 leading-tight flex items-center gap-1.5">
                                         {{ company.name }}
+                                        <i *ngIf="company.isVerified" class="bi bi-patch-check-fill text-blue-500 text-[18px]" title="Verified Company"></i>
                                     </h3>
                                     <p class="text-sm text-gray-500 mt-1 line-clamp-2">
                                         {{ company.description }}
@@ -125,8 +126,9 @@
                                         class="w-full h-full object-contain rounded-xl" />
                                 </div>
                                 <div class="grow">
-                                    <h3 class="text-xl font-bold text-white leading-tight">
+                                    <h3 class="text-xl font-bold text-white leading-tight flex items-center gap-1.5">
                                         {{ company.name }}
+                                        <i *ngIf="company.isVerified" class="bi bi-patch-check-fill text-blue-400 text-[18px]" title="Verified Company"></i>
                                     </h3>
                                     <p class="text-sm text-white/80 opacity-30 mt-1 line-clamp-2">
                                         {{ company.description }}

@@ -3,6 +3,7 @@ import { NgIf, NgFor, NgClass, TitleCasePipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
 import { AuthService } from '../../../../services/auth.service';
+import { ThemeService } from '../../../../services/theme.service';
 import { ModalService } from '../../../../services/modal.service';
 import { MorphLoading } from '../../../../features/components/ui/morph-loading/morph-loading';
 import { take } from 'rxjs/operators';
@@ -17,6 +18,7 @@ import { take } from 'rxjs/operators';
 export class CompanySettings implements OnInit {
   private api = inject(ApiService);
   private auth = inject(AuthService);
+  public theme = inject(ThemeService);
   private modalService = inject(ModalService);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);

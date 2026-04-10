@@ -8,7 +8,7 @@
         </p>
     </div>
     <a routerLink="/company/dashboard/competitions/create"
-        class="group relative inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-sm tracking-wide text-white bg-linear-to-r from-(--dd-blue-dark) via-(--dd-orange) to-(--dd-yellow) shadow-lg shadow-orange-200/40 transition-all duration-300 hover:scale-[1.03] no-underline"
+        class="group relative inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-sm tracking-wide text-white bg-linear-to-r from-(--dd-blue-dark) via-(--dd-orange) to-(--dd-yellow) shadow-md transition-all duration-300 hover:scale-[1.03] no-underline"
         [class.opacity-50]="companyProfile && !companyProfile.isProfileCompleted">
         <span class="relative z-10 flex items-center gap-2">
             <i class="bi bi-plus-circle"></i> New Competition
@@ -77,19 +77,19 @@
         <div class="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 shadow-sm border border-neutral-100 dark:border-neutral-800 relative overflow-hidden group h-full">
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">User Engagement</h2>
-                    <p class="text-[13px] text-slate-500 font-semibold m-0 mt-1">Participant interaction levels</p>
+                    <h2 class="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">Shortlisting Trends</h2>
+                    <p class="text-[13px] text-slate-500 font-semibold m-0 mt-1">Candidates moved to shortlist pipeline</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-(--dd-blue)"></span>
-                    <span class="text-[12px] font-semibold text-slate-600">Engagement</span>
+                    <span class="text-[12px] font-semibold text-slate-600">Shortlisted</span>
                 </div>
             </div>
             <div class="h-[250px]">
                 <app-area-chart
-                    [data]="competitionEngagement"
+                    [data]="shortlistedData"
                     [labels]="chartLabels"
-                    label="User Engagement"
+                    label="Shortlisted Candidates"
                     primaryColor="#2563eb">
                 </app-area-chart>
             </div>
@@ -197,23 +197,3 @@
     </div>
 </div>
 
-<div
-    class="bg-linear-to-r from-gray-900 to-slate-800 rounded-3xl p-6 shadow-lg mt-8 flex items-center gap-5 flex-wrap relative overflow-hidden text-white">
-    <div
-        class="absolute inset-0 bg-linear-to-r from-(--dd-blue)/20 via-(--dd-orange)/10 to-(--dd-yellow)/20 blur-xl">
-    </div>
-    <div class="relative text-3xl text-(--dd-yellow) bg-white/10 p-4 rounded-2xl backdrop-blur-sm">
-        <i class="bi bi-gem gap-2 flex items-center"></i>
-    </div>
-    <div class="flex-1 relative">
-        <h3 class="text-xl font-bold">{{ planName || 'Pro' }} Plan</h3>
-        <p class="text-sm text-gray-300 mt-1">
-            Renews on <strong class="text-white font-semibold">{{ subEndDate || '8 Jan 2026' }}</strong> | ₹{{ (planPrice | number) || '12,999' }}/year |
-            {{ planLimit === 999 ? 'Unlimited' : (planLimit || 20) }} Active Competitions allowed
-        </p>
-    </div>
-    <a routerLink="/company/dashboard/billing"
-        class="relative bg-white/10 border border-white/20 hover:bg-white text-white hover:text-gray-900 font-bold text-sm px-6 py-3 rounded-full cursor-pointer inline-flex items-center transition-all duration-300 shadow-md no-underline backdrop-blur-sm">
-        Manage Billing
-    </a>
-</div>

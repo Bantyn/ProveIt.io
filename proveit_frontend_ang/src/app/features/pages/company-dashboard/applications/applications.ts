@@ -30,7 +30,7 @@ export class CompanyApplications implements OnInit {
   selectedCompetition: any = null;
   filter = 'all';
   selected: any = null;
-  statusFilters = ['all', 'pending', 'submitted', 'under_evaluation', 'selected', 'winner', 'interview_scheduled', 'not_selected', 'rejected'];
+  statusFilters = ['all', 'pending', 'submitted', 'under_evaluation', 'shortlisted', 'selected', 'winner', 'interview_scheduled', 'not_selected', 'rejected'];
   userId = '';
   companyId = '';
   loading = false;
@@ -347,8 +347,8 @@ export class CompanyApplications implements OnInit {
   }
 
   quickAction(application: any, newStatus: string) {
-    // If selecting or rejecting and no score assigned, open evaluation first
-    if ((newStatus === 'selected' || newStatus === 'rejected') && !this.hasScore(application.score)) {
+    // If shortlisting or rejecting and no score assigned, open evaluation first
+    if ((newStatus === 'shortlisted' || newStatus === 'rejected') && !this.hasScore(application.score)) {
       this.pendingStatusAfterScore = newStatus;
       this.openEvaluationModal(application);
       return;
@@ -504,7 +504,7 @@ export class CompanyApplications implements OnInit {
       if (!confirmed) return;
     }
 
-    // Find the highest scored application
+    // Find the top 5 highest scored applications
     const scoredApps = competitionApps.filter((a: any) => this.hasScore(a.score));
 
     if (scoredApps.length === 0) {
@@ -513,19 +513,25 @@ export class CompanyApplications implements OnInit {
     }
 
     scoredApps.sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0));
-    const winner = scoredApps[0];
+    
+    // Select top 5
+    const topScorers = scoredApps.slice(0, 5);
+    const topScorerIds = new Set(topScorers.map(a => a.id));
 
     const updates: Promise<any>[] = [];
 
     for (const app of competitionApps) {
       let newStatus: string;
-      if (app.id === winner.id) {
-        newStatus = 'selected';
-      } else if (app.status === 'selected' || app.status === 'interview_scheduled') {
-        // Don't demote already-progressed applications
+      
+      // Preserve "interview_scheduled" status as it's further in the pipeline
+      if (app.status === 'interview_scheduled') {
         continue;
+      }
+
+      if (topScorerIds.has(app.id)) {
+        newStatus = 'shortlisted';
       } else {
-        newStatus = 'not_selected';
+        newStatus = 'rejected';
       }
 
       if (app.status !== newStatus) {
@@ -542,9 +548,10 @@ export class CompanyApplications implements OnInit {
     try {
       await Promise.all(updates);
       this.cdr.detectChanges();
+      const count = topScorers.length;
       await this.modalService.alert(
-        `Review complete! ${winner.candidateName || 'Top scorer'} declared as winner with a score of ${winner.score}/100.`,
-        'Winner Declared',
+        `Review complete! The top ${count} candidate${count > 1 ? 's' : ''} ${count > 1 ? 'have' : 'has'} been shortlisted based on their scores. Remaining candidates have been marked as rejected.`,
+        'Review Completed',
         'success',
       );
     } catch (err) {

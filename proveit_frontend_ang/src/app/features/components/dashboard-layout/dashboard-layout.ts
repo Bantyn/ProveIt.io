@@ -6,6 +6,7 @@ import { AuthService } from '../../../services/auth.service';
 import { ApiService } from '../../../services/api.service';
 import { DummyDataService } from '../../../services/dummy-data.service';
 import { LucideAngularModule } from 'lucide-angular';
+import { FormsModule } from '@angular/forms';
 
 import { take } from 'rxjs/operators';
 
@@ -21,7 +22,7 @@ export interface NavItem {
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, NgFor, NgIf, DatePipe, Sidebar, SidebarBody, SidebarLink, Logo, LucideAngularModule],
+  imports: [RouterOutlet, RouterLink, NgFor, NgIf, DatePipe, Sidebar, SidebarBody, SidebarLink, Logo, LucideAngularModule, FormsModule],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.css',
 })
@@ -34,15 +35,21 @@ export class DashboardLayout implements OnInit {
   companyName = '';
   companyLogoUrl = '';
   userAvatarUrl = '';
+  userId = '';
   notifications: any[] = [];
   currentPlanFeatures: any = null;
   pendingAppCount = 0;
+  searchQuery: string = '';
+  searchResults: any[] = [];
+  isSearching: boolean = false;
+  isVerified: boolean = false;
 
   constructor(
     private authService: AuthService,
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
     public dataService: DummyDataService,
+    private router: Router
   ) {}
 
   get unreadNotifsCount() {
@@ -70,6 +77,7 @@ export class DashboardLayout implements OnInit {
   fetchUserData() {
     this.authService.user$.pipe(take(1)).subscribe((user) => {
       if (user) {
+        this.userId = user.uid;
         if (this.role === 'company') {
           this.apiService.getCompanyByOwnerId(user.uid).subscribe({
             next: (company: any) => {
@@ -80,6 +88,7 @@ export class DashboardLayout implements OnInit {
                 this.userName =
                   company.ownerName || company.contactPerson || user.displayName || this.companyName;
                 this.userInitials = this.getInitials(this.companyName);
+                this.isVerified = company.verificationStatus === 'verified' || company.status === 'verified' || company.verificationStatus === 'approved';
                 this.loadCompanyPlanFeatures(company.plan || 'Starter');
                 this.cdr.detectChanges();
                 return;
@@ -236,6 +245,22 @@ export class DashboardLayout implements OnInit {
     }
   }
 
+  clearNotifications() {
+    if (!this.userId) return;
+    this.apiService.clearUserNotifications(this.userId).subscribe({
+      next: () => {
+        this.notifications = [];
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error clearing notifications:', err);
+        // Fallback: Clear locally if API fails
+        this.notifications = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   toggleProfile() {
     this.profileOpen = !this.profileOpen;
     this.notifOpen = false;
@@ -330,5 +355,74 @@ export class DashboardLayout implements OnInit {
         createdAt: item.createdAt || item.timestamp || new Date().toISOString(),
       }))
       .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+  }
+
+  onSearch(query: string) {
+    this.searchQuery = query;
+    if (!query || query.length < 2) {
+      this.searchResults = [];
+      this.isSearching = false;
+      return;
+    }
+
+    this.isSearching = true;
+    
+    // Admin Global Search
+    if (this.role === 'admin') {
+      this.apiService.getUsers().subscribe(users => {
+        const userRes = (users || []).filter(u => 
+          (u.fullName || u.name || '').toLowerCase().includes(query.toLowerCase()) || 
+          (u.email || '').toLowerCase().includes(query.toLowerCase())
+        ).map(u => ({ id: u.id || u.uid, title: u.fullName || u.name || 'User', sub: u.email, type: 'User', icon: 'user', route: '/admin/users' }));
+
+        this.apiService.getCompanies().subscribe(companies => {
+          const compRes = (companies || []).filter(c => 
+            (c.companyName || c.name || '').toLowerCase().includes(query.toLowerCase())
+          ).map(c => ({ id: c.id, title: c.companyName || c.name, sub: 'Company', type: 'Company', icon: 'building', route: '/admin/companies' }));
+
+          this.apiService.getCompetitions().subscribe(competitions => {
+            const competitionRes = (competitions || []).filter(c => 
+              (c.title || '').toLowerCase().includes(query.toLowerCase())
+            ).map(c => ({ id: c.id, title: c.title, sub: 'Competition', type: 'Competition', icon: 'trophy', route: '/admin/competitions' }));
+
+            this.searchResults = [...userRes, ...compRes, ...competitionRes].slice(0, 10);
+            this.isSearching = false;
+            this.cdr.detectChanges();
+          });
+        });
+      });
+    } 
+    // Company Global Search
+    else {
+      this.authService.user$.pipe(take(1)).subscribe(user => {
+        if (!user) return;
+        this.apiService.getCompanyByOwnerId(user.uid).subscribe(company => {
+          if (!company || !company.id) return;
+          this.apiService.getCompanyCompetitions(company.id).subscribe(comps => {
+            const compRes = (comps || []).filter(c => 
+              (c.title || '').toLowerCase().includes(query.toLowerCase())
+            ).map(c => ({ id: c.id, title: c.title, sub: `Status: ${c.status || 'Active'}`, type: 'Competition', icon: 'trophy', route: '/company/dashboard/competitions' }));
+
+            this.apiService.getCompanyApplications(company.id).subscribe(apps => {
+              const appRes = (apps || []).filter(a => 
+                (a.candidateName || '').toLowerCase().includes(query.toLowerCase()) ||
+                (a.competitionTitle || '').toLowerCase().includes(query.toLowerCase())
+              ).map(a => ({ id: a.id, title: a.candidateName || 'Candidate', sub: a.competitionTitle || 'Application', type: 'Application', icon: 'users', route: '/company/dashboard/applications' }));
+
+              this.searchResults = [...compRes, ...appRes].slice(0, 10);
+              this.isSearching = false;
+              this.cdr.detectChanges();
+            });
+          });
+        });
+      });
+    }
+  }
+
+  navigateToResult(item: any) {
+    this.searchQuery = '';
+    this.searchResults = [];
+    this.isSearching = false;
+    this.router.navigate([item.route], { queryParams: { id: item.id, search: item.title } });
   }
 }

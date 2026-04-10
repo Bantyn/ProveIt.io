@@ -338,14 +338,14 @@ router.get('/:id/dashboard', async (req, res) => {
         const averageRating = reviewCount > 0 ? Math.round((reviewSum / reviewCount) * 10) / 10 : 0;
         const recentReviews = allReviews.slice(0, 5);
 
-        // 4. Calculate Chart Analytics (single-pass aggregation)
+        // 4. Calculate Chart Analytics (Real Shortlisting Trends)
         const labels = [];
         const dailyApplications = [];
-        const dailyEngagement = [];
+        const dailyShortlisted = [];
         const now = new Date();
         const dayKeys = [];
         const applicationCountByDay = new Map();
-        const engagementCountByDay = new Map();
+        const shortlistingCountByDay = new Map();
 
         // Last 7 days
         for (let i = 6; i >= 0; i--) {
@@ -357,44 +357,35 @@ router.get('/:id/dashboard', async (req, res) => {
             labels.push(dayLabel);
             dayKeys.push(dateStr);
             applicationCountByDay.set(dateStr, 0);
-            engagementCountByDay.set(dateStr, 0);
+            shortlistingCountByDay.set(dateStr, 0);
         }
 
         applications.forEach((app) => {
-            const dateStr = app.submittedAt?.split('T')?.[0];
-            if (dateStr && applicationCountByDay.has(dateStr)) {
-                applicationCountByDay.set(dateStr, (applicationCountByDay.get(dateStr) || 0) + 1);
+            // Count applications by submission day
+            const subDateStr = app.submittedAt?.split('T')?.[0];
+            if (subDateStr && applicationCountByDay.has(subDateStr)) {
+                applicationCountByDay.set(subDateStr, (applicationCountByDay.get(subDateStr) || 0) + 1);
+            }
+
+            // Count shortlists (using updatedAt if available, otherwise submittedAt as fallback for trends)
+            const isShortlisted = app.status && app.status.toLowerCase() === 'shortlisted';
+            if (isShortlisted) {
+                const shortlistDateStr = (app.updatedAt || app.submittedAt)?.split('T')?.[0];
+                if (shortlistDateStr && shortlistingCountByDay.has(shortlistDateStr)) {
+                    shortlistingCountByDay.set(shortlistDateStr, (shortlistingCountByDay.get(shortlistDateStr) || 0) + 1);
+                }
             }
         });
 
         dayKeys.forEach((dateStr) => {
             dailyApplications.push(applicationCountByDay.get(dateStr) || 0);
-            dailyEngagement.push(0);
-        });
-
-        // 5. Fetch Interviews for Engagement Chart
-        const interviewsSnap = await db.collection('interviews')
-            .where('companyId', '==', companyId)
-            .get();
-
-        if (!interviewsSnap.empty) {
-            interviewsSnap.forEach(doc => {
-                const data = doc.data();
-                const dateStr = data.createdAt?.split('T')?.[0];
-                if (dateStr && engagementCountByDay.has(dateStr)) {
-                    engagementCountByDay.set(dateStr, (engagementCountByDay.get(dateStr) || 0) + 1);
-                }
-            });
-        }
-
-        dayKeys.forEach((dateStr, index) => {
-            dailyEngagement[index] = engagementCountByDay.get(dateStr) || 0;
+            dailyShortlisted.push(shortlistingCountByDay.get(dateStr) || 0);
         });
 
         const analytics = {
             labels,
             applicationData: dailyApplications,
-            engagementData: dailyEngagement
+            shortlistedData: dailyShortlisted
         };
 
         const stats = [

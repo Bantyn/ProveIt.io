@@ -144,17 +144,18 @@ export class ProjectSubmission implements OnInit {
                 }
               }
 
-              const activeApp = apps.find((app) => {
+              const activeAppFromSameCompany = apps.find((app) => {
                 const status = (app.status || '').toUpperCase();
-                // Only block if the active app is from a DIFFERENT competition
+                // Check if active app is from a DIFFERENT competition but from SAME COMPANY
                 return app.competitionId !== this.competitionId 
+                  && app.companyId === this.competition?.companyId
                   && status !== 'REJECTED' 
                   && status !== 'SELECTED';
               });
 
-              if (activeApp) {
+              if (activeAppFromSameCompany) {
                 await this.modalService.alert(
-                  'You already have an active application for another competition. You cannot apply for a new one until your current application is rejected or completed.',
+                  'You already have an active application with this company for another competition. You cannot apply for a new one until your current application is rejected or completed.',
                   'Application Restriction',
                 );
                 this.router.navigate(['/user/applications']);

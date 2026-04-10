@@ -1,15 +1,23 @@
 <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
     <div>
-        <h1 class="text-[22px] font-bold text-slate-900">Company Settings</h1>
+        <h1 class="text-[22px] font-bold text-slate-900 dark:text-white">Company Settings</h1>
         <p class="text-[13px] text-slate-500 mt-0.5">Minimal profile details for a faster viva demo flow</p>
     </div>
+    <button type="button" (click)="theme.toggleWithTransition('horizontal')"
+      class="group relative flex h-10 w-10 items-center justify-center rounded-2xl transition-all duration-200 focus:outline-none bg-white dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 shadow-sm hover:shadow-md"
+      [attr.aria-label]="'Switch theme'">
+      <i class="bi text-[18px] transition-transform duration-300 group-hover:rotate-[20deg]" [ngClass]="{
+          'bi-sun-fill text-amber-500': !theme.isDark(),
+          'bi-moon-stars-fill text-indigo-400': theme.isDark()
+        }"></i>
+    </button>
 </div>
 
-<div class="flex gap-1 border-b-2 border-slate-100">
-    <div class="flex items-center gap-2.5 p-1 bg-white shadow-sm rounded-2xl border border-slate-100">
+<div class="flex gap-1 border-b-2 border-slate-100 dark:border-neutral-800">
+    <div class="flex items-center gap-2.5 p-1 bg-white dark:bg-neutral-900 shadow-sm rounded-2xl border border-slate-100 dark:border-neutral-800">
         <button *ngFor="let f of statusFilters"
             class="text-sm font-bold px-4 py-2 rounded-xl transition-all border-none cursor-pointer whitespace-nowrap"
-            [ngClass]="filter === f ? 'bg-white text-[var(--dd-blue)] shadow-sm' : 'bg-transparent text-black hover:text-slate-700'"
+            [ngClass]="filter === f ? 'bg-white dark:bg-neutral-800 text-[var(--dd-blue)] shadow-sm' : 'bg-transparent text-black dark:text-neutral-400 hover:text-slate-700 dark:hover:text-white'"
             (click)="setFilter(f)" (click)="activeTab=f">
             {{ f | titlecase }}
         </button>
@@ -22,49 +30,52 @@
     <div class="text-sm font-semibold text-slate-500 mt-4">Loading your settings...</div>
 </div>
 
-<div *ngIf="!isLoading && activeTab==='profile'" class="mt-8 p-6 rounded-3xl bg-white">
-    <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+<div *ngIf="!isLoading && activeTab==='profile'" class="mt-8 p-6 rounded-3xl bg-white dark:bg-neutral-900 shadow-sm border border-slate-100 dark:border-neutral-800">
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-50 dark:border-neutral-800">
         <div>
-            <h2 class="text-lg font-bold text-slate-800 m-0">Company Profile</h2>
+            <h2 class="text-lg font-bold text-slate-800 dark:text-white m-0">Company Profile</h2>
             <p class="text-[11px] text-slate-400 mt-0.5 font-medium">Only the essentials needed to publish demo competitions</p>
         </div>
         <div class="flex flex-col items-end gap-1">
             <span class="text-[10px] font-extrabold text-slate-400">Account Status</span>
-            <span class="text-[11px] font-bold px-3 py-1 rounded-full shadow-sm" [ngClass]="{
+            <span class="text-[11px] font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5" [ngClass]="{
                     'bg-amber-100 text-amber-700': company.verificationStatus === 'pending',
-                    'bg-emerald-100 text-emerald-700': company.verificationStatus === 'approved',
-                    'bg-rose-100 text-rose-700': company.verificationStatus === 'rejected'
-                }">{{ company.verificationStatus || 'Pending Approval' | titlecase }}</span>
+                    'bg-emerald-100 text-emerald-700': company.verificationStatus === 'approved' || company.verificationStatus === 'verified',
+                    'bg-rose-100 text-rose-700': company.verificationStatus === 'rejected' || company.verificationStatus === 'suspended'
+                }">
+                {{ (company.verificationStatus === 'approved' || company.verificationStatus === 'verified' ? 'Verified' : (company.verificationStatus || 'Pending Approval')) | titlecase }}
+                <i *ngIf="company.verificationStatus === 'approved' || company.verificationStatus === 'verified'" class="bi bi-patch-check-fill text-blue-500 text-[10px]"></i>
+            </span>
         </div>
     </div>
 
     <form [formGroup]="profileForm" (ngSubmit)="save()">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="flex flex-col gap-1.5">
-                <label class="text-md font-semibold text-black ml-1">Company Name <span class="text-rose-500">*</span></label>
+                <label class="text-md font-semibold text-black dark:text-neutral-300 ml-1">Company Name <span class="text-rose-500">*</span></label>
                 <input
-                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 dark:placeholder:text-white/20"
                     placeholder="e.g. EduUp Technologies" formControlName="companyName" />
             </div>
 
             <div class="flex flex-col gap-1.5">
-                <label class="text-md font-semibold text-black ml-1">Industry <span class="text-rose-500">*</span></label>
+                <label class="text-md font-semibold text-black dark:text-neutral-300 ml-1">Industry <span class="text-rose-500">*</span></label>
                 <input
-                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 dark:placeholder:text-white/20"
                     placeholder="e.g. EdTech" formControlName="industry" />
             </div>
 
             <div class="flex flex-col gap-1.5">
-                <label class="text-md font-semibold text-black ml-1">Contact Email <span class="text-rose-500">*</span></label>
+                <label class="text-md font-semibold text-black dark:text-neutral-300 ml-1">Contact Email <span class="text-rose-500">*</span></label>
                 <input
-                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 dark:placeholder:text-white/20"
                     placeholder="contact@company.com" formControlName="email" type="email" />
             </div>
 
             <div class="flex flex-col gap-1.5">
-                <label class="text-md font-semibold text-black ml-1">Logo URL <span class="text-slate-400 text-sm font-normal">(Optional)</span></label>
+                <label class="text-md font-semibold text-black dark:text-neutral-300 ml-1">Logo URL <span class="text-slate-400 text-sm font-normal">(Optional)</span></label>
                 <input
-                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                    class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 dark:placeholder:text-white/20"
                     placeholder="https://link-to-your-logo.png" formControlName="logoUrl" />
             </div>
         </div>
@@ -89,22 +100,22 @@
     </form>
 </div>
 
-<div *ngIf="!isLoading && activeTab==='branding'" class="mt-8 p-6 rounded-3xl bg-white">
-    <h2 class="text-lg font-bold text-slate-800 m-0 mb-6 border-b border-slate-50 pb-4">Branding Preview</h2>
+<div *ngIf="!isLoading && activeTab==='branding'" class="mt-8 p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 shadow-sm">
+    <h2 class="text-lg font-bold text-slate-800 dark:text-white m-0 mb-6 border-b border-slate-50 dark:border-neutral-800 pb-4">Branding Preview</h2>
     <form [formGroup]="profileForm" (ngSubmit)="save()">
         <div
             class="flex flex-col md:flex-row items-start md:items-center gap-6 p-6 rounded-3xl border border-slate-100 bg-slate-50/50 mb-8">
             <div
-                class="w-24 h-24 shrink-0 rounded-2xl bg-white shadow-sm border border-slate-200 flex items-center justify-center overflow-hidden">
+                class="w-24 h-24 shrink-0 rounded-2xl bg-white dark:bg-neutral-800 shadow-sm border border-slate-200 dark:border-neutral-700 flex items-center justify-center overflow-hidden">
                 <img *ngIf="profileForm.get('logoUrl')?.value" [src]="profileForm.get('logoUrl')?.value"
                     class="w-full h-full object-contain p-2" />
-                <span *ngIf="!profileForm.get('logoUrl')?.value" class="text-slate-300 font-bold text-xs">LOGO</span>
+                <span *ngIf="!profileForm.get('logoUrl')?.value" class="text-slate-300 dark:text-neutral-600 font-bold text-xs">LOGO</span>
             </div>
             <div class="flex-grow w-full">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-md font-semibold text-black ml-1">Company Logo URL</label>
+                    <label class="text-md font-semibold text-black dark:text-neutral-300 ml-1">Company Logo URL</label>
                     <input
-                        class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                        class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 dark:placeholder:text-white/20"
                         placeholder="https://link-to-your-logo.png" formControlName="logoUrl" />
                 </div>
             </div>
@@ -128,27 +139,27 @@
     </form>
 </div>
 
-<div *ngIf="!isLoading && activeTab==='security'" class="mt-8 p-6 rounded-3xl bg-white">
-    <h2 class="text-lg font-bold text-slate-800 m-0 border-b border-slate-50 mb-6 pb-4">Security</h2>
-    <p class="text-sm text-slate-500 mb-6">Security settings are unchanged. They are not required for the viva demo flow.</p>
+<div *ngIf="!isLoading && activeTab==='security'" class="mt-8 p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 shadow-sm">
+    <h2 class="text-lg font-bold text-slate-800 dark:text-white m-0 border-b border-slate-50 dark:border-neutral-800 mb-6 pb-4">Security</h2>
+    <p class="text-sm text-slate-500 dark:text-neutral-400 mb-6">Security settings are unchanged. They are not required for the viva demo flow.</p>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="flex flex-col gap-1.5">
-            <label class="text-md font-semibold text-black ml-1">Current Password</label>
+            <label class="text-md font-semibold text-black dark:text-neutral-300 ml-1">Current Password</label>
             <input
-                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 dark:placeholder:text-white/20"
                 type="password" />
         </div>
         <div class="flex w-full md:block hidden"></div>
         <div class="flex flex-col gap-1.5">
-            <label class="text-md font-semibold text-black ml-1">New Password</label>
+            <label class="text-md font-semibold text-black dark:text-neutral-300 ml-1">New Password</label>
             <input
-                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 dark:placeholder:text-white/20"
                 type="password" />
         </div>
         <div class="flex flex-col gap-1.5">
-            <label class="text-md font-semibold text-black ml-1">Confirm Password</label>
+            <label class="text-md font-semibold text-black dark:text-neutral-300 ml-1">Confirm Password</label>
             <input
-                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30"
+                class="w-full py-5 px-5 rounded-2xl text-sm border border-blue-100/50 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white outline-none transition focus:bg-white focus:border-[var(--dd-blue)] focus:ring-4 focus:ring-[var(--dd-blue)]/10 font-normal placeholder:text-black/30 dark:placeholder:text-white/20"
                 type="password" />
         </div>
     </div>

@@ -88,11 +88,11 @@ export class AdminOverview implements OnInit {
     this.stats = [
       {
         label: 'Total Users',
-        value: data.totalUsers,
+        value: (data.totalUsers || 0) - (data.totalCompanies || 0),
         icon: 'users',
         color: 'purple',
         change: '+' + (data.userGrowth || 0) + '%',
-        subtext: 'Active platform participants'
+        subtext: 'Registered platform candidates'
       },
       {
         label: 'Partner Companies',

@@ -343,8 +343,8 @@ export class ApiService {
   }
 
   // ─── ADMIN ────────────────────────────────────────────────────────────────
-  getAdminStats(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/admin/stats`);
+  getAdminStats(range: string = 'all'): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/admin/stats?range=${range}`);
   }
 
   getAdminLogs(): Observable<any[]> {
@@ -403,8 +403,8 @@ export class ApiService {
     return this.http.put<any>(`${this.baseUrl}/admin/system-settings`, settings);
   }
 
-  getAdminPayments(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/admin/payments`);
+  getAdminPayments(range: string = 'all'): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/admin/payments?range=${range}`);
   }
 
   getAdminPlans(): Observable<any[]> {
@@ -418,5 +418,18 @@ export class ApiService {
   // Public endpoint — used by pricing page
   getPlans(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/admin/plans`);
+  }
+
+  // ─── NOTIFICATIONS ────────────────────────────────────────────────────────
+  getUserNotifications(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/notifications/user/${userId}`);
+  }
+
+  markNotificationAsRead(id: string): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/notifications/${id}/read`, {});
+  }
+
+  clearUserNotifications(userId: string): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/notifications/user/${userId}`);
   }
 }

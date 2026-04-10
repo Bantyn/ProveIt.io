@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { DummyDataService } from '../../../../services/dummy-data.service';
-import { NgIf } from '@angular/common';
+import { NgIf, DecimalPipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../services/auth.service';
 import { ApiService } from '../../../../services/api.service';
@@ -21,6 +21,8 @@ declare var Razorpay: any;
   standalone: true,
   imports: [
     NgIf,
+    DecimalPipe,
+    TitleCasePipe,
     FormsModule,
     MorphLoading,
     PricingTable,

@@ -33,17 +33,20 @@ async function getCompanyPlan(companyId) {
             'STARTER': {
                 competitions: { maxCompetitionsPerMonth: 2, maxApplicationsPerCompetition: 50, maxShortlistedPerCompetition: 5 },
                 messaging: { enabled: true },
-                interviews: { enabled: false }
+                interviews: { enabled: false },
+                ai: { chatbotSupport: false }
             },
             'GROWTH': {
                 competitions: { maxCompetitionsPerMonth: 10, maxApplicationsPerCompetition: 200, maxShortlistedPerCompetition: 25 },
                 messaging: { enabled: true },
-                interviews: { enabled: true }
+                interviews: { enabled: true },
+                ai: { chatbotSupport: false }
             },
             'ELITE': {
                 competitions: { maxCompetitionsPerMonth: 999999, maxApplicationsPerCompetition: 999999, maxShortlistedPerCompetition: 999999 },
                 messaging: { enabled: true },
-                interviews: { enabled: true }
+                interviews: { enabled: true },
+                ai: { chatbotSupport: true }
             }
         };
         features = fallbacks[planName] || fallbacks['STARTER'];
@@ -189,7 +192,8 @@ async function checkAiChatEnabled(companyId) {
     if (!features) return { allowed: false, error: 'Company or Plan not found' };
     
     // Structure in Firestore: features.ai.chatbotSupport (boolean)
-    if (features.ai && features.ai.chatbotSupport === false) {
+    // We strictly check for true. If it's missing or false, we deny.
+    if (!features.ai || features.ai.chatbotSupport !== true) {
         return { 
             allowed: false, 
             error: `AI Chat features are not available in your current plan. Please upgrade.` 

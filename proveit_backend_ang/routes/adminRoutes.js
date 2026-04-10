@@ -81,8 +81,11 @@ const STATS_CACHE_TTL = 60000;
 // Get global admin dashboard statistics
 router.get('/stats', async (req, res) => {
     try {
+        const { range } = req.query; // 'month', 'year', 'all'
+        
+        // Skip cache if range is provided (or we could cache by range)
         const now = Date.now();
-        if (statsCache.data && (now - statsCache.fetchedAt) < STATS_CACHE_TTL) {
+        if (!range && statsCache.data && (now - statsCache.fetchedAt) < STATS_CACHE_TTL) {
             return res.status(200).json(statsCache.data);
         }
 
@@ -98,8 +101,25 @@ router.get('/stats', async (req, res) => {
         let totalRevenue = 0;
         let totalTransactions = 0;
         let refundsIssued = 0;
+
+        const filterDate = new Date();
+        if (range === 'month') {
+            filterDate.setDate(1);
+            filterDate.setHours(0, 0, 0, 0);
+        } else if (range === 'year') {
+            filterDate.setMonth(0, 1);
+            filterDate.setHours(0, 0, 0, 0);
+        }
+
         allPaymentsSnap.forEach(doc => {
             const d = doc.data();
+            const createdAt = d.createdAt ? new Date(d.createdAt) : null;
+            
+            // Filter by date if range is specified
+            if (range && range !== 'all' && createdAt) {
+                if (createdAt < filterDate) return;
+            }
+
             const s = (d.status || '').toLowerCase();
             totalTransactions++;
             if (s === 'success') totalRevenue += (d.amount || 0);
@@ -119,8 +139,49 @@ router.get('/stats', async (req, res) => {
             revenueGrowth: 18
         };
 
-        statsCache = { data: result, fetchedAt: now };
+        if (!range) {
+            statsCache = { data: result, fetchedAt: now };
+        }
         res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get activity logs as notifications
+router.get('/notifications', async (req, res) => {
+    try {
+        const snapshot = await db.collection('activityLogs')
+            .orderBy('createdAt', 'desc')
+            .limit(10)
+            .get();
+
+        let notifs = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            notifs.push({
+                id: doc.id,
+                title: data.action || 'Admin Notice',
+                message: data.description || data.action,
+                status: 'unread',
+                type: data.severity === 'ERROR' ? 'error' : (data.severity === 'SUCCESS' ? 'success' : 'info'),
+                createdAt: data.createdAt || data.timestamp,
+            });
+        });
+
+        // Add dummy notice if empty
+        if (notifs.length === 0) {
+            notifs.push({
+                id: 'system-init',
+                title: 'System Online',
+                message: 'All platform services are operational.',
+                status: 'unread',
+                type: 'success',
+                createdAt: new Date().toISOString()
+            });
+        }
+
+        res.status(200).json(notifs);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -482,9 +543,22 @@ router.delete('/roles/:id', async (req, res) => {
 // Get Payments
 router.get('/payments', async (req, res) => {
     try {
-        const snapshot = await db.collection('payments')
-            .orderBy('createdAt', 'desc')
-            .get();
+        const { range } = req.query;
+        let query = db.collection('payments').orderBy('createdAt', 'desc');
+
+        if (range === 'month') {
+            const startOfMonth = new Date();
+            startOfMonth.setDate(1);
+            startOfMonth.setHours(0, 0, 0, 0);
+            query = query.where('createdAt', '>=', startOfMonth.toISOString());
+        } else if (range === 'year') {
+            const startOfYear = new Date();
+            startOfYear.setMonth(0, 1);
+            startOfYear.setHours(0, 0, 0, 0);
+            query = query.where('createdAt', '>=', startOfYear.toISOString());
+        }
+
+        const snapshot = await query.get();
         let payments = [];
         snapshot.forEach(doc => payments.push({ id: doc.id, ...doc.data() }));
         res.status(200).json(payments);

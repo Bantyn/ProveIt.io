@@ -18,41 +18,45 @@ export class Footer {
 
   footerData = {
     sections: [
-      { 
-        title: "About", 
+      {
+        title: 'Platform',
         links: [
-          { label: "Home", path: "/landing" },
-          { label: "Features", path: "/features" },
-          { label: "Pricing", path: "/pricing" },
-          { label: "Contact Us", path: "/contact" }
-        ] 
+          { label: 'Home', path: '/' },
+          { label: 'Competitions', path: '/user/compition' },
+          { label: 'Pricing', path: '/pricing' },
+          { label: 'About Us', path: '/about' },
+        ],
       },
-      { 
-        title: "Platform", 
+      {
+        title: 'Company',
         links: [
-          { label: "Documentation", path: "/docs" },
-          { label: "Security", path: "/security" },
-          { label: "Certification", path: "/certify" },
-          { label: "Support", path: "/support" }
-        ] 
+          { label: 'Partners', path: '/user/company' },
+          { label: 'Support', path: '/support' },
+          { label: 'Contact Us', path: '/contact' },
+          { label: 'Platform Status', path: '/maintenance' },
+        ],
       },
-      { 
-        title: "Resources", 
+      {
+        title: 'Community',
         links: [
-          { label: "News", path: "/news" },
-          { label: "Blog", path: "/blog" },
-          { label: "Community", path: "/community" },
-          { label: "Publications", path: "/pubs" }
-        ] 
+          { label: 'Leaderboard', path: '/leader' },
+          { label: 'Sign In', path: '/auth' },
+          { label: 'Dashboard', path: '/company/dashboard' },
+          { label: 'Help Center', path: '/support' },
+        ],
       },
     ],
     social: [
-      { href: "#", label: "Twitter", icon: this.twitter },
-      { href: "#", label: "GitHub", icon: this.github },
-      { href: "#", label: "LinkedIn", icon: this.linkedin },
+      { href: 'https://x.com/proveit_io', label: 'Twitter', icon: this.twitter },
+      { href: 'https://github.com/ProveIt-io', label: 'GitHub', icon: this.github },
+      {
+        href: 'https://www.linkedin.com/company/proveit-io/',
+        label: 'LinkedIn',
+        icon: this.linkedin,
+      },
     ],
-    title: "ProveIt",
-    subtitle: "Verify skills with confidence",
-    copyright: "© 2024 ProveIt.io. All rights reserved",
+    title: 'ProveIt',
+    subtitle: 'Verify skills with confidence',
+    copyright: '© 2026 ProveIt.io. All rights reserved',
   };
 }

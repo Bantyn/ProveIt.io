@@ -24,7 +24,6 @@ interface CompetitionCard {
   title: string;
   company: string;
   companyLogo: string;
-  bannerImage: string;
   location: string;
   projectType: string;
   requiredSkills: string[];
@@ -32,12 +31,17 @@ interface CompetitionCard {
   deadline: string | null;
   difficulty: string;
   maxCandidates: number | null;
+  status: string;
+  isCompanyVerified?: boolean;
+  isCompanySuspended?: boolean;
 }
 
 interface CompanyLookup {
   id: string;
   name: string;
   logoUrl: string;
+  isVerified: boolean;
+  isSuspended: boolean;
 }
 
 const RECENTLY_VIEWED_KEY = 'recently_viewed_competitions';
@@ -164,7 +168,11 @@ export class Compition implements OnInit, OnDestroy {
   }
 
   /* ================= DATE CLASSIFICATION ================= */
-  getStatus(competition: CompetitionCard): 'upcoming' | 'active' | 'completed' {
+  getStatus(competition: CompetitionCard): 'upcoming' | 'active' | 'completed' | 'cancelled' {
+    if (competition.status === 'cancelled' || competition.status === 'cancel') {
+      return 'cancelled';
+    }
+
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
@@ -191,22 +199,27 @@ export class Compition implements OnInit, OnDestroy {
 
   /* ================= BASE FILTERED LIST ================= */
   private get baseFiltered() {
+    const query = (this.filters.search || '').toLowerCase().trim();
+    
     return this.competitions.filter(
       (c) =>
-        (!this.filters.search ||
-          c.title.toLowerCase().includes(this.filters.search.toLowerCase()) ||
-          c.company.toLowerCase().includes(this.filters.search.toLowerCase()) ||
+        !c.isCompanySuspended &&
+        (!query ||
+          c.title.toLowerCase().includes(query) ||
+          c.company.toLowerCase().includes(query) ||
+          c.projectType.toLowerCase().includes(query) ||
           c.requiredSkills.some((skill) =>
-            skill.toLowerCase().includes(this.filters.search.toLowerCase()),
+            String(skill).toLowerCase().includes(query)
           )) &&
         (!this.filters.projectType || c.projectType === this.filters.projectType) &&
         (!this.filters.difficulty || c.difficulty === this.filters.difficulty) &&
-        (!this.filters.skill || c.requiredSkills.includes(this.filters.skill)),
+        (!this.filters.skill || c.requiredSkills.some(s => String(s).toLowerCase() === this.filters.skill.toLowerCase())),
     );
   }
 
   canOpenCompetition(competition: CompetitionCard): boolean {
-    return this.getStatus(competition) !== 'upcoming';
+    const status = this.getStatus(competition);
+    return status !== 'upcoming' && status !== 'cancelled';
   }
 
   /* ================= CATEGORIZED GETTERS ================= */
@@ -219,7 +232,10 @@ export class Compition implements OnInit, OnDestroy {
   }
 
   get activeCompetitions() {
-    const list = this.baseFiltered.filter((c) => this.getStatus(c) === 'active');
+    const list = this.baseFiltered.filter((c) => {
+      const s = this.getStatus(c);
+      return s === 'active' || s === 'cancelled';
+    });
     if (this.filters.view === 'recently_viewed') {
       return list.filter((c) => this.recentlyViewedIds.includes(c.id));
     }
@@ -259,16 +275,14 @@ export class Compition implements OnInit, OnDestroy {
       id: competition.id || competition._id || '',
       title: competition.title || competition.name || 'Untitled Competition',
       company: companyDetails?.name || companyName,
+      isCompanyVerified: companyDetails?.isVerified || false,
+      isCompanySuspended: companyDetails?.isSuspended || false,
       companyLogo:
         competition.companyLogo ||
         competition.logoUrl ||
         competition.company?.logoUrl ||
         companyDetails?.logoUrl ||
         'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=100&h=100&fit=crop',
-      bannerImage:
-        competition.img_url ||
-        competition.imageUrl ||
-        'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=60',
       location: competition.location || competition.projectInfo?.location || '',
       projectType:
         competition.projectType || competition.competitionType || competition.category || '',
@@ -277,6 +291,7 @@ export class Compition implements OnInit, OnDestroy {
       deadline: competition.endDate || competition.deadline || competition.projectInfo?.deadline || null,
       difficulty: competition.projectInfo?.difficulty || '',
       maxCandidates: competition.projectInfo?.maxCandidates || null,
+      status: competition.status || '',
     };
   }
 
@@ -284,9 +299,12 @@ export class Compition implements OnInit, OnDestroy {
     const lookup = new Map<string, CompanyLookup>();
 
     for (const company of companies) {
+      const status = company.verificationStatus || company.status || 'pending';
       const normalized: CompanyLookup = {
         id: company.id || company._id || '',
         name: company.companyName || company.name || 'Partner',
+        isVerified: status === 'verified',
+        isSuspended: status === 'suspended',
         logoUrl:
           company.logoUrl ||
           company.imageUrl ||

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { NgIf, NgFor, NgClass, CommonModule } from '@angular/common';
+import { NgIf, CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
@@ -15,9 +15,6 @@ import { take } from 'rxjs/operators';
   standalone: true,
   imports: [
     CommonModule,
-    NgIf,
-    NgFor,
-    NgClass,
     ReactiveFormsModule,
     Navbar,
     Footer,
@@ -41,7 +38,6 @@ export class UserProfile implements OnInit {
   isLoading = true;
   isSaving = false;
   returnUrl: string | null = null;
-  editingSection: string | null = null;
   profileCompletion: number = 0;
 
   checklist: any[] = [
@@ -133,15 +129,9 @@ export class UserProfile implements OnInit {
     this.profileCompletion = completedValue;
   }
 
-  toggleEdit(section: string | null) {
-    this.editingSection = this.editingSection === section ? null : section;
-    this.cdr.detectChanges();
-  }
-
   save() {
     if (this.profileForm.invalid) {
       console.warn('Form validation failed:', this.profileForm.errors);
-      // Log which controls are invalid
       Object.keys(this.profileForm.controls).forEach((key) => {
         const controlErrors = this.profileForm.get(key)?.errors;
         if (controlErrors) console.warn(`Control ${key} is invalid:`, controlErrors);
@@ -202,7 +192,6 @@ export class UserProfile implements OnInit {
         this.saved = true;
         this.isSaving = false;
         this.user = { ...this.user, ...updates };
-        this.editingSection = null;
         this.cdr.detectChanges();
 
         setTimeout(() => {

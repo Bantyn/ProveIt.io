@@ -20,7 +20,7 @@ import {
   Router,
   NavigationEnd,
 } from '@angular/router';
-import { NgClass, NgForOf, NgIf, TitleCasePipe } from '@angular/common';
+import { NgClass, NgForOf, NgIf, TitleCasePipe, DatePipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { ApiService } from '../../../services/api.service';
 import { ThemeService } from '../../../services/theme.service';
@@ -40,6 +40,7 @@ type UserRole = 'candidate' | 'company' | 'admin' | null;
     NgForOf,
     NgIf,
     TitleCasePipe,
+    DatePipe,
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
@@ -47,7 +48,10 @@ type UserRole = 'candidate' | 'company' | 'admin' | null;
 export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   isLoggedIn = false;
   role: UserRole = null;
+  userId: string | null = null;
   showProfileDropdown = false;
+  showNotifications = false;
+  notifications: any[] = [];
   mobileMenuOpen = false;
 
   private authService = inject(AuthService);
@@ -78,6 +82,7 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {
       this.showProfileDropdown = false;
+      this.showNotifications = false;
     }
   }
 
@@ -215,6 +220,8 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
     this.role = this.getCookie('user_role') as UserRole;
     this.authService.user$.pipe(take(1)).subscribe((user: any) => {
       if (user) {
+        this.userId = user.uid;
+        this.loadNotifications();
         this.apiService.getUser(user.uid).subscribe((data: any) => {
           if (data) {
             this.userName = data.fullName || data.name || user.displayName;
@@ -223,6 +230,37 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
           }
         });
       }
+    });
+  }
+
+  loadNotifications() {
+    if (!this.userId) return;
+    this.apiService.getUserNotifications(this.userId).subscribe((data) => {
+      this.notifications = data;
+    });
+  }
+
+  get unreadCount() {
+    return this.notifications.filter((n) => !n.read).length;
+  }
+
+  toggleNotifications() {
+    this.showNotifications = !this.showNotifications;
+    if (this.showNotifications) this.showProfileDropdown = false;
+  }
+
+  clearAllNotifications() {
+    if (!this.userId) return;
+    this.apiService.clearUserNotifications(this.userId).subscribe(() => {
+      this.notifications = [];
+      this.showNotifications = false;
+    });
+  }
+
+  markAsRead(n: any) {
+    if (n.read) return;
+    this.apiService.markNotificationAsRead(n.id).subscribe(() => {
+      n.read = true;
     });
   }
 
@@ -317,6 +355,7 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   }
   toggleDropdown() {
     this.showProfileDropdown = !this.showProfileDropdown;
+    if (this.showProfileDropdown) this.showNotifications = false;
   }
   toggleMobileMenu() {
     this.mobileMenuOpen = !this.mobileMenuOpen;

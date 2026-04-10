@@ -19,8 +19,8 @@
                 class="bg-white/30 dark:bg-(--dd-surface-secondary) backdrop-blur-xl sticky top-25 z-100 w-[80%] mx-auto rounded-xl p-5 shadow-md dark:shadow-violet-900/20 border border-gray-200/50 dark:border-violet-400/20 mb-6">
                 <div class="flex flex-wrap gap-4 items-center">
 
-                    <input type="text" placeholder="Search competition..."
-                        class="px-5 py-2.5 rounded-2xl bg-blue-50/50 dark:bg-(--dd-surface-input) border border-blue-100/50 dark:border-violet-400/20 outline-none focus:bg-white dark:focus:bg-(--dd-surface) focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium w-full sm:w-60 dark:text-violet-100 dark:placeholder:text-violet-300/40"
+                    <input type="text" placeholder="Search competitions, skills, or companies..."
+                        class="px-5 py-2.5 rounded-2xl bg-blue-50/50 dark:bg-(--dd-surface-input) border border-blue-100/50 dark:border-violet-400/20 outline-none focus:bg-white dark:focus:bg-(--dd-surface) focus:border-(--dd-blue) focus:ring-4 focus:ring-(--dd-blue)/10 transition-all text-sm font-medium w-full sm:w-80 dark:text-violet-100 dark:placeholder:text-violet-300/40"
                         [(ngModel)]="filters.search" />
 
                     <app-fluid-dropdown [options]="projectTypeOptions" placeholder="All Roles"
@@ -43,7 +43,7 @@
                     </button>
 
                     <button (click)="clearFilters()"
-                        class="ml-auto px-6 py-2.5 rounded-full bg-linear-to-r from-(--dd-blue-dark) via-(--dd-orange) to-(--dd-yellow) text-white text-sm font-bold shadow-md shadow-orange-500/20 hover:scale-105 active:scale-95 transition-all">
+                        class="ml-auto px-6 py-2.5 rounded-full bg-linear-to-r from-(--dd-blue-dark) via-(--dd-orange) to-(--dd-yellow) text-white text-sm font-bold shadow-md hover:scale-105 active:scale-95 transition-all">
                         Clear Filters
                     </button>
                 </div>
@@ -91,11 +91,6 @@
                     <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 bg-transparent md:px-40 px-4 mx-auto">
                         <div *ngFor="let competition of activeCompetitions"
                             class="bg-white dark:bg-(--dd-surface) relative p-5 w-full rounded-2xl border border-transparent dark:border-violet-500/15 hover:shadow-md dark:hover:shadow-violet-500/10 hover:border-violet-300 dark:hover:border-violet-500/30 transition-all overflow-hidden duration-500 ease-out group">
-                            <div class="imageContainer overflow-hidden w-full max-h-100 rounded-2xl">
-                                <img [src]="competition.bannerImage"
-                                    alt="img"
-                                    class="object-cover w-full h-48 transition-all duration-500 group-hover:scale-105" />
-                            </div>
                             <div class="flex items-center gap-3 mt-5">
                                 <div class="w-10 h-10 rounded-lg bg-white/10 border border-black/5 flex items-center justify-center p-1 overflow-hidden shrink-0">
                                     <img [src]="competition.companyLogo"
@@ -105,13 +100,18 @@
                                     <h3 class="text-lg font-bold text-gray-900 leading-tight truncate">
                                         {{ competition.title }}
                                     </h3>
-                                    <span class="text-[10px] text-gray-400 font-medium truncate uppercase tracking-wider">
+                                    <span class="text-[10px] text-gray-400 font-medium truncate uppercase tracking-wider flex items-center gap-1">
                                         {{ competition.company }}
+                                        <i *ngIf="competition.isCompanyVerified" class="bi bi-patch-check-fill text-blue-500 text-[10px]" title="Verified Company"></i>
                                     </span>
                                 </div>
-                                <span
+                                <span *ngIf="getStatus(competition) === 'active'"
                                     class="text-[10px] px-2 py-0.5 rounded-full bg-(--dd-blue-ultra-light) text-(--dd-blue-dark) font-bold shrink-0 ml-auto uppercase tracking-tighter">
                                     Live
+                                </span>
+                                <span *ngIf="getStatus(competition) === 'cancelled'"
+                                    class="text-[10px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 font-bold shrink-0 ml-auto uppercase tracking-tighter">
+                                    Cancelled
                                 </span>
                             </div>
                             <div class="h-px bg-gray-200 dark:bg-violet-500/15 my-4"></div>
@@ -135,10 +135,14 @@
                                     <span class="font-semibold text-violet-600">Max {{ competition.maxCandidates }} Candidates</span>
                                 </div>
                             </div>
-                            <a [routerLink]="['/user/compition', competition.id]" (click)="trackView(competition.id)"
+                            <a *ngIf="getStatus(competition) !== 'cancelled'" [routerLink]="['/user/compition', competition.id]" (click)="trackView(competition.id)"
                                 class="block text-center mt-5 w-full py-4 rounded-full bg-(--btn-blue) text-white font-semibold text-sm transition-all duration-300 border border-transparent hover:bg-(--btn-blue-hover) hover:border-(--btn-blue-dark) hover:shadow-lg hover:shadow-violet-500/20 cursor-pointer">
                                 View Challenge
                             </a>
+                            <button *ngIf="getStatus(competition) === 'cancelled'" [disabled]="true"
+                                class="block text-center mt-5 w-full py-4 rounded-full bg-slate-100 border border-slate-200 text-slate-500 font-semibold text-sm cursor-not-allowed">
+                                Competition Cancelled
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -176,11 +180,6 @@
                     <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 bg-transparent md:px-40 px-4 mx-auto">
                         <div *ngFor="let competition of upcomingCompetitions"
                             class="bg-white dark:bg-(--dd-surface) relative p-5 w-full rounded-2xl border border-transparent dark:border-violet-500/15 hover:shadow-md dark:hover:shadow-violet-500/10 transition-all overflow-hidden duration-500 ease-out group">
-                            <div class="imageContainer overflow-hidden w-full max-h-100 rounded-2xl">
-                                <img [src]="competition.bannerImage"
-                                    alt="img"
-                                    class="object-cover w-full h-48 transition-all duration-500 group-hover:scale-105" />
-                            </div>
                             <div class="flex items-start justify-between mt-5">
                                 <h3 class="text-lg font-semibold text-gray-900 leading-tight truncate">
                                     {{ competition.title }}
@@ -259,11 +258,6 @@
                     <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 bg-transparent md:px-40 px-4 mx-auto">
                         <div *ngFor="let competition of completedCompetitions"
                             class="bg-white dark:bg-(--dd-surface) relative p-5 w-full rounded-2xl border border-transparent dark:border-violet-500/10 hover:shadow-md dark:hover:shadow-violet-500/10 transition-all overflow-hidden duration-500 ease-out group opacity-80 hover:opacity-100">
-                            <div class="imageContainer overflow-hidden w-full max-h-100 rounded-2xl">
-                                <img [src]="competition.bannerImage"
-                                    alt="img"
-                                    class="object-cover w-full h-48 transition-all duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0" />
-                            </div>
                             <div class="flex items-start justify-between mt-5">
                                 <h3 class="text-lg font-semibold text-gray-700 leading-tight truncate">
                                     {{ competition.title }}

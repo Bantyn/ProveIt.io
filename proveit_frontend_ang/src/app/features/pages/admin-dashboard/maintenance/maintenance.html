@@ -1,53 +1,69 @@
-<div class="min-h-[70vh] flex items-center justify-center px-4">
-  <div class="w-full max-w-3xl p-8 md:p-10 text-center relative overflow-hidden">
-    <div class="absolute -top-12 -right-12 w-40 h-40 bg-orange-50 rounded-full blur-3xl opacity-80"></div>
-    <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-blue-50 rounded-full blur-3xl opacity-80"></div>
-
-    <div class="relative">
-      <div class="w-24 h-24  text-(--dd-orange) rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">
-        <i class="bi bi-cone-striped"></i>
+<app-stars-background>
+  <div class="fixed inset-0 flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+    
+    <div class="relative z-20 max-w-2xl mx-auto flex flex-col items-center gap-8">
+      
+      <!-- Icon Container (Transparent) -->
+      <div class="relative group">
+        <div class="relative w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
+          <i class="bi bi-gear-wide-connected text-4xl sm:text-6xl text-(--dd-blue) dark:text-(--dd-blue-light) animate-spin-slow"></i>
+        </div>
       </div>
 
-      <h1 class="text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">
-        {{ settings?.maintenanceMode ? 'System Maintenance Active' : 'Maintenance Mode' }}
-      </h1>
-
-      <p class="text-lg text-slate-500 max-w-2xl mb-8 leading-relaxed font-medium mx-auto">
-        <span *ngIf="settings?.maintenanceMode">
-          ProveIt is temporarily unavailable for public and company-side usage while maintenance mode is enabled.
-        </span>
-        <span *ngIf="!settings?.maintenanceMode">
-          The platform is live. You can enable maintenance mode here or from system settings whenever a global pause is
-          needed.
-        </span>
-      </p>
-
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-8"
-        [ngClass]="settings?.maintenanceMode ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'">
-        <i class="bi" [ngClass]="settings?.maintenanceMode ? 'bi-pause-circle' : 'bi-check-circle'"></i>
-        {{ settings?.maintenanceMode ? 'Maintenance Enabled' : 'System Live' }}
+      <!-- Text Content -->
+      <div class="space-y-4 font-sans">
+        <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Under <span class="bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue) bg-clip-text text-transparent">Maintenance</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-slate-500 dark:text-neutral-400 font-medium max-w-md mx-auto leading-relaxed">
+          We're currently fine-tuning the engines to provide you with a smoother, faster, and more robust experience.
+        </p>
       </div>
 
-      <div class="flex flex-wrap gap-4 justify-center">
-        <button
-          class="px-8 py-3 bg-(--dd-blue-dark) text-white font-bold rounded-xl shadow-md hover:bg-black transition-all cursor-pointer"
-          (click)="refreshStatus()">
-          Refresh Status
-        </button>
+      <!-- Progressive Loading Bar (Shadow Removed) -->
+      <div class="w-full max-w-xs h-1.5 bg-slate-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+        <div class="h-full bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue) rounded-full animate-progress"></div>
+      </div>
 
+      <!-- Stats / Details (Optional Admin Info) -->
+      <div *ngIf="settings" class="flex flex-wrap items-center justify-center gap-4 text-sm font-semibold">
+        <div class="px-4 py-2 rounded-2xl bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm border border-slate-200/50 dark:border-neutral-800/50 text-slate-600 dark:text-neutral-300">
+          Version: {{ settings.platformVersion }}
+        </div>
+        <div class="px-4 py-2 rounded-2xl bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm border border-slate-200/50 dark:border-neutral-800/50 text-slate-600 dark:text-neutral-300">
+          Support: {{ settings.supportEmail }}
+        </div>
+      </div>
 
-        <button *ngIf="isAdminView && !settings?.maintenanceMode"
-          class="px-8 py-3 bg-amber-500 text-white font-bold rounded-xl shadow-md hover:bg-amber-600 transition-all cursor-pointer"
-          [disabled]="isSaving" (click)="toggleMaintenance(true)">
-          {{ isSaving ? 'Updating...' : 'Enable Maintenance' }}
-        </button>
-
-        <button *ngIf="isAdminView && settings?.maintenanceMode"
-          class="px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-md hover:bg-emerald-700 transition-all cursor-pointer"
-          [disabled]="isSaving" (click)="toggleMaintenance(false)">
-          {{ isSaving ? 'Updating...' : 'Disable Maintenance' }}
+      <!-- Action Button (If Admin - Shadow Removed) -->
+      <div *ngIf="isAdminView" class="pt-8">
+        <button (click)="toggleMaintenance(false)" 
+                class="px-8 py-4 rounded-3xl bg-(--dd-blue-dark) hover:bg-(--dd-blue) text-white font-bold hover:scale-105 transition-all active:scale-95">
+          Return to Dashboard
         </button>
       </div>
     </div>
+
+    <!-- Background Decoration Removed -->
   </div>
-</div>
+</app-stars-background>
+
+<style>
+  @keyframes progress {
+    0% { width: 0%; transform: translateX(-100%); }
+    50% { width: 40%; transform: translateX(50%); }
+    100% { width: 100%; transform: translateX(100%); }
+  }
+  .animate-progress {
+    animation: progress 3s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+  }
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
+  .animate-bounce-slow {
+    animation: bounce 4s ease-in-out infinite;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+</style>

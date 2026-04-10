@@ -4,10 +4,12 @@ import { Router } from '@angular/router';
 import { ApiService } from '../../../../services/api.service';
 import { SystemSettingsService } from '../../../../services/system-settings.service';
 
+import { StarsBackground } from '../../../../features/components/ui/stars-background/stars-background';
+
 @Component({
   selector: 'app-admin-maintenance',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StarsBackground],
   templateUrl: './maintenance.html',
 })
 export class AdminMaintenance implements OnInit {

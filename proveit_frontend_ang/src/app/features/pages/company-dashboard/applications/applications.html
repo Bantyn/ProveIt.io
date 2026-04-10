@@ -133,13 +133,13 @@
         </div>
         <div class="flex gap-2.5">
             <button
-                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-[13px] bg-linear-to-r from-amber-500 to-yellow-500 text-white border-none cursor-pointer hover:from-amber-600 hover:to-yellow-600 transition-colors shadow-lg shadow-amber-500/30"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-[13px] bg-linear-to-r from-amber-500 to-yellow-500 text-white border-none cursor-pointer hover:from-amber-600 hover:to-yellow-600 transition-colors shadow-md"
                 (click)="showLeaderboard = true">
                 <i class="bi bi-bar-chart-fill"></i>
                 <span>Leaderboard</span>
             </button>
             <button
-                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-[13px] bg-amber-500 text-white border-none cursor-pointer hover:bg-amber-600 transition-colors shadow-lg shadow-amber-500/30"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-[13px] bg-amber-500 text-white border-none cursor-pointer hover:bg-amber-600 transition-colors shadow-md"
                 (click)="completeReviewPeriod()">
                 <i class="bi bi-check2-all"></i>
                 <span>Complete Review Period</span>
@@ -227,9 +227,9 @@
             <tr *ngFor="let a of filtered"
                 class="group transition-colors"
                 [ngClass]="{
-                    'bg-emerald-50/60 hover:bg-emerald-50': a.status === 'selected' || a.status === 'winner',
+                    'bg-emerald-50/60 hover:bg-emerald-50': a.status === 'selected' || a.status === 'winner' || a.status === 'shortlisted',
                     'bg-rose-50/40 hover:bg-rose-50': a.status === 'rejected' || a.status === 'not_selected',
-                    'hover:bg-slate-50/50': a.status !== 'selected' && a.status !== 'winner' && a.status !== 'rejected' && a.status !== 'not_selected'
+                    'hover:bg-slate-50/50': a.status !== 'selected' && a.status !== 'winner' && a.status !== 'shortlisted' && a.status !== 'rejected' && a.status !== 'not_selected'
                 }">
                 <td class="py-4 border-b border-slate-50 pr-4">
                     <a [routerLink]="['/user/applications', a.id, 'details']" target="_blank" 
@@ -260,7 +260,7 @@
                         [ngClass]="{
                             'bg-blue-50 text-blue-600 border border-blue-100': a.status === 'applied',
                             'bg-amber-50 text-amber-600 border border-amber-100': a.status === 'under_review',
-                            'bg-emerald-50 text-emerald-600 border border-emerald-100': a.status === 'accepted' || a.status === 'winner' || a.status === 'selected',
+                            'bg-emerald-50 text-emerald-600 border border-emerald-100': a.status === 'accepted' || a.status === 'winner' || a.status === 'selected' || a.status === 'shortlisted',
                             'bg-indigo-50 text-indigo-600 border border-indigo-100': a.status === 'submitted',
                             'bg-orange-50 text-orange-600 border border-orange-100': a.status === 'under_evaluation',
                             'bg-cyan-50 text-cyan-600 border border-cyan-100': a.status === 'interview_scheduled',
@@ -268,58 +268,55 @@
                         }">{{ a.status | titlecase }}</span>
                 </td>
                 <td class="py-4 border-b border-slate-50 text-right align-top">
-                    <div class="flex flex-col items-end gap-3">
-                        <div class="flex flex-wrap gap-2 justify-end">
-                            <button
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-blue-50 text-blue-700 hover:bg-blue-100"
-                                (click)="openFullReview(a)" title="Open review">
-                                <i class="bi bi-eye"></i>
-                                <span>Review</span>
-                            </button>
-                            <button *ngIf="a.status === 'submitted' || a.status === 'under_evaluation' || a.status === 'winner' || a.status === 'interview_scheduled' || a.status === 'not_selected' || a.status === 'rejected'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                (click)="openEvaluationModal(a)" title="Open manual evaluation">
-                                <i class="bi bi-sliders2"></i>
-                                <span>Open Evaluation</span>
-                            </button>
-                        </div>
+                    <div class="flex flex-wrap gap-2 justify-end">
+                        <button
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                            (click)="openFullReview(a)" title="Open review">
+                            <i class="bi bi-eye"></i>
+                            <span>Review</span>
+                        </button>
 
-                        <div class="flex flex-wrap gap-2 justify-end">
-                            <button *ngIf="a.status === 'applied'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-amber-50 text-amber-600 hover:bg-amber-100"
-                                (click)="updateStatus(a, 'under_review')" title="Start Review">
-                                <i class="bi bi-eye-fill"></i>
-                                <span>Start Review</span>
-                            </button>
+                        <button *ngIf="a.status !== 'applied' && a.status !== 'under_review' && a.status !== 'submitted'"
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                            (click)="openEvaluationModal(a)" title="Open manual evaluation">
+                            <i class="bi bi-sliders2"></i>
+                            <span>Open Evaluation</span>
+                        </button>
 
-                            <button *ngIf="a.status === 'under_review'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
-                                (click)="updateStatus(a, 'accepted')" title="Accept">
-                                <i class="bi bi-check-lg"></i>
-                                <span>Accept</span>
-                            </button>
-                            <button *ngIf="a.status === 'under_review'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-rose-50 text-rose-600 hover:bg-rose-100"
-                                (click)="updateStatus(a, 'rejected')" title="Reject">
-                                <i class="bi bi-x-lg"></i>
-                                <span>Reject</span>
-                            </button>
+                        <button *ngIf="a.status === 'applied'"
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-amber-50 text-amber-600 hover:bg-amber-100"
+                            (click)="updateStatus(a, 'under_review')" title="Start Review">
+                            <i class="bi bi-eye-fill"></i>
+                            <span>Start Review</span>
+                        </button>
 
-                            <button *ngIf="a.status === 'submitted'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-orange-50 text-orange-600 hover:bg-orange-100"
-                                (click)="updateStatus(a, 'under_evaluation')" title="Start Evaluation">
-                                <i class="bi bi-play-fill"></i>
-                                <span>Start Evaluation</span>
-                            </button>
+                        <button *ngIf="a.status === 'under_review'"
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                            (click)="updateStatus(a, 'shortlisted')" title="Shortlist">
+                            <i class="bi bi-person-check-fill"></i>
+                            <span>Shortlist</span>
+                        </button>
 
-                            <button *ngIf="a.status === 'winner' || a.status === 'selected'"
-                                class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
-                                (click)="navigateToPipelineFor(a)" title="Schedule Interview">
-                                <i class="bi bi-calendar-plus-fill"></i>
-                                <span>Schedule Interview</span>
-                            </button>
+                        <button *ngIf="a.status === 'under_review'"
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-rose-50 text-rose-600 hover:bg-rose-100"
+                            (click)="updateStatus(a, 'rejected')" title="Reject">
+                            <i class="bi bi-x-lg"></i>
+                            <span>Reject</span>
+                        </button>
 
-                        </div>
+                        <button *ngIf="a.status === 'submitted'"
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-orange-50 text-orange-600 hover:bg-orange-100"
+                            (click)="updateStatus(a, 'under_evaluation')" title="Start Evaluation">
+                            <i class="bi bi-play-fill"></i>
+                            <span>Start Evaluation</span>
+                        </button>
+
+                        <button *ngIf="a.status === 'shortlisted'"
+                            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-xl border-none cursor-pointer text-[12px] font-semibold transition-all hover:scale-105 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
+                            (click)="navigateToPipelineFor(a)" title="Schedule Interview">
+                            <i class="bi bi-calendar-plus-fill"></i>
+                            <span>Schedule Interview</span>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -400,7 +397,7 @@
                     <p class="text-3xl font-black text-amber-500">🥇</p>
                     <p class="text-base font-bold text-slate-900 mt-1">{{ leaderboardData[0].candidateName }}</p>
                     <p class="text-sm font-bold text-amber-600 mt-0.5">{{ leaderboardData[0].score }}/100</p>
-                    <span *ngIf="leaderboardData[0].status === 'selected' || leaderboardData[0].status === 'winner'" class="inline-block mt-1 px-3 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 border border-emerald-200">Selected</span>
+                    <span *ngIf="leaderboardData[0].status === 'selected' || leaderboardData[0].status === 'winner' || leaderboardData[0].status === 'shortlisted'" class="inline-block mt-1 px-3 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 border border-emerald-200">Selected</span>
                 </div>
                 <div class="mt-3 w-28 h-36 rounded-t-2xl bg-linear-to-b from-amber-300 to-amber-400 flex items-center justify-center">
                     <span class="text-5xl font-black text-white/80">1</span>
@@ -459,9 +456,9 @@
                     <td class="py-4 border-b border-slate-50">
                         <span class="text-[10px] font-semibold px-3 py-1 rounded-lg whitespace-nowrap"
                             [ngClass]="{
-                                'bg-emerald-50 text-emerald-600 border border-emerald-100': a.status === 'selected' || a.status === 'winner',
+                                'bg-emerald-50 text-emerald-600 border border-emerald-100': a.status === 'selected' || a.status === 'winner' || a.status === 'shortlisted',
                                 'bg-rose-50 text-rose-600 border border-rose-100': a.status === 'rejected' || a.status === 'not_selected',
-                                'bg-slate-50 text-slate-500 border border-slate-200': a.status !== 'selected' && a.status !== 'winner' && a.status !== 'rejected' && a.status !== 'not_selected'
+                                'bg-slate-50 text-slate-500 border border-slate-200': a.status !== 'selected' && a.status !== 'winner' && a.status !== 'shortlisted' && a.status !== 'rejected' && a.status !== 'not_selected'
                             }">{{ a.status | titlecase }}</span>
                     </td>
                 </tr>
@@ -520,7 +517,7 @@
                 [ngClass]="{
                     'bg-blue-50 text-blue-600 border border-blue-100': fullReviewApplication.status === 'applied',
                     'bg-amber-50 text-amber-600 border border-amber-100': fullReviewApplication.status === 'under_review',
-                    'bg-emerald-50 text-emerald-600 border border-emerald-100': fullReviewApplication.status === 'winner' || fullReviewApplication.status === 'selected',
+                    'bg-emerald-50 text-emerald-600 border border-emerald-100': fullReviewApplication.status === 'winner' || fullReviewApplication.status === 'selected' || fullReviewApplication.status === 'shortlisted',
                     'bg-indigo-50 text-indigo-600 border border-indigo-100': fullReviewApplication.status === 'submitted',
                     'bg-orange-50 text-orange-600 border border-orange-100': fullReviewApplication.status === 'under_evaluation',
                     'bg-cyan-50 text-cyan-600 border border-cyan-100': fullReviewApplication.status === 'interview_scheduled',
@@ -607,11 +604,11 @@
         <p class="text-[12px] font-bold tracking-[0.14em] text-slate-400 uppercase mb-4">Actions</p>
         <div class="flex flex-wrap gap-3">
             <button
-                *ngIf="fullReviewApplication.status !== 'selected' && fullReviewApplication.status !== 'winner'"
+                *ngIf="fullReviewApplication.status !== 'selected' && fullReviewApplication.status !== 'winner' && fullReviewApplication.status !== 'shortlisted'"
                 class="inline-flex items-center gap-2 h-11 px-5 rounded-xl border-none cursor-pointer text-[13px] font-bold transition-all bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm hover:shadow-md"
-                (click)="quickAction(fullReviewApplication, 'selected')">
-                <i class="bi bi-trophy-fill"></i>
-                <span>Select</span>
+                (click)="quickAction(fullReviewApplication, 'shortlisted')">
+                <i class="bi bi-person-check-fill"></i>
+                <span>Shortlist</span>
             </button>
             <button
                 *ngIf="fullReviewApplication.status !== 'rejected'"
@@ -621,7 +618,7 @@
                 <span>Reject</span>
             </button>
             <button
-                *ngIf="fullReviewApplication.status === 'selected' || fullReviewApplication.status === 'winner'"
+                *ngIf="fullReviewApplication.status === 'shortlisted'"
                 class="inline-flex items-center gap-2 h-11 px-5 rounded-xl border-none cursor-pointer text-[13px] font-bold transition-all bg-cyan-500 text-white hover:bg-cyan-600 shadow-sm hover:shadow-md"
                 (click)="navigateToPipeline()">
                 <i class="bi bi-calendar-plus-fill"></i>

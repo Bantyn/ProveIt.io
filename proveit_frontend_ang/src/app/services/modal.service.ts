@@ -33,11 +33,13 @@ export class ModalService {
     type: 'info' | 'error' | 'success' = 'info',
   ): Promise<boolean> {
     return new Promise((resolve) => {
-      // Always run inside Angular zone so change detection fires immediately
-      this.zone.run(() => {
-        this.modalStateSource.next({
-          config: { title, message, confirmText: 'Got it!', showCancel: false, type },
-          resolve,
+      // Use setTimeout to push to next tick and avoid ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => {
+        this.zone.run(() => {
+          this.modalStateSource.next({
+            config: { title, message, confirmText: 'Got it!', showCancel: false, type },
+            resolve,
+          });
         });
       });
     });
@@ -46,17 +48,19 @@ export class ModalService {
   // Replacement for window.confirm
   confirm(message: string, title: string = 'Confirm'): Promise<boolean> {
     return new Promise((resolve) => {
-      this.zone.run(() => {
-        this.modalStateSource.next({
-          config: {
-            title,
-            message,
-            confirmText: 'Yes',
-            cancelText: 'No, Not Yet',
-            showCancel: true,
-            mode: 'confirm',
-          },
-          resolve,
+      setTimeout(() => {
+        this.zone.run(() => {
+          this.modalStateSource.next({
+            config: {
+              title,
+              message,
+              confirmText: 'Yes',
+              cancelText: 'No, Not Yet',
+              showCancel: true,
+              mode: 'confirm',
+            },
+            resolve,
+          });
         });
       });
     });
@@ -70,21 +74,23 @@ export class ModalService {
     initialMeetingLink?: string,
   ): Promise<{ date: string; time: string; meetingLink: string } | null> {
     return new Promise((resolve) => {
-      this.zone.run(() => {
-        this.modalStateSource.next({
-          config: {
-            title,
-            message,
-            confirmText: 'Schedule',
-            cancelText: 'Cancel',
-            showCancel: true,
-            type: 'info',
-            mode: 'schedule',
-            initialDate: initialDate ?? null,
-            initialTime: initialTime ?? '',
-            initialMeetingLink: initialMeetingLink ?? '',
-          },
-          resolve,
+      setTimeout(() => {
+        this.zone.run(() => {
+          this.modalStateSource.next({
+            config: {
+              title,
+              message,
+              confirmText: 'Schedule',
+              cancelText: 'Cancel',
+              showCancel: true,
+              type: 'info',
+              mode: 'schedule',
+              initialDate: initialDate ?? null,
+              initialTime: initialTime ?? '',
+              initialMeetingLink: initialMeetingLink ?? '',
+            },
+            resolve,
+          });
         });
       });
     });
@@ -93,8 +99,10 @@ export class ModalService {
   // Close from within the component
   close(result: any, resolveFn: (val: any) => void) {
     resolveFn(result);
-    this.zone.run(() => {
-      this.modalStateSource.next(null);
+    setTimeout(() => {
+      this.zone.run(() => {
+        this.modalStateSource.next(null);
+      });
     });
   }
 }
