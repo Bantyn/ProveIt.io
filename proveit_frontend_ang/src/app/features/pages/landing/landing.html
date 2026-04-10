@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- Landing Animatio -->
 
 <div class="animationContainer landing-lock min-h-screen w-full flex flex-col">
@@ -167,4 +168,175 @@
         <!-- ================= FOOTER ================= -->
         <app-footer></app-footer>
     </main>
+=======
+<!-- Landing Animatio -->
+
+<div class="animationContainer landing-lock min-h-screen w-full flex flex-col">
+    <header class="fixed top-0 left-0 w-full z-100">
+        <app-navbar [transparent]="true"></app-navbar>
+    </header>
+    <div class="screen h-0 bg-(--dd-cream) absolute top-0 w-full z-53"></div>
+    <div class="screen h-0 bg-(--dd-yellow) absolute bottom-0 w-full z-52"></div>
+    <div class="screen h-0 bg-(--dd-orange) absolute top-0 w-full z-51"></div>
+    <div class="screen h-0 bg-(--dd-blue-light) absolute top-0 w-full z-50"></div>
+
+    <main class="main grow flex flex-col">
+
+        <section class="flex min-h-[50vh] md:min-h-screen w-full justify-center items-center bg-(--dd-cream)">
+            <!-- title animation -->
+            <div class="w-full absolute top-20 herader-glow h-50 overflow-hidden">
+                <div class="dd-holiday-202511-header dd-fill-tertiary">
+                    <div class="dd-container">
+                        <div class="dd-colors">
+                            <div class="dd-color dd-blue"></div>
+                            <div class="dd-color dd-orange"></div>
+                            <div class="dd-color dd-yellow-orange"></div>
+                            <div class="dd-color dd-blue-yellow"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- hero title -->
+            <div class="flex flex-col space-y-10 items-center">
+                <h1 class="text-[3rem] md:text-[12.5rem] text-[var(--dd-dark)] font-bold hero mt-10 md:mt-30 text-start">
+                    <div class="animated-text-container">
+
+                        <span class="animated-text">
+                            <span>S</span>
+                            <span>k</span>
+                            <span>i</span>
+                            <span>l</span>
+                            <span>l</span>
+                            <span>-</span>
+                            <span>B</span>
+                            <span>a</span>
+                            <span>s</span>
+                            <span>e</span>
+                            <span>d</span>
+                        </span>
+                    </div>
+
+                    <div class="animated-text-container">
+                        <span class="animated-text-2">
+                            <span>H</span>
+                            <span>i</span>
+                            <span>r</span>
+                            <span>i</span>
+                            <span>n</span>
+                            <span>g</span>
+                            <span class="ml-10">P</span>
+                            <span>l</span>
+                            <span>a</span>
+                            <span>t</span>
+                            <span>f</span>
+                            <span>
+                                <i class="bi bi-gear-wide text-[2rem] md:text-[9rem] animate-spinner align-middle"></i>
+                            </span>
+                            <span>r</span>
+                            <span>m</span>
+                        </span>
+                    </div>
+                </h1>
+
+            </div>
+        </section>
+
+
+        <hr class="border-(--dd-blue) w-[90%] mx-auto">
+
+        <!-- Horizontal Scroll Section (GSAP Premium Style) -->
+        <section class="horizontal-scroll-wrapper relative bg-(--dd-cream) h-[500vh]">
+            <div class="sticky-container sticky top-0 h-screen w-full overflow-hidden flex items-center">
+                <div class="horizontal-scroll-container flex items-center relative">
+                    <h2
+                        class="hero-2 horizontal-scroll-text whitespace-nowrap text-[9rem] md:text-[10rem] font-normal px-20 text-[var(--dd-dark)] leading-none">
+                        <!-- <span class="text-white mx-10 bg-(--dd-blue-light) px-5 py-2 rounded-2xl">ProveIt.io</span> is a skill-based hiring platform where <span class="relative text-white mx-10 bg-(--dd-yellow) px-5 py-2 rounded-2xl after:content-['post'] after:absolute after:-top-10 after:left-[100%] after:text-7xl after:py-5 after:px-4 after:bg-(--dd-success) after:rounded-2xl after:text-white after:flex after:items-center after:justify-center before:content-['task'] before:absolute before:-top-10 before:left-[100%] before:text-7xl before:py-5 before:px-4 before:bg-(--dd-success) before:rounded-2xl before:text-white before:flex before:items-center before:justify-center">companies</span>and candidates submit projects. -->
+                        <span class="text-white mx-10 bg-(--dd-blue-light) px-5 py-2 rounded-2xl">
+                            ProveIt.io
+                        </span>
+                        is a skill-based hiring platform where
+
+                        <span class="relative text-white mx-10 bg-(--dd-warning) px-5 py-2 rounded-2xl
+                                after:content-['post']
+                                after:absolute
+                                after:-top-5
+                                after:left-[90%]
+                                after:ml-3
+                                after:text-7xl
+                                after:py-2
+                                after:px-4
+                                after:bg-(--dd-success)
+                                after:rounded-xl
+                                after:text-white
+                                after:rotate-5
+                                after:shadow-lg
+
+                                before:content-['task']
+                                before:absolute
+                                before:top-10
+                                before:left-[108%]
+                                before:text-8xl
+                                before:font-mono
+                                before:py-2
+                                before:px-4
+                                before:bg-rose-400
+                                before:rounded-xl
+                                before:text-white
+                                before:-rotate-10
+                                before:shadow-lg
+
+                                mr-100
+                            "> companies </span> and candidates <span class="bg-green-400 px-5 py-2 rounded-2xl">submit
+                            projects.</span>
+                    </h2>
+                </div>
+            </div>
+        </section>
+
+        <section class="flex flex-col justify-center items-center bg-(--dd-cream)">
+
+            <div class="container mx-auto flex flex-col items-center">
+                <app-ripple-button route="/user/compition"
+                    className="mx-auto md:w-60 font-semibold tracking-wide h-15 text-lg">
+                    Explore ProveIt
+                    <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                </app-ripple-button>
+            </div>
+        </section>
+
+        <hr class="mt-20 border-(--dd-blue) w-[90%] mx-auto">
+
+        <app-bouncy-cards-features></app-bouncy-cards-features>
+
+        <hr class="border-(--dd-blue) w-[90%] mx-auto">
+
+        <section class="min-h-screen w-full flex flex-col items-center justify-center bg-(--dd-cream) py-20">
+            <div class="container mx-auto px-10 mb-20 text-center">
+                <h2 class="text-7xl font-bold text-(--dd-dark) mb-6">
+                    Showcase Your <span class="text-(--dd-blue)">Proven</span> Skills
+                </h2>
+                <p class="text-2xl text-(--dd-dark)/60 max-w-3xl mx-auto">
+                    A dynamic gallery of top projects and talent on ProveIt.io.
+                    Hover to explore excellence in action.
+                </p>
+            </div>
+
+            <div class="w-[100%] aspect-video mx-auto  overflow-hidden">
+                <app-dynamic-frame-layout [frames]="demoFrames" className="w-full h-full" [hoverSize]="7"
+                    [gapSize]="0"></app-dynamic-frame-layout>
+            </div>
+            
+        </section>
+
+        
+
+        <!-- ================= FOOTER ================= -->
+        <app-footer></app-footer>
+    </main>
+>>>>>>> 15b60bdeb090a8bb55165510e3e641d1cc0e86b2
 </div>
