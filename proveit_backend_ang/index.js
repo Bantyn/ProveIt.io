@@ -4,12 +4,9 @@ const dotenv = require('dotenv');
 const { db } = require('./config/firebase');
 
 dotenv.config();
-
 const app = express();
-
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
-
 app.use((err, req, res, next) => {
     if (err.type === 'entity.parse.failed' || err.status === 400) {
         return res.status(400).json({
