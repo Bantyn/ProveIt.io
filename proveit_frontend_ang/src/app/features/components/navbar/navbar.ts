@@ -233,7 +233,6 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
           { label: 'Home', route: '/home' },
           { label: 'Competitions', route: '/user/compition' },
           { label: 'Company', route: '/user/company' },
-          { label: 'Pricing', route: '/pricing' },
           { label: 'About', route: '/about' },
           { label: 'Contact', route: '/contact' },
           { label: 'Support', route: '/support' },

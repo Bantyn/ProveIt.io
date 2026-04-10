@@ -8,6 +8,7 @@ import { FluidDropdown, DropdownOption } from '../../components/ui/fluid-dropdow
 import { FaqAccordion, FaqItem } from '../../components/faq-accordion/faq-accordion';
 import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
 import { TextRotateComponent } from '../../components/ui/text-rotate/text-rotate';
+import { Navbar } from '../../components/navbar/navbar';
 import { forkJoin } from 'rxjs';
 
 interface Filters {
@@ -54,6 +55,7 @@ const MAX_RECENTLY_VIEWED = 10;
     FaqAccordion,
     ShaderHeroComponent,
     TextRotateComponent,
+    Navbar,
   ],
   templateUrl: './compition.html',
   styleUrl: './compition.css',

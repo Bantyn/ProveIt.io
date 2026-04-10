@@ -1,81 +1,15 @@
-.shader-hero {
-  position: relative;
+:host {
+  display: block;
   width: 100%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.shader-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
+.shape-inner {
+  will-change: transform;
 }
 
-.shader-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 0%,
-    rgba(0, 0, 0, 0.035) 100%
-  );
-  pointer-events: none;
-}
-
-:host-context(html.dark) .shader-overlay {
-  background: radial-gradient(
-    ellipse at center,
-    transparent 0%,
-    rgba(0, 0, 0, 0.18) 100%
-  );
-}
-
-/* Bottom fade — subtle dissolve at hero's very bottom edge */
-.shader-bottom-fade {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 180px;
-  z-index: 2;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    var(--dd-cream) 100%
-  );
-  pointer-events: none;
-}
-
-.shader-content {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.shader-text {
-  max-width: 48rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 18vh;
-}
-
-@media (min-width: 768px) {
-  .shader-content {
-    padding: 3rem;
+/* Hide shapes on mobile if they overlap too much or just scale them */
+@media (max-width: 768px) {
+  .shape-inner {
+    transform: scale(0.6);
   }
 }
-

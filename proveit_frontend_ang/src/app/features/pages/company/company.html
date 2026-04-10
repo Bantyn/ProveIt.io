@@ -1,9 +1,18 @@
 <div class="min-h-screen flex flex-col bg-(--dd-cream)">
     <div class="grow">
+        <header class="absolute top-0 left-0 w-full z-30">
+            <app-navbar [transparent]="true"
+                [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+        </header>
+
         <!-- ================= SHADER HERO ================= -->
-        <app-shader-hero title="We're Hiring Exceptional Talent"
+        <app-shader-hero 
+            badge="Join the Future"
+            title1="We're Hiring"
+            title2="Exceptional Talent"
             subtitle="Showcase your skills through real-world challenges and get hired by top companies building the future."
-            [darkText]="true" minHeight="100vh">
+            [darkText]="true" 
+            minHeight="100vh">
         </app-shader-hero>
 
         <section class="-mt-30">

@@ -8,6 +8,7 @@ import { FluidDropdown, DropdownOption } from '../../components/ui/fluid-dropdow
 import { FaqAccordion, FaqItem } from '../../components/faq-accordion/faq-accordion';
 import { ShaderHeroComponent } from '../../components/ui/shader-hero/shader-hero';
 import { TextRotateComponent } from '../../components/ui/text-rotate/text-rotate';
+import { Navbar } from '../../components/navbar/navbar';
 
 interface Filters {
   search: string;
@@ -42,7 +43,7 @@ interface CompanyCard {
     FluidDropdown,
     FaqAccordion,
     ShaderHeroComponent,
-    TextRotateComponent,
+    Navbar,
   ],
   templateUrl: './company.html',
   styleUrl: './company.css',

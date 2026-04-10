@@ -1,6 +1,9 @@
 <!-- Landing Animatio -->
 
 <div class="animationContainer landing-lock min-h-screen w-full flex flex-col">
+    <header class="fixed top-0 left-0 w-full z-100">
+        <app-navbar [transparent]="true"></app-navbar>
+    </header>
     <div class="screen h-0 bg-(--dd-cream) absolute top-0 w-full z-53"></div>
     <div class="screen h-0 bg-(--dd-yellow) absolute bottom-0 w-full z-52"></div>
     <div class="screen h-0 bg-(--dd-orange) absolute top-0 w-full z-51"></div>

@@ -1,9 +1,18 @@
-<!-- ================= SHADER HERO ================= -->
-<app-shader-hero
-    title="Help Center"
-    subtitle="Search our knowledge base or browse categories to find answers to common questions about ProveIt.io."
-    minHeight="100vh">
-</app-shader-hero>
+<div class="min-h-screen flex flex-col bg-(--dd-cream)">
+    <div class="grow">
+        <header class="absolute top-0 left-0 w-full z-30">
+            <app-navbar [transparent]="true"
+                [menus]="[{ label: 'Compitions', route: 'user/compition' }, { label: 'Company', route: 'user/company' }, { label: 'About', route: '/about' }]"></app-navbar>
+        </header>
+
+        <!-- ================= SHADER HERO ================= -->
+        <app-shader-hero
+            badge="Help Center"
+            title1="How can we"
+            title2="Help You?"
+            subtitle="Search our knowledge base or browse categories to find answers to common questions about ProveIt.io."
+            minHeight="100vh">
+        </app-shader-hero>
 
 <!-- ================= MAIN CONTENT ================= -->
 <div class="bg-(--dd-cream) md:max-w-[95%] mx-auto">
@@ -139,4 +148,6 @@
 </div>
 
 <!-- ================= FOOTER ================= -->
-<app-footer></app-footer>
+    </div>
+    <app-footer></app-footer>
+</div>

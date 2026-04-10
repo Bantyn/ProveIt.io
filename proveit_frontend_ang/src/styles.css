@@ -129,23 +129,23 @@ html.dark {
     --dd-blue-dark: #8b7eff;
     --dd-blue: #aa9fff;
     --dd-blue-light: #cfc9ff;
-    --dd-blue-ultra-light: #1a1731;
-    --dd-cream: #1a17300a;
-    --dd-yellow: #2a2350;
-    --dd-yellow-dark: #4b4190;
+    --dd-blue-ultra-light: #121212;
+    --dd-cream: #000000;
+    --dd-yellow: #151515;
+    --dd-yellow-dark: #252525;
     --dd-orange: #b5a8ff;
     --dd-red: #a89cff;
-    --dd-light: #1e1b3a;
+    --dd-light: #0a0a0a;
     --dd-dark: #e5e7eb;
-    --dd-black: #f0eeff;
-    --dd-white: #1a1730;
+    --dd-black: #ffffff;
+    --dd-white: #000000;
 
-    /* Dark surface tokens — light pastel lavender (between white & purple) */
-    --dd-surface: #4a428004;
-    --dd-surface-secondary: #524a8a11;
-    --dd-surface-input: #3d367011;
-    --dd-border: rgba(180, 165, 255, 0.25);
-    --dd-border-hover: rgba(180, 165, 255, 0.45);
+    /* Dark surface tokens — Neutral darks */
+    --dd-surface: #0a0a0a;
+    --dd-surface-secondary: #0f0f0f;
+    --dd-surface-input: #151515;
+    --dd-border: rgba(255, 255, 255, 0.1);
+    --dd-border-hover: rgba(255, 255, 255, 0.2);
     --btn-blue: #7c6ef0;
     --btn-blue-hover: #6a5ce0;
 }

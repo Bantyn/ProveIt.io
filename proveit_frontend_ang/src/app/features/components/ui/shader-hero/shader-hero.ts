@@ -1,193 +1,160 @@
 import {
   Component,
   Input,
-  ElementRef,
+  OnInit,
   AfterViewInit,
-  OnDestroy,
-  ViewChild,
+  ElementRef,
+  ViewChildren,
+  QueryList,
   NgZone,
+  OnDestroy,
 } from '@angular/core';
-import { NgIf } from '@angular/common';
-import {
-  ShaderMount,
-  type ShaderMountUniforms,
-  meshGradientFragmentShader,
-  getShaderColorFromString,
-  ShaderFitOptions,
-} from '@paper-design/shaders';
+import { NgIf, NgForOf, NgClass } from '@angular/common';
+import { gsap } from 'gsap';
 
 @Component({
   selector: 'app-shader-hero',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgForOf, NgClass],
   templateUrl: './shader-hero.html',
   styleUrl: './shader-hero.css',
 })
-export class ShaderHeroComponent implements AfterViewInit, OnDestroy {
-  @Input() title = '';
-  @Input() subtitle = '';
-  @Input() minHeight = '650px';
+export class ShaderHeroComponent implements OnInit, AfterViewInit, OnDestroy {
+  @Input() badge: string = '✨ ProveIt.io';
+  @Input() title1: string = 'Elevate Your';
+  @Input() title2: string = 'Digital Vision';
+  @Input() title: string = ''; // Legacy support
+  @Input() subtitle: string = ''; // Legacy support
+  @Input() description: string = 'Crafting exceptional digital experiences through innovative design and cutting-edge technology.';
+  @Input() minHeight: string = '100vh';
   @Input() darkText: boolean = false;
-  @Input() lightColors: string[] = [
-    '#e8e0ff',
-    '#7a6cf0',
-    '#f6f4ff',
-    '#a78bfa',
-    '#c7b8ff',
+
+  @ViewChildren('shape') shapes!: QueryList<ElementRef>;
+  @ViewChildren('fadeUp') fadeUpElements!: QueryList<ElementRef>;
+
+  shapesData = [
+    {
+      delay: 0.3,
+      width: 600,
+      height: 140,
+      rotate: 12,
+      gradient: 'from-indigo-500/[0.25] dark:from-indigo-500/[0.2]',
+      className: 'left-[-10%] md:left-[-5%] top-[15%] md:top-[20%]',
+    },
+    {
+      delay: 0.5,
+      width: 500,
+      height: 120,
+      rotate: -15,
+      gradient: 'from-rose-500/[0.25] dark:from-rose-500/[0.2]',
+      className: 'right-[-5%] md:right-[0%] top-[70%] md:top-[75%]',
+    },
+    {
+      delay: 0.4,
+      width: 300,
+      height: 80,
+      rotate: -8,
+      gradient: 'from-violet-500/[0.25] dark:from-violet-500/[0.2]',
+      className: 'left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]',
+    },
+    {
+      delay: 0.6,
+      width: 200,
+      height: 60,
+      rotate: 20,
+      gradient: 'from-amber-500/[0.25] dark:from-amber-500/[0.2]',
+      className: 'right-[15%] md:right-[20%] top-[10%] md:top-[15%]',
+    },
+    {
+      delay: 0.7,
+      width: 150,
+      height: 40,
+      rotate: -25,
+      gradient: 'from-cyan-500/[0.25] dark:from-cyan-500/[0.2]',
+      className: 'left-[20%] md:left-[25%] top-[5%] md:top-[10%]',
+    },
   ];
-  @Input() darkColors: string[] = [
-    '#000000',
-    '#8b5cf6',
-    '#ffffff',
-    '#1e1b4b',
-    '#4c1d95',
-  ];
-  @Input() colors: string[] | null = null;
-  @Input() speed = 0.12;
-
-  @ViewChild('shaderContainer', { static: true })
-  shaderContainerRef!: ElementRef<HTMLDivElement>;
-
-  private shaderMount: ShaderMount | null = null;
-  private observer: IntersectionObserver | null = null;
-  private themeObserver: MutationObserver | null = null;
-  useStaticFallback = false;
-  private zone = NgZone;
-
-  private get isDark(): boolean {
-    return document.documentElement.classList.contains('dark');
-  }
-
-  private get activeColors(): string[] {
-    if (this.colors) return this.colors;
-    return this.isDark ? this.darkColors : this.lightColors;
-  }
 
   constructor(private ngZone: NgZone) {}
 
+  ngOnInit() {
+    // Handle legacy title/subtitle
+    if (this.title) {
+      this.title1 = this.title;
+      this.title2 = '';
+    }
+    if (this.subtitle) {
+      this.description = this.subtitle;
+    }
+  }
+
   ngAfterViewInit() {
-    // Run shader init outside Angular zone so rAF doesn't trigger change detection
     this.ngZone.runOutsideAngular(() => {
-      this.initShader();
-      this.setupVisibilityObserver();
-      this.setupThemeObserver();
+      // Use a small timeout to ensure DOM is fully ready for GSAP
+      setTimeout(() => {
+        this.initAnimations();
+      }, 100);
     });
   }
 
   ngOnDestroy() {
-    this.observer?.disconnect();
-    this.observer = null;
-    this.themeObserver?.disconnect();
-    this.themeObserver = null;
-    this.shaderMount?.dispose();
-    this.shaderMount = null;
+    gsap.killTweensOf('.shape-inner');
+    // Also kill tweens of the native elements
+    this.shapes?.forEach(shape => gsap.killTweensOf(shape.nativeElement));
+    this.fadeUpElements?.forEach(el => gsap.killTweensOf(el.nativeElement));
   }
 
-  private initShader() {
-    const container = this.shaderContainerRef.nativeElement;
-    if (!container) return;
-
-    // Dispose previous instance if reinitializing
-    this.shaderMount?.dispose();
-    this.shaderMount = null;
-
-    this.useStaticFallback = this.shouldUseStaticFallback();
-    if (this.useStaticFallback) {
-      this.applyFallbackBackground(container);
-      return;
-    }
-
-    const colorVecs = this.activeColors.map((c) => getShaderColorFromString(c));
-    while (colorVecs.length < 10) {
-      colorVecs.push([0, 0, 0, 0]);
-    }
-
-    const uniforms: ShaderMountUniforms = {
-      u_colors: colorVecs,
-      u_colorsCount: this.activeColors.length,
-      u_distortion: 0.25,
-      u_swirl: 0.08,
-      u_grainMixer: 0.06,
-      u_grainOverlay: 0.04,
-      u_fit: ShaderFitOptions['cover'],
-      u_scale: 1,
-      u_rotation: 0,
-      u_originX: 0.5,
-      u_originY: 0.5,
-      u_offsetX: 0,
-      u_offsetY: 0,
-      u_worldWidth: 1,
-      u_worldHeight: 1,
-    };
-
-    try {
-      this.shaderMount = new ShaderMount(
-        container,
-        meshGradientFragmentShader,
-        uniforms,
-        { antialias: false, powerPreference: 'low-power' },
-        Math.min(this.speed, 0.08),
-        undefined,
-        1,            // minPixelRatio (1x = no retina upscale)
-        960 * 540     // lower GPU budget keeps scroll and hover much smoother
-      );
-    } catch (e) {
-      console.warn('WebGL shader init failed, using CSS fallback', e);
-      this.applyFallbackBackground(container);
-    }
-  }
-
-  /** Pause shader animation when scrolled out of view to save GPU */
-  private setupVisibilityObserver() {
-    const container = this.shaderContainerRef.nativeElement;
-    if (!container || !this.shaderMount) return;
-
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            this.shaderMount?.setSpeed(Math.min(this.speed, 0.08));
-          } else {
-            this.shaderMount?.setSpeed(0); // pauses animation loop
-          }
+  private initAnimations() {
+    // 1. Shapes Entry Animation
+    this.shapes.forEach((shapeRef, i) => {
+      const data = this.shapesData[i];
+      gsap.fromTo(
+        shapeRef.nativeElement,
+        {
+          opacity: 0,
+          y: -150,
+          rotate: data.rotate - 15,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          rotate: data.rotate,
+          duration: 2.4,
+          delay: data.delay,
+          ease: 'power3.out',
         }
-      },
-      { threshold: 0.05 }
-    );
-    this.observer.observe(container);
-  }
+      );
 
-  /** Watch for theme toggling and reinitialize shader with matching colors */
-  private setupThemeObserver() {
-    this.themeObserver = new MutationObserver(() => {
-      this.initShader();
-      this.setupVisibilityObserver();
+      // 2. Floating Animation
+      const inner = shapeRef.nativeElement.querySelector('.shape-inner');
+      if (inner) {
+        gsap.to(inner, {
+          y: 15,
+          duration: 12,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: data.delay,
+        });
+      }
     });
-    this.themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
+
+    // 3. Content Fade Up
+    this.fadeUpElements.forEach((elRef, i) => {
+      gsap.fromTo(
+        elRef.nativeElement,
+        {
+          opacity: 0,
+          y: 30,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          delay: 0.5 + i * 0.2,
+          ease: 'power2.out',
+        }
+      );
     });
-  }
-
-  private shouldUseStaticFallback(): boolean {
-    if (typeof window === 'undefined' || typeof navigator === 'undefined') return true;
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const saveData = 'connection' in navigator && (navigator as Navigator & {
-      connection?: { saveData?: boolean };
-    }).connection?.saveData;
-    const lowMemoryDevice =
-      'deviceMemory' in navigator &&
-      ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 4;
-    const lowCpuDevice = navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4;
-    const smallViewport = window.innerWidth < 1024;
-
-    return prefersReducedMotion || !!saveData || !!lowMemoryDevice || lowCpuDevice || smallViewport;
-  }
-
-  private applyFallbackBackground(container: HTMLDivElement) {
-    container.style.background = this.isDark
-      ? 'radial-gradient(circle at 20% 20%, rgba(170,159,255,0.28), transparent 32%), linear-gradient(135deg, #141126 0%, #1d1936 42%, #2a2350 100%)'
-      : 'radial-gradient(circle at 20% 20%, rgba(154,140,255,0.22), transparent 30%), linear-gradient(135deg, #f6f4ff 0%, #ebe7ff 45%, #ddd6ff 100%)';
   }
 }
