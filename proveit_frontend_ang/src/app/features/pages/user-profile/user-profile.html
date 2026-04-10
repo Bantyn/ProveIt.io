@@ -23,9 +23,11 @@
                     <div class="lg:col-span-4 space-y-6 lg:sticky top-24">
 
                         <!-- Profile Identity Card -->
-                        <div class="bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100">
+                        <div
+                            class="bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100">
                             <div class="px-6 pt-8 flex justify-center">
-                                <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-slate-100">
+                                <div
+                                    class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-slate-100">
                                     <img *ngIf="profileForm.get('profileImage')?.value"
                                         [src]="profileForm.get('profileImage')?.value"
                                         class="w-full h-full object-cover">
@@ -37,8 +39,10 @@
                             </div>
 
                             <div class="p-6 text-center">
-                                <h3 class="font-bold text-slate-900 text-lg">{{ profileForm.get('fullName')?.value || 'Your Name' }}</h3>
-                                <p class="text-xs text-slate-500 font-medium mt-1">{{ profileForm.get('email')?.value }}</p>
+                                <h3 class="font-bold text-slate-900 text-lg">{{ profileForm.get('fullName')?.value ||
+                                    'Your Name' }}</h3>
+                                <p class="text-xs text-slate-500 font-medium mt-1">{{ profileForm.get('email')?.value }}
+                                </p>
 
                                 <div class="my-4 h-px w-full bg-slate-100"></div>
 
@@ -49,13 +53,16 @@
                                     </div>
                                     <div class="flex items-start gap-3 text-slate-600 text-sm">
                                         <i class="bi bi-stars text-(--dd-blue) mt-1"></i>
-                                        <span>{{ profileForm.get('skills')?.value || 'Add a few core skills for your demo profile.' }}</span>
+                                        <span>{{ profileForm.get('skills')?.value || 'Add a few core skills for your
+                                            demo profile.' }}</span>
                                     </div>
-                                    <div *ngIf="profileForm.get('github')?.value" class="flex items-center gap-3 text-slate-600 text-sm">
+                                    <div *ngIf="profileForm.get('github')?.value"
+                                        class="flex items-center gap-3 text-slate-600 text-sm">
                                         <i class="bi bi-github text-(--dd-blue)"></i>
                                         <span class="truncate">{{ profileForm.get('github')?.value }}</span>
                                     </div>
-                                    <div *ngIf="profileForm.get('resumeUrl')?.value" class="flex items-center gap-3 text-slate-600 text-sm">
+                                    <div *ngIf="profileForm.get('resumeUrl')?.value"
+                                        class="flex items-center gap-3 text-slate-600 text-sm">
                                         <i class="bi bi-file-earmark-pdf-fill text-(--dd-blue)"></i>
                                         <span class="truncate">{{ profileForm.get('resumeUrl')?.value }}</span>
                                     </div>
@@ -91,14 +98,16 @@
                                             <i class="bi" [ngClass]="item.complete ? 'bi-check-lg' : 'bi-x-lg'"></i>
                                         </div>
                                         <span class="text-sm font-bold transition-all"
-                                            [ngClass]="item.complete ? 'text-slate-900' : 'text-slate-400'">{{ item.label }}</span>
+                                            [ngClass]="item.complete ? 'text-slate-900' : 'text-slate-400'">{{
+                                            item.label }}</span>
                                     </div>
                                     <span class="text-xs font-black transition-all"
                                         [ngClass]="item.complete ? 'text-slate-300' : 'text-emerald-500'">+{{item.bonus}}%</span>
                                 </div>
                             </div>
 
-                            <div *ngIf="profileCompletion >= 80 && returnUrl" class="mt-8 pt-8 border-t border-slate-100">
+                            <div *ngIf="profileCompletion >= 80 && returnUrl"
+                                class="mt-8 pt-8 border-t border-slate-100">
                                 <a [routerLink]="returnUrl"
                                     class="w-full block bg-emerald-500 text-white text-center font-bold py-4 rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-600 transition-all">
                                     Proceed to Competition
@@ -115,7 +124,8 @@
                             <div class="flex justify-between items-center mb-8">
                                 <div>
                                     <h2 class="text-lg font-bold text-slate-900">Basic Info</h2>
-                                    <p class="text-sm text-slate-500 mt-1">Keep this light so it is fast to fill during your demo.</p>
+                                    <p class="text-sm text-slate-500 mt-1">Keep this light so it is fast to fill during
+                                        your demo.</p>
                                 </div>
                                 <button type="button" (click)="toggleEdit('basic')"
                                     class="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
@@ -127,28 +137,33 @@
                             <div *ngIf="editingSection !== 'basic'" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <p class="text-xs font-bold text-slate-400 mb-1">Full Name</p>
-                                    <p class="text-slate-900 font-bold">{{ profileForm.get('fullName')?.value || 'Not set' }}</p>
+                                    <p class="text-slate-900 font-bold">{{ profileForm.get('fullName')?.value || 'Not
+                                        set' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs font-bold text-slate-400 mb-1">Phone</p>
-                                    <p class="text-slate-900 font-bold">{{ profileForm.get('phone')?.value || 'Not set' }}</p>
+                                    <p class="text-slate-900 font-bold">{{ profileForm.get('phone')?.value || 'Not set'
+                                        }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs font-bold text-slate-400 mb-1">Email</p>
-                                    <p class="text-slate-900 font-bold truncate">{{ profileForm.get('email')?.value }}</p>
+                                    <p class="text-slate-900 font-bold truncate">{{ profileForm.get('email')?.value }}
+                                    </p>
                                 </div>
                             </div>
 
                             <div *ngIf="editingSection === 'basic'" class="animate-fade-in space-y-6">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">Full Name</label>
+                                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">Full
+                                            Name</label>
                                         <input type="text" [formControl]="$any(profileForm.get('fullName'))"
                                             class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 focus:border-(--dd-blue) outline-none text-sm transition-all shadow-sm"
                                             placeholder="Enter full name">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">Phone Number</label>
+                                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">Phone
+                                            Number</label>
                                         <input type="tel" [formControl]="$any(profileForm.get('phone'))"
                                             class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-(--dd-blue)/10 focus:border-(--dd-blue) outline-none text-sm transition-all shadow-sm"
                                             placeholder="Phone number">
@@ -156,7 +171,8 @@
                                 </div>
                                 <div class="flex justify-end gap-3 mt-4">
                                     <button type="button" (click)="save()"
-                                        class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save changes</button>
+                                        class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save
+                                        changes</button>
                                 </div>
                             </div>
                         </div>
@@ -165,7 +181,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                             <!-- Skills Card -->
-                            <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
+                            <div
+                                class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
                                 <div class="flex justify-between items-center mb-6">
                                     <div>
                                         <h2 class="text-lg font-bold text-slate-900">Skills</h2>
@@ -185,7 +202,8 @@
                                             [hidden]="!skill.trim()">
                                             {{ skill.trim() }}
                                         </span>
-                                        <span *ngIf="!profileForm.get('skills')?.value" class="text-sm text-slate-400 italic">No skills added yet</span>
+                                        <span *ngIf="!profileForm.get('skills')?.value"
+                                            class="text-sm text-slate-400 italic">No skills added yet</span>
                                     </div>
                                 </div>
 
@@ -198,13 +216,15 @@
                                     </div>
                                     <div class="flex justify-end gap-3 mt-4">
                                         <button type="button" (click)="save()"
-                                            class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save changes</button>
+                                            class="bg-(--dd-blue) text-white text-sm font-bold px-8 py-3 rounded-2xl shadow-lg shadow-(--dd-blue)/10 hover:scale-[1.02] transition-all">Save
+                                            changes</button>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Profile Photo Card -->
-                            <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
+                            <div
+                                class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
                                 <div class="flex justify-between items-center mb-6">
                                     <div>
                                         <h2 class="text-lg font-bold text-slate-900">Profile Photo</h2>
@@ -223,13 +243,15 @@
 
                                 <div *ngIf="editingSection === 'image'" class="animate-fade-in space-y-4">
                                     <div>
-                                        <label class="block text-sm font-bold text-slate-500 mb-2">Profile Image URL</label>
+                                        <label class="block text-sm font-bold text-slate-500 mb-2">Profile Image
+                                            URL</label>
                                         <input type="text" [formControl]="$any(profileForm.get('profileImage'))"
                                             class="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-(--dd-blue) outline-none text-sm"
                                             placeholder="https://...">
                                     </div>
                                     <div class="flex justify-end gap-2 pt-2">
-                                        <button type="button" (click)="save()" class="action-button">Save changes</button>
+                                        <button type="button" (click)="save()" class="action-button">Save
+                                            changes</button>
                                     </div>
                                 </div>
                             </div>
@@ -240,7 +262,8 @@
                             <div class="flex justify-between items-center mb-6">
                                 <div>
                                     <h2 class="text-lg font-bold text-slate-900">Links</h2>
-                                    <p class="text-sm text-slate-500 mt-1">Optional links you wanted back in the candidate profile.</p>
+                                    <p class="text-sm text-slate-500 mt-1">Optional links you wanted back in the
+                                        candidate profile.</p>
                                 </div>
                                 <button type="button" (click)="toggleEdit('links')"
                                     class="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
@@ -249,14 +272,19 @@
                                 </button>
                             </div>
 
-                            <div *ngIf="editingSection !== 'links'" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600">
-                                <div class="flex items-center gap-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+                            <div *ngIf="editingSection !== 'links'"
+                                class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600">
+                                <div
+                                    class="flex items-center gap-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
                                     <i class="bi bi-github text-slate-700 text-lg"></i>
-                                    <span class="truncate">{{ profileForm.get('github')?.value || 'GitHub link not added' }}</span>
+                                    <span class="truncate">{{ profileForm.get('github')?.value || 'GitHub link not
+                                        added' }}</span>
                                 </div>
-                                <div class="flex items-center gap-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+                                <div
+                                    class="flex items-center gap-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
                                     <i class="bi bi-file-earmark-pdf-fill text-rose-500 text-lg"></i>
-                                    <span class="truncate">{{ profileForm.get('resumeUrl')?.value || 'Resume link not added' }}</span>
+                                    <span class="truncate">{{ profileForm.get('resumeUrl')?.value || 'Resume link not
+                                        added' }}</span>
                                 </div>
                             </div>
 
