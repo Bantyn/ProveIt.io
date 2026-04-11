@@ -1,28 +1,21 @@
 @echo off
-TITLE ProveIt.io Unified Console
-COLOR 0B
+TITLE ProveIt.io - Project Launcher
 
-echo ==========================================================
-echo           PROVEIT.IO - UNIFIED RUNNER
-echo ==========================================================
+echo [1/2] Launching Backend Server...
+start "ProveIt - Backend" cmd /k "cd proveit_backend_ang && npm run dev"
+
+echo [2/2] Launching Frontend Development Server...
+start "ProveIt - Frontend" cmd /k "cd proveit_frontend_ang && npm start"
+
 echo.
-echo [1/2] Initializing Backend Server...
-echo [2/2] Initializing Frontend Application...
+echo ==================================================
+echo BOTH TERMINALS ARE NOW OPEN IN SEPARATE WINDOWS
 echo.
-echo [Note] Both processes will share this single terminal window.
-echo [Note] To stop both, press CTRL+C once or close this window.
-echo.
-echo ==========================================================
-echo.
-
-SET BASE_DIR=%~dp0
-
-cd /d "%BASE_DIR%proveit_backend_ang"
-start /B cmd /c "npm run dev"
-
-timeout /t 3 /nobreak > nul
-
-cd /d "%BASE_DIR%proveit_frontend_ang"
-npm start
-
+echo --------------------------------------------------
+echo [BACKEND]  : Running on Port 3000
+echo [FRONTEND] : Running on http://localhost:4200/
+echo [NETWORK]  : Access via your Local IP (e.g., http://192.168.x.x:4200)
+echo --------------------------------------------------
+echo Tip: Use 'ipconfig' in a new CMD to find your Local IP.
+echo ==================================================
 pause
