@@ -1,86 +1,113 @@
-<!-- Admin Dashboard View -->
-<div *ngIf="isAdminView" class="p-4 sm:p-8">
-  <div class="max-w-4xl mx-auto space-y-8">
-    <header class="flex flex-col gap-2">
-      <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Maintenance Mode</h1>
-      <p class="text-neutral-500 font-medium italic">Control platform-wide availability and system redirects</p>
-    </header>
+<!-- Admin Dashboard View: Clean Settings Style -->
+<div *ngIf="isAdminView" class="animate-in fade-in slide-in-from-bottom-4 duration-700">
+  <!-- Header section matching Settings Page -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+    <div>
+      <h1 class="text-3xl font-extrabold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-neutral-300 dark:to-white bg-clip-text text-transparent">
+        Maintenance Settings
+      </h1>
+      <p class="text-[13px] text-black dark:text-neutral-400 mt-1 font-medium">Control platform availability and system-wide redirects</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a routerLink="/maintenance" target="_blank"
+         class="px-6 py-2.5 rounded-full font-bold text-[13px] bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-slate-300 no-underline hover:bg-slate-200 dark:hover:bg-neutral-700 transition-all flex items-center gap-2">
+        <i class="bi bi-eye"></i> Preview Public Page
+      </a>
+    </div>
+  </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Status Card -->
-      <div class="md:col-span-2 p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-6">
-        <div class="flex items-center justify-between">
-          <div class="space-y-1">
-            <h3 class="text-xl font-bold">Platform Accessibility</h3>
-            <p class="text-sm text-neutral-400">When enabled, all non-admin traffic is sent to the maintenance page.</p>
-          </div>
-          <div [class.bg-red-500]="settings?.maintenanceMode" [class.bg-green-500]="!settings?.maintenanceMode" 
-               class="px-4 py-1.5 rounded-full text-[10px] font-bold text-white uppercase tracking-widest animate-pulse">
-            {{ settings?.maintenanceMode ? 'Maintenance ON' : 'System LIVE' }}
-          </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Maintenance Toggle Card (Same style as Settings features) -->
+    <div class="bg-white dark:bg-neutral-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-neutral-800 relative overflow-hidden group">
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-(--dd-blue-light)/20 rounded-full blur-3xl opacity-60"></div>
+      
+      <div class="flex items-center gap-3 mb-6 relative z-10">
+        <div class="w-10 h-10 rounded-xl bg-(--dd-blue-light)/10 text-(--dd-blue) flex items-center justify-center text-lg shadow-sm">
+          <i class="bi bi-cpu"></i>
         </div>
-
-        <div class="p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 flex items-center justify-between border border-neutral-200/50 dark:border-neutral-700/50">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-white dark:bg-neutral-800 flex items-center justify-center shadow-sm">
-              <i class="bi bi-gear-wide-connected text-2xl text-(--dd-blue)"></i>
-            </div>
-            <div>
-              <p class="text-[13px] font-bold text-slate-800 dark:text-white">Toggle Maintenance Mode</p>
-              <p class="text-[11px] text-neutral-400">Current Status: {{ settings?.maintenanceMode ? 'Restricted Access' : 'Full Access' }}</p>
-            </div>
-          </div>
-          
-          <button (click)="toggleMaintenance(!settings?.maintenanceMode)" 
-                  [disabled]="isSaving"
-                  class="group relative overflow-hidden px-8 py-3 rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-50"
-                  [class.bg-red-500]="!settings?.maintenanceMode"
-                  [class.text-white]="!settings?.maintenanceMode"
-                  [class.bg-green-500]="settings?.maintenanceMode"
-                  [class.text-white]="settings?.maintenanceMode">
-            <span class="flex items-center gap-2">
-              <i class="bi" [class.bi-power]="!settings?.maintenanceMode" [class.bi-check-circle-fill]="settings?.maintenanceMode"></i>
-              {{ isSaving ? 'Processing...' : (settings?.maintenanceMode ? 'Disable & Go Live' : 'Enable Maintenance') }}
-            </span>
-          </button>
-        </div>
+        <h2 class="text-[16px] font-bold text-slate-900 dark:text-white">System Availability</h2>
       </div>
 
-      <!-- Info Card -->
-      <div class="p-8 rounded-3xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-6">
-        <h3 class="text-lg font-bold">System Meta</h3>
-        <div *ngIf="settings" class="space-y-4">
-          <div class="flex flex-col gap-1">
-            <span class="text-[10px] font-bold uppercase text-neutral-400">Platform Version</span>
-            <span class="text-sm font-semibold">{{ settings.platformVersion }}</span>
+      <div class="flex flex-col gap-4 relative z-10">
+        <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 dark:bg-neutral-800/30 border border-slate-100 dark:border-neutral-800 group/item hover:bg-white dark:hover:bg-neutral-800 hover:shadow-md hover:border-(--dd-blue-light)/30 transition-all duration-300">
+          <div class="flex-1">
+            <p class="text-[13px] font-bold text-slate-900 dark:text-white mb-0.5 group-hover/item:text-(--dd-blue) transition-colors">
+              Maintenance Mode
+            </p>
+            <p class="text-[13px] text-slate-500 dark:text-neutral-400 max-w-[280px]">
+              When enabled, only administrators can access the platform. Everyone else is redirected.
+            </p>
           </div>
-          <div class="flex flex-col gap-1">
-            <span class="text-[10px] font-bold uppercase text-neutral-400">Last Database Sync</span>
-            <span class="text-sm font-semibold">{{ settings.lastSync || 'Just now' }}</span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="text-[10px] font-bold uppercase text-neutral-400">Admin Bypass</span>
-            <span class="text-[11px] text-green-500 font-bold px-2 py-0.5 bg-green-500/10 rounded-lg w-fit">ACTIVE</span>
+          
+          <!-- Toggle Switch with direct Tailwind classes to avoid @apply error -->
+          <div (click)="toggleMaintenance(!settings?.maintenanceMode)"
+               [class.bg-(--dd-blue)]="settings?.maintenanceMode"
+               [class.bg-slate-200]="!settings?.maintenanceMode"
+               [class.dark:bg-neutral-800]="!settings?.maintenanceMode"
+               class="relative w-12 h-6 rounded-full cursor-pointer transition-all duration-300 transform scale-90 group-hover:scale-100">
+            <div [class.left-7]="settings?.maintenanceMode"
+                 [class.left-1]="!settings?.maintenanceMode"
+                 class="absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-sm">
+            </div>
           </div>
         </div>
+
+        <div class="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100/50 dark:border-amber-900/30">
+          <p class="text-[12px] font-semibold text-amber-600 dark:text-amber-500 flex items-center gap-2">
+            <i class="bi bi-exclamation-triangle"></i>
+            Current Status: {{ settings?.maintenanceMode ? 'Maintenance is currently ACTIVE. Public access is disabled.' : 'System is LIVE. Regular users can access the platform.' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Platform Details Card -->
+    <div class="bg-white dark:bg-neutral-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-neutral-800 relative overflow-hidden group">
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-100/20 rounded-full blur-3xl opacity-60"></div>
+
+      <div class="flex items-center gap-3 mb-6 relative z-10">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg">
+          <i class="bi bi-info-circle"></i>
+        </div>
+        <h2 class="text-[16px] font-bold text-slate-900 dark:text-white">Platform Information</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10" *ngIf="settings">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-bold text-slate-500 dark:text-neutral-400 ml-1">Platform Version</label>
+          <div class="p-3 bg-slate-50 dark:bg-neutral-950 border border-slate-100 dark:border-neutral-800 rounded-2xl text-[13px] font-bold text-slate-900 dark:text-white">
+            <i class="bi bi-cpu mr-2 text-neutral-400"></i>
+            {{ settings.platformVersion }}
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-bold text-slate-500 dark:text-neutral-400 ml-1">Support Endpoint</label>
+          <div class="p-3 bg-slate-50 dark:bg-neutral-950 border border-slate-100 dark:border-neutral-800 rounded-2xl text-[13px] font-bold text-slate-900 dark:text-white">
+            <i class="bi bi-envelope mr-2 text-neutral-400"></i>
+            {{ settings.supportEmail }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-8 pt-6 border-t border-slate-100 dark:border-neutral-800">
+        <p class="text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-3">Public Route</p>
+        <code class="block p-3 bg-slate-100 dark:bg-neutral-950 text-(--dd-blue) rounded-xl text-[12px] font-mono break-all">
+          {{ '/maintenance' }}
+        </code>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Public Maintenance View -->
+<!-- Public Maintenance View: Immersive UI -->
 <app-stars-background *ngIf="!isAdminView">
   <div class="fixed inset-0 flex flex-col items-center justify-center p-6 text-center overflow-hidden">
-    
+    <!-- Original Stars & Gear Content -->
     <div class="relative z-20 max-w-2xl mx-auto flex flex-col items-center gap-8">
-      <!-- Icon Container -->
-      <div class="relative group">
-        <div class="relative w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
-          <i class="bi bi-gear-wide-connected text-4xl sm:text-6xl text-(--dd-blue) dark:text-(--dd-blue-light) animate-spin-slow"></i>
-        </div>
+      <div class="relative w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
+        <i class="bi bi-gear-wide-connected text-4xl sm:text-6xl text-(--dd-blue) dark:text-(--dd-blue-light) animate-spin-slow"></i>
       </div>
 
-      <!-- Text Content -->
       <div class="space-y-4 font-sans">
         <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-slate-900 dark:text-white">
           Under <span class="bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue) bg-clip-text text-transparent">Maintenance</span>
@@ -90,19 +117,8 @@
         </p>
       </div>
 
-      <!-- Loading Bar -->
       <div class="w-full max-w-xs h-1.5 bg-slate-200 dark:bg-neutral-800 rounded-full overflow-hidden">
         <div class="h-full bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue) rounded-full animate-progress"></div>
-      </div>
-
-      <!-- Links -->
-      <div *ngIf="settings" class="flex flex-wrap items-center justify-center gap-4 text-sm font-semibold">
-        <div class="px-4 py-2 rounded-2xl bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm border border-slate-200/50 dark:border-neutral-800/50 text-slate-600 dark:text-neutral-300">
-          Version: {{ settings.platformVersion }}
-        </div>
-        <div class="px-4 py-2 rounded-2xl bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm border border-slate-200/50 dark:border-neutral-800/50 text-slate-600 dark:text-neutral-300">
-          Support: {{ settings.supportEmail }}
-        </div>
       </div>
     </div>
   </div>
