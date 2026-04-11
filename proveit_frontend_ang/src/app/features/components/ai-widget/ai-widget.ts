@@ -16,6 +16,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../services/auth.service';
 import { ApiService } from '../../../services/api.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { environment } from '../../../environments/eniroment';
 import { marked } from 'marked';
 
 interface ChatMessage {
@@ -137,8 +138,7 @@ export class AiWidget {
         } catch (e) {}
       }
 
-      // Hardcode the environment apiUrl since we cannot easily inject environment here without adding a constructor arg, or we can use environment directly
-      const apiUrl = 'http://localhost:3000/api'; // Or from environment
+      const apiUrl = environment.apiUrl;
 
       const response = await fetch(`${apiUrl}/ai/chat`, {
         method: 'POST',

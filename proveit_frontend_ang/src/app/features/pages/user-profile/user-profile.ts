@@ -42,20 +42,28 @@ export class UserProfile implements OnInit {
 
   checklist: any[] = [
     { label: 'Setup account', bonus: 10, key: 'id', complete: true },
-    { label: 'Upload your photo', bonus: 5, key: 'profileImage', complete: false },
-    { label: 'Name', bonus: 35, key: 'fullName', complete: false },
-    { label: 'Phone', bonus: 25, key: 'phone', complete: false },
-    { label: 'Skills', bonus: 25, key: 'skills', complete: false },
+    { label: 'Add Profile Photo', bonus: 10, key: 'profileImage', complete: false },
+    { label: 'Enter Full Name', bonus: 20, key: 'fullName', complete: false },
+    { label: 'Phone Number', bonus: 20, key: 'phone', complete: false },
+    { label: 'Add Skills', bonus: 20, key: 'skills', complete: false },
+    { label: 'GitHub Profile', bonus: 10, key: 'github', complete: false },
+    { label: 'Resume/CV Link', bonus: 10, key: 'resumeUrl', complete: false },
   ];
 
   profileForm: FormGroup = this.fb.group({
-    fullName: ['', Validators.required],
+    fullName: ['', [Validators.required, Validators.minLength(3)]],
     email: [{ value: '', disabled: true }],
-    phone: ['', Validators.required],
+    phone: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern('^[0-9]{10}$'), // 10 digit validation
+      ],
+    ],
     skills: ['', Validators.required],
     profileImage: [''],
-    github: [''],
-    resumeUrl: [''],
+    github: ['', Validators.pattern('https?://.*')], // Basic URL validation
+    resumeUrl: ['', Validators.pattern('https?://.*')],
   });
 
   ngOnInit() {
@@ -115,13 +123,27 @@ export class UserProfile implements OnInit {
     });
   }
 
+  setRandomProfileImage() {
+    const randomId = Math.floor(Math.random() * 100) + 1;
+    const url = `https://picsum.photos/id/${randomId}/1080/1080`;
+    this.profileForm.get('profileImage')?.setValue(url);
+    this.calculateProgress();
+  }
+
   calculateProgress() {
     let completedValue = 0;
     const formVal = this.profileForm.getRawValue();
 
     this.checklist.forEach((item) => {
-      const val = formVal[item.key] || this.user?.[item.key];
-      item.complete = !!val;
+      // Special case for 'id' which is always true
+      if (item.key === 'id') {
+        item.complete = true;
+      } else {
+        const control = this.profileForm.get(item.key);
+        // Valid if the control is valid AND has a value
+        item.complete = !!(control?.valid && (formVal[item.key] || this.user?.[item.key]));
+      }
+
       if (item.complete) {
         completedValue += item.bonus;
       }

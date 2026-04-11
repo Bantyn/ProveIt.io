@@ -9,5 +9,5 @@ export const environment = {
     appId: '1:740363327652:web:83465e9fbdef78f96a2e31',
     measurementId: 'G-2TNLLZJ56N',
   },
-  apiUrl: 'http://localhost:3000/api', // Replace with production URL when available
+  apiUrl: 'http://172.20.10.3:3000/api', // Replace with production URL when available
 };

@@ -88,14 +88,20 @@
                                 <label class="text-sm font-bold text-slate-600">Full Name</label>
                                 <input type="text" formControlName="fullName"
                                     class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:border-(--dd-blue) transition-all bg-slate-50/20"
+                                    [class.border-red-400]="profileForm.get('fullName')?.invalid && profileForm.get('fullName')?.touched"
                                     placeholder="John Doe">
+                                <p *ngIf="profileForm.get('fullName')?.errors?.['required'] && profileForm.get('fullName')?.touched" class="text-[10px] text-red-500 font-bold uppercase pl-2">Name is required</p>
+                                <p *ngIf="profileForm.get('fullName')?.errors?.['minlength'] && profileForm.get('fullName')?.touched" class="text-[10px] text-red-500 font-bold uppercase pl-2">Minimum 3 characters required</p>
                             </div>
 
                             <div class="space-y-2">
                                 <label class="text-sm font-bold text-slate-600">Phone</label>
                                 <input type="tel" formControlName="phone"
                                     class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:border-(--dd-blue) transition-all bg-slate-50/20"
-                                    placeholder="+91 ...">
+                                    [class.border-red-400]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched"
+                                    placeholder="10-digit number">
+                                <p *ngIf="profileForm.get('phone')?.errors?.['required'] && profileForm.get('phone')?.touched" class="text-[10px] text-red-500 font-bold uppercase pl-2">Phone is required</p>
+                                <p *ngIf="profileForm.get('phone')?.errors?.['pattern'] && profileForm.get('phone')?.touched" class="text-[10px] text-red-500 font-bold uppercase pl-2">Please enter exactly 10 digits</p>
                             </div>
 
                             <div class="md:col-span-2 space-y-2">
@@ -116,14 +122,22 @@
                                     <label class="text-sm font-bold text-slate-600">Core Skills</label>
                                     <textarea formControlName="skills"
                                         class="w-full px-5 py-5 rounded-2xl border border-slate-200 outline-none focus:border-(--dd-blue) transition-all min-h-[140px] bg-white text-sm"
+                                        [class.border-red-400]="profileForm.get('skills')?.invalid && profileForm.get('skills')?.touched"
                                         placeholder="e.g. Angular, React, UI/UX"></textarea>
+                                    <p *ngIf="profileForm.get('skills')?.invalid && profileForm.get('skills')?.touched" class="text-[10px] text-red-500 font-bold uppercase pl-2">At least one skill is required</p>
                                 </div>
                             </div>
 
                             <div class="space-y-6">
                                 <h2 class="text-lg font-bold text-slate-900 border-l-4 border-violet-400 pl-4">Appearance</h2>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-bold text-slate-600">Profile Image URL</label>
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-sm font-bold text-slate-600">Profile Image URL</label>
+                                        <button type="button" (click)="setRandomProfileImage()" 
+                                            class="text-[10px] font-bold text-(--dd-blue) hover:text-(--dd-blue-dark) flex items-center gap-1 uppercase tracking-wider bg-white border border-(--dd-blue-light)/30 px-2 py-1 rounded-lg transition-all active:scale-95">
+                                            <i class="bi bi-shuffle"></i> Random Suggestion
+                                        </button>
+                                    </div>
                                     <input type="url" formControlName="profileImage"
                                         class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:border-(--dd-blue) transition-all bg-white text-sm"
                                         placeholder="https://...">
@@ -149,13 +163,17 @@
                                 <label class="text-sm font-bold text-slate-600">GitHub Profile</label>
                                 <input type="url" formControlName="github"
                                     class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:border-(--dd-blue) transition-all bg-slate-50/20"
+                                    [class.border-red-400]="profileForm.get('github')?.invalid && profileForm.get('github')?.touched"
                                     placeholder="https://github.com/...">
+                                <p *ngIf="profileForm.get('github')?.invalid && profileForm.get('github')?.touched" class="text-[10px] text-red-500 font-bold uppercase pl-2">Must be a valid URL (http/https)</p>
                             </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-bold text-slate-600">Resume Link</label>
                                 <input type="url" formControlName="resumeUrl"
                                     class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:border-(--dd-blue) transition-all bg-slate-50/20"
+                                    [class.border-red-400]="profileForm.get('resumeUrl')?.invalid && profileForm.get('resumeUrl')?.touched"
                                     placeholder="https://drive.google.com/...">
+                                <p *ngIf="profileForm.get('resumeUrl')?.invalid && profileForm.get('resumeUrl')?.touched" class="text-[10px] text-red-500 font-bold uppercase pl-2">Must be a valid URL (http/https)</p>
                             </div>
                         </div>
                     </div>

@@ -88,6 +88,11 @@ app.get('/api/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running on port ${PORT} (Network Accessible)`);
+const HOST = '0.0.0.0';
+app.listen(PORT, HOST, () => {
+    console.log(`\n==================================================`);
+    console.log(`🚀 Backend Server is Network Ready!`);
+    console.log(`🏠 Local:   http://localhost:${PORT}`);
+    console.log(`🌐 Network: http://172.20.10.3:${PORT}`);
+    console.log(`==================================================\n`);
 });
