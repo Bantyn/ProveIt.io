@@ -1,9 +1,79 @@
-<app-stars-background>
+<!-- Admin Dashboard View -->
+<div *ngIf="isAdminView" class="p-4 sm:p-8">
+  <div class="max-w-4xl mx-auto space-y-8">
+    <header class="flex flex-col gap-2">
+      <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Maintenance Mode</h1>
+      <p class="text-neutral-500 font-medium italic">Control platform-wide availability and system redirects</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Status Card -->
+      <div class="md:col-span-2 p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-6">
+        <div class="flex items-center justify-between">
+          <div class="space-y-1">
+            <h3 class="text-xl font-bold">Platform Accessibility</h3>
+            <p class="text-sm text-neutral-400">When enabled, all non-admin traffic is sent to the maintenance page.</p>
+          </div>
+          <div [class.bg-red-500]="settings?.maintenanceMode" [class.bg-green-500]="!settings?.maintenanceMode" 
+               class="px-4 py-1.5 rounded-full text-[10px] font-bold text-white uppercase tracking-widest animate-pulse">
+            {{ settings?.maintenanceMode ? 'Maintenance ON' : 'System LIVE' }}
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 flex items-center justify-between border border-neutral-200/50 dark:border-neutral-700/50">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-white dark:bg-neutral-800 flex items-center justify-center shadow-sm">
+              <i class="bi bi-gear-wide-connected text-2xl text-(--dd-blue)"></i>
+            </div>
+            <div>
+              <p class="text-[13px] font-bold text-slate-800 dark:text-white">Toggle Maintenance Mode</p>
+              <p class="text-[11px] text-neutral-400">Current Status: {{ settings?.maintenanceMode ? 'Restricted Access' : 'Full Access' }}</p>
+            </div>
+          </div>
+          
+          <button (click)="toggleMaintenance(!settings?.maintenanceMode)" 
+                  [disabled]="isSaving"
+                  class="group relative overflow-hidden px-8 py-3 rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-50"
+                  [class.bg-red-500]="!settings?.maintenanceMode"
+                  [class.text-white]="!settings?.maintenanceMode"
+                  [class.bg-green-500]="settings?.maintenanceMode"
+                  [class.text-white]="settings?.maintenanceMode">
+            <span class="flex items-center gap-2">
+              <i class="bi" [class.bi-power]="!settings?.maintenanceMode" [class.bi-check-circle-fill]="settings?.maintenanceMode"></i>
+              {{ isSaving ? 'Processing...' : (settings?.maintenanceMode ? 'Disable & Go Live' : 'Enable Maintenance') }}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Info Card -->
+      <div class="p-8 rounded-3xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-6">
+        <h3 class="text-lg font-bold">System Meta</h3>
+        <div *ngIf="settings" class="space-y-4">
+          <div class="flex flex-col gap-1">
+            <span class="text-[10px] font-bold uppercase text-neutral-400">Platform Version</span>
+            <span class="text-sm font-semibold">{{ settings.platformVersion }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-[10px] font-bold uppercase text-neutral-400">Last Database Sync</span>
+            <span class="text-sm font-semibold">{{ settings.lastSync || 'Just now' }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-[10px] font-bold uppercase text-neutral-400">Admin Bypass</span>
+            <span class="text-[11px] text-green-500 font-bold px-2 py-0.5 bg-green-500/10 rounded-lg w-fit">ACTIVE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Public Maintenance View -->
+<app-stars-background *ngIf="!isAdminView">
   <div class="fixed inset-0 flex flex-col items-center justify-center p-6 text-center overflow-hidden">
     
     <div class="relative z-20 max-w-2xl mx-auto flex flex-col items-center gap-8">
-      
-      <!-- Icon Container (Transparent) -->
+      <!-- Icon Container -->
       <div class="relative group">
         <div class="relative w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
           <i class="bi bi-gear-wide-connected text-4xl sm:text-6xl text-(--dd-blue) dark:text-(--dd-blue-light) animate-spin-slow"></i>
@@ -20,12 +90,12 @@
         </p>
       </div>
 
-      <!-- Progressive Loading Bar (Shadow Removed) -->
+      <!-- Loading Bar -->
       <div class="w-full max-w-xs h-1.5 bg-slate-200 dark:bg-neutral-800 rounded-full overflow-hidden">
         <div class="h-full bg-linear-to-r from-(--dd-blue-dark) to-(--dd-blue) rounded-full animate-progress"></div>
       </div>
 
-      <!-- Stats / Details (Optional Admin Info) -->
+      <!-- Links -->
       <div *ngIf="settings" class="flex flex-wrap items-center justify-center gap-4 text-sm font-semibold">
         <div class="px-4 py-2 rounded-2xl bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm border border-slate-200/50 dark:border-neutral-800/50 text-slate-600 dark:text-neutral-300">
           Version: {{ settings.platformVersion }}
@@ -34,17 +104,7 @@
           Support: {{ settings.supportEmail }}
         </div>
       </div>
-
-      <!-- Action Button (If Admin - Shadow Removed) -->
-      <div *ngIf="isAdminView" class="pt-8">
-        <button (click)="toggleMaintenance(false)" 
-                class="px-8 py-4 rounded-3xl bg-(--dd-blue-dark) hover:bg-(--dd-blue) text-white font-bold hover:scale-105 transition-all active:scale-95">
-          Return to Dashboard
-        </button>
-      </div>
     </div>
-
-    <!-- Background Decoration Removed -->
   </div>
 </app-stars-background>
 
